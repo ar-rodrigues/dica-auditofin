@@ -1,5 +1,5 @@
 import { atom } from "jotai";
-import Logo from "@/public/images/logo400x400.svg";
+import Logo from "@/public/logo.png";
 
 export const navbarMenus = atom([
   {
@@ -8,13 +8,13 @@ export const navbarMenus = atom([
     icon: "",
   },
   {
-    name: "About",
+    name: "Sobre Nosotros",
     link: "/about",
     icon: "",
   },
   {
-    name: "Examples",
-    link: "/examples",
+    name: "Contacto",
+    link: "/contact",
     icon: "",
   },
 ]);

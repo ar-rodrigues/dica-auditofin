@@ -11,11 +11,11 @@ const containerStyle = {
 };
 const menuStyle = {
   marginBottom: "10px",
-  gap: "10px",
+  gap: "25px",
   padding: "5px",
   justifyContent: "end",
   alignItems: "center",
-  width: "100%",
+  width: "auto",
   height: "100%",
 };
 const logoStyle = {
@@ -51,7 +51,7 @@ export default function Navbar() {
             <a
               key={index}
               href={link}
-              className="text-white hover:text-gray-300 w-24"
+              className="text-white hover:text-gray-300 w-20 text-nowrap"
             >
               {name}
             </a>
