@@ -55,9 +55,7 @@ export default function AuthLayout({ children }) {
       >
         <AntdRegistry>
           <Layout style={{ minHeight: "100vh" }}>
-            <Header style={headerStyle}>
-              <Navbar />
-            </Header>
+            <Navbar />
             <Content>{children}</Content>
             <Footer style={footerStyle}>Dica ©2025 Created by Dica</Footer>
           </Layout>

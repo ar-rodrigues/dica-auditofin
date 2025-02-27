@@ -1,63 +1,44 @@
 "use client";
-
-import React from "react";
-import { Flex, Col, Row } from "antd";
+import "@ant-design/v5-patch-for-react-19";
+import React, { useState } from "react";
+import { Flex } from "antd";
 import Image from "next/image";
 import { useAtomValue } from "jotai";
-import { navbarMenus, logoImage } from "@/utils/atoms";
-
-const containerStyle = {
-  padding: "5px",
-};
-const menuStyle = {
-  marginBottom: "10px",
-  gap: "25px",
-  padding: "5px",
-  justifyContent: "end",
-  alignItems: "center",
-  width: "auto",
-  height: "100%",
-};
-const logoStyle = {
-  marginBottom: "10px",
-  padding: "5px",
-  justifyContent: "center",
-  alignItems: "center",
-  width: "100%",
-  height: "100%",
-};
+import { navbarMenus, logoWhiteImage } from "@/utils/atoms";
 
 export default function Navbar() {
   const menus = useAtomValue(navbarMenus);
-  const logo = useAtomValue(logoImage);
+  const logo = useAtomValue(logoWhiteImage);
+  const [activeMenu, setActiveMenu] = useState(null);
 
-  if (!menus) {
-    throw new Error("Navbar: menus is required");
-  } else if (menus.length < 1) {
-    throw new Error("Navbar: menus must have at least one item");
-  } else if (!logo) {
-    throw new Error("Navbar: logo is required");
+  if (!menus || menus.length < 1 || !logo) {
+    throw new Error("Navbar: required props missing");
   }
+
   return (
-    <Row gutter={[4, 4]} span={24} style={containerStyle}>
-      <Col xs={24} sm={6} md={6} span={6}>
-        <Flex style={logoStyle}>
-          <Image width={50} height={50} src={logo} alt="Logo" />
-        </Flex>
-      </Col>
-      <Col xs={0} sm={12} md={16} span={18}>
-        <Flex style={menuStyle}>
-          {menus.map(({ name, link, icon }, index) => (
-            <a
-              key={index}
-              href={link}
-              className="text-white hover:text-gray-300 w-20 text-nowrap"
-            >
-              {name}
-            </a>
-          ))}
-        </Flex>
-      </Col>
-    </Row>
+    <Flex className="bg-primary w-full h-20 items-center justify-around pr-20 mr-10">
+      <Flex className="hover:scale-105 transition-transform duration-300">
+        <Image width={80} height={80} src={logo} alt="Logo" priority />
+      </Flex>
+
+      <Flex className="items-center gap-8 pr-10">
+        {menus.map(({ name, link }, index) => (
+          <a
+            key={index}
+            href={link}
+            className="relative text-white text-lg px-2 py-1 transition-all duration-300 hover:text-secondary"
+            onMouseEnter={() => setActiveMenu(index)}
+            onMouseLeave={() => setActiveMenu(null)}
+          >
+            {name}
+            <span
+              className={`absolute left-0 bottom-0 w-full h-0.5 bg-secondary transform origin-left transition-transform duration-300 ${
+                activeMenu === index ? "scale-x-100" : "scale-x-0"
+              }`}
+            />
+          </a>
+        ))}
+      </Flex>
+    </Flex>
   );
 }

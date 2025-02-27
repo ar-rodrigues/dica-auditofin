@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Spin, Layout } from "antd";
+import Script from "next/script";
 
 const { Content } = Layout;
 
@@ -35,12 +36,27 @@ export default function DashboardContent() {
             <iframe
               title="DICA_dashboard_xalapa_demo"
               className="absolute top-0 left-0 w-full h-full rounded-lg"
-              src="https://app.powerbi.com/view?r=eyJrIjoiNDM1YzNlOGUtZGExNS00NDkzLWJiNmYtNGVjZWM5ZTcyYjBkIiwidCI6Ijk2NDYyYWMzLTYwMzktNGE1YS1iYWI5LTBjMmY5YjNkYzFiYSJ9"
+              src="https://app.powerbi.com/reportEmbed?reportId=c6cb917a-675b-4011-9587-d5fe73dc3e08&appId=e81bff81-4f58-4c34-b226-fe48e0377411&autoAuth=true&ctid=96462ac3-6039-4a5a-bab9-0c2f9b3dc1ba"
               allowFullScreen={true}
             ></iframe>
           </div>
         </div>
       </Content>
+      {/* <Script
+        src="https://cdn.voiceflow.com/widget-next/bundle.mjs"
+        type="text/javascript"
+        strategy="afterInteractive"
+        onLoad={() => {
+          window.voiceflow.chat.load({
+            verify: { projectID: "67b8c131e50f77be72ba5f9f" },
+            url: "https://general-runtime.voiceflow.com",
+            versionID: "production",
+            voice: {
+              url: "https://runtime-api.voiceflow.com",
+            },
+          });
+        }}
+      /> */}
     </Layout>
   );
 }
