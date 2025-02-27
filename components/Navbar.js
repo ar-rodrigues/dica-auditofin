@@ -4,11 +4,12 @@ import React, { useState } from "react";
 import { Flex } from "antd";
 import Image from "next/image";
 import { useAtomValue } from "jotai";
-import { navbarMenus, logoWhiteImage } from "@/utils/atoms";
+import { navbarMenus, logoAtoms } from "@/utils/atoms";
+import Link from "next/link";
 
 export default function Navbar() {
   const menus = useAtomValue(navbarMenus);
-  const logo = useAtomValue(logoWhiteImage);
+  const logo = useAtomValue(logoAtoms.white);
   const [activeMenu, setActiveMenu] = useState(null);
 
   if (!menus || menus.length < 1 || !logo) {
@@ -18,7 +19,9 @@ export default function Navbar() {
   return (
     <Flex className="bg-primary w-full h-20 items-center justify-around pr-20 mr-10">
       <Flex className="hover:scale-105 transition-transform duration-300">
-        <Image width={80} height={80} src={logo} alt="Logo" priority />
+        <Link href="/">
+          <Image width={80} height={80} src={logo} alt="Logo" priority />
+        </Link>
       </Flex>
 
       <Flex className="items-center gap-8 pr-10">

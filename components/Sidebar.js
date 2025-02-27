@@ -1,69 +1,75 @@
 "use client";
-import React, { useState } from "react";
-import {
-  DesktopOutlined,
-  FileOutlined,
-  PieChartOutlined,
-  TeamOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
+import React, { useState, useEffect } from "react";
 import { Flex, Layout, Menu } from "antd";
 import Image from "next/image";
-import { logoImage } from "@/utils/atoms";
-import { useAtomValue } from "jotai";
+import {
+  logoAtoms,
+  sidebarCollapsedAtom,
+  loadingAtom,
+  sidebarItems,
+  sidebarLogoStyle,
+  MOBILE_BREAKPOINT,
+} from "@/utils/atoms";
+import { useAtom, useAtomValue } from "jotai";
+import { useRouter } from "next/navigation";
 
 const { Sider } = Layout;
 
-function getItem(label, key, icon, children) {
-  return {
-    key,
-    icon,
-    children,
-    label,
-  };
-}
-
-const items = [
-  getItem("Dashboard", "1", <PieChartOutlined />),
-  // getItem("Option 2", "2", <DesktopOutlined />),
-  // getItem("User", "sub1", <UserOutlined />, [
-  //   getItem("Tom", "3"),
-  //   getItem("Bill", "4"),
-  //   getItem("Alex", "5"),
-  // ]),
-  // getItem("Team", "sub2", <TeamOutlined />, [
-  //   getItem("Team 1", "6"),
-  //   getItem("Team 2", "8"),
-  // ]),
-  // getItem("Files", "9", <FileOutlined />),
-];
-
-export const demoLogoVertical = {
-  height: "32px",
-  margin: "16px",
-  padding: 5,
-  justifyContent: "center",
-  background: "rgba(255, 255, 255)",
-  borderRadius: "6px",
-};
-
 export default function Sidebar() {
-  const [collapsed, setCollapsed] = useState(false);
-  const logo = useAtomValue(logoImage);
+  const [collapsed, setCollapsed] = useAtom(sidebarCollapsedAtom);
+  const logo = useAtomValue(logoAtoms.default);
+  const [current, setCurrent] = useState("1");
+  const [loading, setLoading] = useAtom(loadingAtom);
+  const router = useRouter();
+
+  const handleClick = async ({ key }) => {
+    setLoading(true);
+    const selectedItem = sidebarItems.find((item) => item.key === key);
+    if (selectedItem?.url) {
+      setCurrent(key);
+      router.push(selectedItem.url);
+    }
+    setTimeout(() => setLoading(false), 500);
+  };
+
+  useEffect(() => {
+    const handleResize = () => {
+      setCollapsed(window.innerWidth <= MOBILE_BREAKPOINT);
+    };
+
+    // Initial check
+    handleResize();
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [setCollapsed]);
+
   return (
     <Sider
       collapsible
       collapsed={collapsed}
-      onCollapse={(value) => setCollapsed(value)}
+      onCollapse={setCollapsed}
+      breakpoint="md"
+      className=" h-full z-[999]"
+      style={{
+        overflow: "auto",
+        height: "100vh",
+        position: "fixed",
+        left: 0,
+        top: 0,
+        bottom: 0,
+      }}
     >
-      <Flex style={demoLogoVertical}>
+      <Flex style={sidebarLogoStyle}>
         <Image width={50} height={50} src={logo} alt="Logo" />
       </Flex>
       <Menu
         theme="dark"
         defaultSelectedKeys={["1"]}
+        selectedKeys={[current]}
         mode="inline"
-        items={items}
+        items={sidebarItems}
+        onClick={handleClick}
       />
     </Sider>
   );

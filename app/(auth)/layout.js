@@ -33,20 +33,6 @@ export const metadata = {
   },
 };
 
-export const headerStyle = {
-  textAlign: "center",
-  color: "#fff",
-  width: "100%",
-  height: "auto",
-  paddingInline: 10,
-  backgroundColor: "#4096ff",
-};
-export const footerStyle = {
-  textAlign: "center",
-  color: "#fff",
-  backgroundColor: "#4096ff",
-};
-
 export default function AuthLayout({ children }) {
   return (
     <html lang="es-MX">
@@ -57,7 +43,9 @@ export default function AuthLayout({ children }) {
           <Layout style={{ minHeight: "100vh" }}>
             <Navbar />
             <Content>{children}</Content>
-            <Footer style={footerStyle}>Dica ©2025 Created by Dica</Footer>
+            <Footer className="!bg-primary !text-white text-center">
+              Dica ©2025 Created by Dica
+            </Footer>
           </Layout>
         </AntdRegistry>
       </body>
