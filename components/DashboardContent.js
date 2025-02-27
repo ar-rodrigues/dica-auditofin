@@ -8,6 +8,8 @@ const { Content } = Layout;
 
 export default function DashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
+  const urlDashboard =
+    "https://app.powerbi.com/reportEmbed?reportId=c6cb917a-675b-4011-9587-d5fe73dc3e08&autoAuth=true&embeddedDemo=true";
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
@@ -36,7 +38,7 @@ export default function DashboardContent() {
             <iframe
               title="DICA_dashboard_xalapa_demo"
               className="absolute top-0 left-0 w-full h-full rounded-lg"
-              src="https://app.powerbi.com/reportEmbed?reportId=c6cb917a-675b-4011-9587-d5fe73dc3e08&appId=e81bff81-4f58-4c34-b226-fe48e0377411&autoAuth=true&ctid=96462ac3-6039-4a5a-bab9-0c2f9b3dc1ba"
+              src={urlDashboard}
               allowFullScreen={true}
             ></iframe>
           </div>

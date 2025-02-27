@@ -8,6 +8,7 @@ import { Flex, Layout, Menu, Breadcrumb, theme, Space } from "antd";
 import { Header, Content, Footer } from "antd/es/layout/layout";
 import Sidebar from "@/components/Sidebar";
 import LogoutButton from "@/components/Logout";
+import LoadingOverlay from "@/components/LoadingOverlay";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,13 +46,14 @@ export default function DashboardLayout({ children }) {
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <AntdRegistry>
+          <LoadingOverlay />
           <Layout
             style={{
               minHeight: "100vh",
             }}
           >
             <Sidebar />
-            <Layout>
+            <Layout className="transition-all duration-300 md:ml-[200px]">
               <Space
                 direction="vertical"
                 size="middle"
@@ -74,7 +76,7 @@ export default function DashboardLayout({ children }) {
                   style={{
                     margin: "0 16px",
                     backgroundColor: "white",
-                    height: "90vh",
+                    minHeight: "calc(100vh - 180px)",
                   }}
                 >
                   {children}

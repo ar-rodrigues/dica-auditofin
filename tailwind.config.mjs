@@ -13,7 +13,7 @@ export default {
         foreground: "var(--foreground)",
         primary: "#020381",
         secondary: "#A2C224",
-        terciary: "#F7F7F7",
+        terciary: "#e5e7eb",
         quaternary: "#161617",
       },
       animation: {

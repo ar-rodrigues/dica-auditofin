@@ -20,6 +20,17 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
+/* Hide scrollbar for Chrome, Safari and Opera */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+
 .carousel-container {
   position: relative;
 }
@@ -63,4 +74,46 @@ body {
 
 .animate-fadeIn {
   animation: fadeIn 1s ease-out forwards;
+}
+
+/* Sidebar and Layout responsive styles */
+.ant-layout-sider {
+  transition: all 0.2s ease-in-out;
+}
+
+.ant-layout-sider-collapsed {
+  width: 80px !important;
+  min-width: 80px !important;
+  max-width: 80px !important;
+}
+
+@media (max-width: 768px) {
+  .ant-layout-sider {
+    position: absolute !important;
+    z-index: 999;
+    height: 100%;
+    left: -100%;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .ant-layout-sider-collapsed {
+    transform: translateX(0);
+    left: 0;
+    width: 80px !important;
+    min-width: 80px !important;
+    max-width: 80px !important;
+  }
+
+  .ant-layout-has-sider {
+    flex-direction: column !important;
+  }
+
+  .ant-layout-content {
+    margin-left: 0 !important;
+    padding: 1rem;
+  }
+
+  .md\:ml-\[200px\] {
+    margin-left: 0 !important;
+  }
 }

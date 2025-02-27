@@ -1,14 +1,15 @@
 import React from "react";
 import Image from "next/image";
-import LogoImage from "@/public/images/logo400x400.svg";
-
+import { useAtomValue } from "jotai";
+import { logoAtoms } from "@/utils/atoms";
 export default function Logo() {
+  const Logo = useAtomValue(logoAtoms.default);
   return (
     <Image
-      src={LogoImage}
+      src={Logo}
       alt="Logo"
       style={{
-        paddingTop: 24,
+        paddingTop: 14,
         paddingBottom: 14,
         paddingRight: 14,
         paddingLeft: 14,

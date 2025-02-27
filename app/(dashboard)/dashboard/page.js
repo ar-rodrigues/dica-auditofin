@@ -1,18 +1,15 @@
-import { redirect } from "next/navigation";
-import { createClient } from "@/utils/supabase/server";
+"use client";
+import { useEffect } from "react";
+import { useAtom } from "jotai";
+import { loadingAtom } from "@/utils/atoms";
 import DashboardContent from "@/components/DashboardContent";
 
-export default async function Dashboard() {
-  const supabase = await createClient();
+export default function Dashboard() {
+  const [, setLoading] = useAtom(loadingAtom);
 
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
-
-  if (error || !user) {
-    redirect("/login");
-  }
+  useEffect(() => {
+    setLoading(false);
+  }, [setLoading]);
 
   return <DashboardContent />;
 }
