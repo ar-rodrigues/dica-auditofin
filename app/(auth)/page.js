@@ -4,7 +4,10 @@ import Image from "next/image";
 import { Layout, Button, Typography, Carousel } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import "@ant-design/v5-patch-for-react-19";
-import { officeImage, teamImage, teamImage2, teamImage3 } from "@/utils/atoms";
+import Office from "@/public/images/content/office.png";
+import Team from "@/public/images/content/team.jpg";
+import Team2 from "@/public/images/content/team2.jpg";
+import Team3 from "@/public/images/content/team3.jpg";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
@@ -13,6 +16,16 @@ export default function Home() {
 
   useEffect(() => {
     setMounted(true);
+    const handleResize = () => {
+      const carousel = document.querySelector('.carousel-container');
+      if (carousel) {
+        carousel.style.height = `${window.innerHeight * 0.8}px`;
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   const carouselItems = [
@@ -21,45 +34,52 @@ export default function Home() {
       description:
         "Transformamos tu negocio con soluciones tecnológicas avanzadas",
       bgColor: "from-primary to-blue-600",
-      image: officeImage,
+      image: Office,
     },
     {
       title: "Auditoría Profesional",
       description: "Servicios de auditoría con los más altos estándares",
       bgColor: "from-primary to-blue-800",
-      image: teamImage,
+      image: Team,
     },
     {
       title: "Consultoría Especializada",
       description: "Años de experiencia en el mercado nos respaldan",
       bgColor: "from-primary to-blue-900",
-      image: teamImage2,
+      image: Team2,
     },
     {
       title: "Soporte Técnico",
       description: "Soporte técnico especializado para tu empresa",
       bgColor: "from-primary to-blue-700",
-      image: teamImage3,
+      image: Team3,
     },
   ];
 
   return (
     <Layout className="min-h-screen bg-terciary">
       <Content>
-        <Carousel autoplay effect="fade" className="w-full">
+        <Carousel
+          autoplay
+          effect="fade"
+          dots={true}
+          className="w-full carousel-container"
+          autoplaySpeed={5000}
+          pauseOnHover={false}
+        >
           {carouselItems.map((item, index) => (
             <div key={index}>
               <div className="relative min-h-[80vh]">
-                {/* Background Image */}
                 <div className="absolute inset-0">
                   <Image
                     src={item.image}
                     alt={item.title}
                     fill
+                    quality={100}
                     style={{ objectFit: "cover" }}
                     priority={index === 0}
+                    sizes="100vw"
                   />
-                  {/* Overlay */}
                   <div
                     className={`absolute inset-0 bg-gradient-to-r ${item.bgColor} opacity-75`}
                   />
@@ -68,8 +88,8 @@ export default function Home() {
                 {/* Content */}
                 <div className="relative flex flex-col items-center justify-center min-h-[80vh]">
                   <div
-                    className={`max-w-4xl mx-auto space-y-8 p-8 text-center ${
-                      mounted ? "animate-fadeIn" : "opacity-0"
+                    className={`max-w-4xl mx-auto space-y-8 p-8 text-center transition-all duration-1000 ${
+                      mounted ? "animate-fadeIn opacity-100 transform translate-y-0" : "opacity-0 transform translate-y-4"
                     }`}
                   >
                     <Title
