@@ -40,7 +40,7 @@ export default function Home() {
           carouselItems={carouselItems}
           redirectRoute="/login"
           containerStyles=""
-          buttonStyles=""
+          buttonStyles="!bg-secondary !text-white"
           mounted={mounted}
         />
 
