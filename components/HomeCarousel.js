@@ -20,7 +20,7 @@ export default function HomeCarousel({
       autoplay
       effect="fade"
       dots={true}
-      className={`w-full carousel-container ${containerStyles}`}
+      className={`w-full carousel-container max-w-[100vw] ${containerStyles}`}
       autoplaySpeed={speed}
       pauseOnHover={pauseOnHover}
     >

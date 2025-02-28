@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Layout, Button, Typography, Carousel } from "antd";
+import { Layout, Button, Typography, Carousel, Flex, Card } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { useAtomValue } from "jotai";
-import { carouselContentAtom } from "@/utils/atoms";
+import { carouselContentAtom, HomeCardsAtom } from "@/utils/atoms";
 import "@ant-design/v5-patch-for-react-19";
 import HomeCarousel from "@/components/HomeCarousel";
 import PrimaryButton from "@/components/PrimaryButton";
@@ -15,6 +15,7 @@ const { Title, Text } = Typography;
 export default function Home() {
   const [mounted, setMounted] = useState(false);
   const carouselItems = useAtomValue(carouselContentAtom);
+  const cardsItens = useAtomValue(HomeCardsAtom);
 
   useEffect(() => {
     setMounted(true);
@@ -43,38 +44,35 @@ export default function Home() {
           mounted={mounted}
         />
 
-        {/* Features Section with improved contrast */}
-        <div className="py-20 px-8 bg-terciary">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-12">
-            {[
-              {
-                title: "Innovación Tecnológica",
-                desc: "Soluciones de vanguardia adaptadas a tus necesidades específicas",
-              },
-              {
-                title: "Excelencia en Servicio",
-                desc: "Comprometidos con los más altos estándares de calidad",
-              },
-              {
-                title: "Experiencia Comprobada",
-                desc: "Trayectoria sólida respaldada por casos de éxito",
-              },
-            ].map((feature, index) => (
-              <div
-                key={index}
-                className="text-center p-8 hover:transform hover:scale-105 transition-all duration-300 
-                  cursor-pointer bg-white rounded-xl shadow-lg hover:shadow-xl"
-              >
-                <Title level={3} className="text-primary mb-4 font-bold">
-                  {feature.title}
-                </Title>
-                <Text className="text-quaternary text-lg">{feature.desc}</Text>
-              </div>
-            ))}
+        {/* Features Section with Cards */}
+        <div className="py-16 px-8 bg-terciary">
+          <div className="max-w-6xl mx-auto">
+            <Flex wrap="wrap" gap="large" justify="center">
+              {cardsItens.map((feature, index) => (
+                <Card
+                  key={index}
+                  className="w-[350px] shadow-md hover:shadow-lg transition-shadow"
+                  bordered={false}
+                >
+                  <Flex vertical gap="middle" align="start">
+                    {feature.icon && (
+                      <div className="text-3xl text-primary">
+                        {feature.icon}
+                      </div>
+                    )}
+                    <Title level={3} className="text-primary mb-2 font-bold">
+                      {feature.title}
+                    </Title>
+                    <Text className="text-quaternary text-base">
+                      {feature.desc}
+                    </Text>
+                  </Flex>
+                </Card>
+              ))}
+            </Flex>
           </div>
         </div>
 
-        {/* CTA Section with improved visibility */}
         <div className="bg-gradient-to-r from-secondary to-white/180 text-white py-20 px-8">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <Title level={2} className="text-white drop-shadow-lg">
@@ -84,15 +82,6 @@ export default function Home() {
               Descubre cómo nuestras soluciones pueden transformar tu empresa.
               ¿Listo para dar el siguiente paso?
             </Text>
-            {/* <Button
-              type="primary"
-              size="large"
-              icon={<ArrowRightOutlined />}
-              className="!bg-primary !text-white border-none hover:!bg-white/80 hover:!text-primary hover:border-primary hover:shadow-lg
-                hover:scale-105 transition-all duration-300 shadow-lg"
-            >
-              Agenda una Consulta
-            </Button> */}
             <PrimaryButton
               type={"primary"}
               size={"large"}

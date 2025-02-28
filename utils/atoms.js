@@ -72,6 +72,21 @@ export const carouselContentAtom = atom([
   },
 ]);
 
+export const HomeCardsAtom = atom([
+  {
+    title: "Innovación Tecnológica",
+    desc: "Soluciones de vanguardia adaptadas a tus necesidades específicas",
+  },
+  {
+    title: "Excelencia en Servicio",
+    desc: "Comprometidos con los más altos estándares de calidad",
+  },
+  {
+    title: "Experiencia Comprobada",
+    desc: "Trayectoria sólida respaldada por casos de éxito",
+  },
+]);
+
 // Navigation menus atom
 export const navbarMenus = atom([
   {
