@@ -7,7 +7,7 @@ export default function PrimaryButton({
   type = "primary",
   text = "Button",
   icon,
-  buttonStyles = "",
+  buttonStyles = "!bg-primary !text-terciary",
   handleClick,
   ...props
 }) {
@@ -18,7 +18,7 @@ export default function PrimaryButton({
       size={size}
       icon={icon}
       {...props}
-      className={`!bg-primary !text-terciary border-none hover:!bg-white/80 hover:!text-primary hover:border-primary hover:shadow-lg
+      className={`  border-none hover:!bg-white/80 hover:!text-primary hover:border-primary hover:shadow-lg
                 hover:scale-105 transition-all duration-300 shadow-lg ${buttonStyles}`}
     >
       {text}
