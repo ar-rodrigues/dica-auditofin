@@ -9,7 +9,7 @@ const { Content } = Layout;
 export default function DashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const urlDashboard =
-    "https://app.powerbi.com/reportEmbed?reportId=c6cb917a-675b-4011-9587-d5fe73dc3e08&autoAuth=true&embeddedDemo=true";
+    "https://app.powerbi.com/reportEmbed?reportId=c6cb917a-675b-4011-9587-d5fe73dc3e08&autoAuth=true&embeddedDemo=true&viewMode=mobile";
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
@@ -40,6 +40,8 @@ export default function DashboardContent() {
               className="absolute top-0 left-0 w-full h-full rounded-lg"
               src={urlDashboard}
               allowFullScreen={true}
+              width={300}
+              height={300}
             ></iframe>
           </div>
         </div>
