@@ -45,7 +45,7 @@ export default function Home() {
         />
 
         {/* Features Section with Cards */}
-        <div className="py-16 px-8 bg-terciary">
+        <div className="py-16 px-8 bg-terciary ">
           <div className="max-w-6xl mx-auto">
             <Flex wrap="wrap" gap="large" justify="center">
               {cardsItens.map((feature, index) => (

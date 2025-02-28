@@ -44,7 +44,7 @@ export default function HomeCarousel({
             </div>
 
             {/* Content with improved visibility */}
-            <div className="relative flex flex-col items-center justify-center min-h-[75vh]">
+            <div className="relative flex flex-col items-center justify-center min-h-[80vh]">
               <div
                 className={`max-w-4xl mx-auto space-y-8 p-8 text-center transition-all duration-1000 
                     ${
