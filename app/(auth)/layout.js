@@ -37,7 +37,7 @@ export default function AuthLayout({ children }) {
   return (
     <html lang="es-MX">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-hidden max-w-[100vw]`}
       >
         <AntdRegistry>
           <Layout style={{ minHeight: "100vh" }}>
