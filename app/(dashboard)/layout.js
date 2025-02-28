@@ -47,7 +47,7 @@ export default function DashboardLayout({ children }) {
       >
         <AntdRegistry>
           <LoadingOverlay />
-          <Layout style={{ minHeight: "100vh", maxWidth: "90vw" }}>
+          <Layout style={{ minHeight: "100vh", maxWidth: "100vw" }}>
             <Sidebar />
             <Space direction="vertical" size="large" style={{ width: "100%" }}>
               <Header
