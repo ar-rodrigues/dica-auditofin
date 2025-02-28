@@ -1,4 +1,4 @@
-import { Card, Statistic } from "antd";
+import { Card, Space, Statistic } from "antd";
 import {
   FileOutlined,
   FileDoneOutlined,
@@ -12,28 +12,28 @@ export default function StatsCards() {
   const colors = useAtomValue(colorsAtoms);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-      <Card>
+    <Space className="flex flex-wrap gap-4 mb-4">
+      <Card size="small">
         <Statistic
           title="Total Requerimientos"
           value={requirements.length}
           prefix={<FileOutlined style={{ color: colors.primary }} />}
         />
       </Card>
-      <Card>
+      <Card size="small">
         <Statistic
           title="Copias Certificadas"
           value={requirements.filter((r) => r.certified).length}
           prefix={<FileDoneOutlined style={{ color: colors.secondary }} />}
         />
       </Card>
-      <Card>
+      <Card size="small" className="sm:col-span-2 lg:col-span-1">
         <Statistic
           title="Originales Requeridos"
           value={requirements.filter((r) => r.original).length}
           prefix={<ClockCircleOutlined style={{ color: colors.black }} />}
         />
       </Card>
-    </div>
+    </Space>
   );
 }

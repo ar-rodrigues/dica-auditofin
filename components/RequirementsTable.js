@@ -39,6 +39,15 @@ export default function RequirementsTable({ filteredRequirements }) {
       dataSource={filteredRequirements}
       rowKey="id"
       className="bg-white rounded-lg shadow"
+      scroll={{ x: "max-content" }}
+      size="small"
+      pagination={{
+        responsive: true,
+        position: ["bottomCenter"],
+        showSizeChanger: true,
+        showTotal: (total, range) =>
+          `${range[0]}-${range[1]} de ${total} items`,
+      }}
     />
   );
 }

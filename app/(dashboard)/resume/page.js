@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input, Select } from "antd";
+import { Input, Select, Space, Typography } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import { useAtom, useAtomValue } from "jotai";
 import { departmentsAtom, requirementsAtom, loadingAtom } from "@/utils/atoms";
@@ -9,6 +9,7 @@ import StatsCards from "@/components/StatsCards";
 import RequirementsTable from "@/components/RequirementsTable";
 
 const { Option } = Select;
+const { Title } = Typography;
 
 export default function ResumePage() {
   const departments = useAtomValue(departmentsAtom);
@@ -36,16 +37,19 @@ export default function ResumePage() {
   });
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Auditoría Xalapa 2024
-          </h1>
-          <p className="text-gray-600">Requerimientos de documentación</p>
-        </div>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
+      <div className=" mx-auto">
+        <Title
+          level={4}
+          className="text-2xl sm:text-3xl font-bold !text-gray-900 mb-2"
+        >
+          Auditoría Xalapa 2024
+        </Title>
+        <Title level={5} className="!text-gray-600">
+          Requerimientos de documentación
+        </Title>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Space className="flex flex-wrap gap-4 mb-4">
           <Input
             placeholder="Buscar requerimiento..."
             prefix={<SearchOutlined />}
@@ -57,6 +61,7 @@ export default function ResumePage() {
             className="w-full"
             value={selectedDept}
             onChange={setSelectedDept}
+            popupMatchSelectWidth={false}
           >
             <Option value="all">Todos los departamentos</Option>
             {Object.keys(departments).map((dept) => (
@@ -66,15 +71,22 @@ export default function ResumePage() {
             ))}
           </Select>
 
-          <Select className="w-full" value={filter} onChange={setFilter}>
+          <Select
+            className="w-full"
+            value={filter}
+            onChange={setFilter}
+            popupMatchSelectWidth={false}
+          >
             <Option value="all">Todos los documentos</Option>
             <Option value="certified">Copia certificada</Option>
             <Option value="original">Original requerido</Option>
           </Select>
-        </div>
+        </Space>
 
         <StatsCards />
-        <RequirementsTable filteredRequirements={filteredRequirements} />
+        <div className="overflow-x-auto">
+          <RequirementsTable filteredRequirements={filteredRequirements} />
+        </div>
       </div>
     </div>
   );

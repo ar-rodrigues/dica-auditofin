@@ -49,16 +49,7 @@ export default function Sidebar() {
       collapsible
       collapsed={collapsed}
       onCollapse={setCollapsed}
-      breakpoint="md"
-      className=" h-full z-[999]"
-      style={{
-        overflow: "auto",
-        height: "100vh",
-        position: "fixed",
-        left: 0,
-        top: 0,
-        bottom: 0,
-      }}
+      breakpoint="sm"
     >
       <Flex style={sidebarLogoStyle}>
         <Image width={50} height={50} src={logo} alt="Logo" />

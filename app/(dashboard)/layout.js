@@ -47,50 +47,34 @@ export default function DashboardLayout({ children }) {
       >
         <AntdRegistry>
           <LoadingOverlay />
-          <Layout
-            style={{
-              minHeight: "100vh",
-            }}
-          >
+          <Layout style={{ minHeight: "100vh", maxWidth: "90vw" }}>
             <Sidebar />
-            <Layout className="transition-all duration-300 md:ml-[200px]">
-              <Space
-                direction="vertical"
-                size="middle"
+            <Space direction="vertical" size="large" style={{ width: "100%" }}>
+              <Header
                 style={{
+                  backgroundColor: "white",
                   display: "flex",
+                  justifyContent: "end",
                 }}
               >
-                <Header
-                  style={{
-                    display: "flex",
-                    padding: 0,
-                    paddingRight: 20,
-                    justifyContent: "end",
-                    backgroundColor: "white",
-                  }}
-                >
-                  <LogoutButton />
-                </Header>
-                <Content
-                  style={{
-                    margin: "0 16px",
-                    backgroundColor: "white",
-                    minHeight: "calc(100vh - 180px)",
-                  }}
-                >
-                  {children}
-                </Content>
+                <LogoutButton />
+              </Header>
+              <Content
+                style={{
+                  backgroundColor: "white",
+                }}
+              >
+                {children}
+              </Content>
 
-                <Footer
-                  style={{
-                    textAlign: "center",
-                  }}
-                >
-                  Dica ©{new Date().getFullYear()}
-                </Footer>
-              </Space>
-            </Layout>
+              <Footer
+                style={{
+                  textAlign: "center",
+                }}
+              >
+                Dica ©{new Date().getFullYear()}
+              </Footer>
+            </Space>
           </Layout>
         </AntdRegistry>
       </body>
