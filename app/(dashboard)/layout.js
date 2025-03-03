@@ -43,17 +43,14 @@ export default function DashboardLayout({ children }) {
       >
         <AntdRegistry>
           <LoadingOverlay />
-          <Layout hasSider={true} style={{ maxWidth: "100%" }}>
+          <Layout
+            hasSider={true}
+            style={{
+              height: "100%",
+            }}
+          >
             <Sidebar />
-            <Space
-              direction="vertical"
-              size="large"
-              style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: "#e5e7eb",
-              }}
-            >
+            <Layout>
               <Header
                 style={{
                   backgroundColor: "white",
@@ -72,7 +69,7 @@ export default function DashboardLayout({ children }) {
               >
                 Dica ©{new Date().getFullYear()}
               </Footer>
-            </Space>
+            </Layout>
           </Layout>
         </AntdRegistry>
       </body>

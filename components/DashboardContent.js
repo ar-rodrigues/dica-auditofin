@@ -17,8 +17,8 @@ export default function DashboardContent() {
   }, []);
 
   return (
-    <Layout className="min-h-screen bg-gray-50">
-      <Content className="p-4 sm:p-6 md:p-8">
+    <Layout className="h-[100vh] bg-gray-50">
+      <Content className="p-4 sm:p-6 md:p-8 h-fit">
         <div className="w-full h-full bg-white rounded-lg shadow-md">
           {isLoading && (
             <div className="w-full h-[calc(100vh-theme(spacing.32))] flex items-center justify-center">

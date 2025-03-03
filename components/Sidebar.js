@@ -66,7 +66,7 @@ export default function Sidebar() {
         theme="dark"
         defaultSelectedKeys={[current]}
         selectedKeys={[current]}
-        mode="inline"
+        mode="vertical"
         items={sidebarItems}
         onClick={handleClick}
       />
