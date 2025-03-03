@@ -11,16 +11,24 @@ import {
   MOBILE_BREAKPOINT,
 } from "@/utils/atoms";
 import { useAtom, useAtomValue } from "jotai";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 
 const { Sider } = Layout;
 
 export default function Sidebar() {
   const [collapsed, setCollapsed] = useAtom(sidebarCollapsedAtom);
   const logo = useAtomValue(logoAtoms.default);
-  const [current, setCurrent] = useState("1");
   const [loading, setLoading] = useAtom(loadingAtom);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Find the current key based on the pathname
+  const getCurrentKey = () => {
+    const item = sidebarItems.find((item) => item.url === pathname);
+    return item ? item.key : "1";
+  };
+
+  const [current, setCurrent] = useState(getCurrentKey());
 
   const handleClick = async ({ key }) => {
     setLoading(true);
@@ -56,7 +64,7 @@ export default function Sidebar() {
       </Flex>
       <Menu
         theme="dark"
-        defaultSelectedKeys={["1"]}
+        defaultSelectedKeys={[current]}
         selectedKeys={[current]}
         mode="inline"
         items={sidebarItems}
