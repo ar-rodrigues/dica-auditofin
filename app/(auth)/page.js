@@ -87,7 +87,7 @@ export default function Home() {
               size={"large"}
               icon={<ArrowRightOutlined />}
               text={"Agenda una Consulta"}
-              buttonStyles={""}
+              buttonStyles={"!bg-primary"}
             />
           </div>
         </div>

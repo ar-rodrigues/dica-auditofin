@@ -1,4 +1,5 @@
 "use client";
+import "@ant-design/v5-patch-for-react-19";
 import React from "react";
 import { Carousel, Typography, Button } from "antd";
 import PrimaryButton from "./PrimaryButton";

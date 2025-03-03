@@ -1,5 +1,6 @@
 // ednf
 "use client";
+import "@ant-design/v5-patch-for-react-19";
 import React from "react";
 import { Button } from "antd";
 
@@ -19,7 +20,7 @@ export default function PrimaryButton({
       size={size}
       icon={icon}
       {...props}
-      className={`  border-none hover:!bg-white/80 hover:!text-primary hover:border-primary hover:shadow-lg
+      className={`border-none hover:!bg-white/80 hover:!text-primary hover:border-primary hover:shadow-lg
                 hover:scale-105 transition-all duration-300 shadow-lg ${buttonStyles}`}
     >
       {text}
