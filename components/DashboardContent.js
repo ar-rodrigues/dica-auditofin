@@ -9,7 +9,7 @@ const { Content } = Layout;
 export default function DashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const urlDashboard =
-    "https://app.powerbi.com/reportEmbed?reportId=c6cb917a-675b-4011-9587-d5fe73dc3e08&autoAuth=true&embeddedDemo=true&viewMode=mobile";
+    "https://app.powerbi.com/view?r=eyJrIjoiZTI2NmE1ZGMtNmZhNy00NTFhLWE3MjEtZDJlY2UyODA2ZmFjIiwidCI6Ijk2NDYyYWMzLTYwMzktNGE1YS1iYWI5LTBjMmY5YjNkYzFiYSJ9&pageName=8ae6bf7bf1366a5a9756";
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
