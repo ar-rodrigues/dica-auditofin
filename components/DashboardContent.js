@@ -37,11 +37,11 @@ export default function DashboardContent() {
           >
             <iframe
               title="DICA_dashboard_xalapa_demo"
-              className="absolute top-0 left-0 w-full h-full rounded-lg"
+              className="absolute top-0 left-0 w-full h-[80%] rounded-lg"
               src={urlDashboard}
               allowFullScreen={true}
-              width={300}
-              height={300}
+              width={200}
+              height={200}
             ></iframe>
           </div>
         </div>
