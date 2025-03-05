@@ -11,6 +11,7 @@ import {
 import { useAtom, useAtomValue } from "jotai";
 import { loadingAtom, colorsAtoms, findingsAtom } from "@/utils/atoms";
 import FindingsTable from "@/components/FindingsTable";
+import AuditHeader from "@/components/AuditHeader";
 
 const { Option } = Select;
 const { Title } = Typography;
@@ -43,17 +44,11 @@ export default function FindingsPage() {
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
       <div className="mx-auto flex flex-col">
-        <Space direction="vertical" size="small">
-          <Title
-            level={4}
-            className="text-2xl sm:text-3xl font-bold !text-gray-900 mb-2"
-          >
-            {findingsData.dashboardName}
-          </Title>
-          <Title level={5} className="!text-gray-600">
-            Hallazgos y observaciones
-          </Title>
-        </Space>
+        <AuditHeader />
+
+        <Title level={5} className="!text-gray-600 mb-4">
+          Hallazgos y observaciones
+        </Title>
 
         <Space className="flex flex-wrap gap-4 mb-4">
           <Input

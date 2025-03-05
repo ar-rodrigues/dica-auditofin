@@ -1,55 +1,56 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { Input, Select, Space, Typography } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { useState } from "react";
+import { Input, Select, Space, Typography, Card, Statistic } from "antd";
+import {
+  SearchOutlined,
+  FileOutlined,
+  FileDoneOutlined,
+  ClockCircleOutlined,
+} from "@ant-design/icons";
 import { useAtom, useAtomValue } from "jotai";
-import { departmentsAtom, requirementsAtom, loadingAtom } from "@/utils/atoms";
-import StatsCards from "@/components/StatsCards";
+import {
+  loadingAtom,
+  colorsAtoms,
+  requirementsAtom,
+  departmentsAtom,
+} from "@/utils/atoms";
 import RequirementsTable from "@/components/RequirementsTable";
+import AuditHeader from "@/components/AuditHeader";
 
 const { Option } = Select;
 const { Title } = Typography;
 
 export default function ResumePage() {
-  const departments = useAtomValue(departmentsAtom);
-  const requirements = useAtomValue(requirementsAtom);
-  const [selectedDept, setSelectedDept] = useState("all");
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectedDept, setSelectedDept] = useState("all");
   const [filter, setFilter] = useState("all");
   const [, setLoading] = useAtom(loadingAtom);
-
-  useEffect(() => {
-    setLoading(false);
-  }, [setLoading]);
+  const colors = useAtomValue(colorsAtoms);
+  const requirements = useAtomValue(requirementsAtom);
+  const departments = useAtomValue(departmentsAtom);
 
   const filteredRequirements = requirements.filter((req) => {
-    const matchesDept =
-      selectedDept === "all" || req.dept === departments[selectedDept];
     const matchesSearch = req.name
       .toLowerCase()
       .includes(searchTerm.toLowerCase());
+    const matchesDept =
+      selectedDept === "all" || req.dept === departments[selectedDept];
     const matchesFilter =
       filter === "all" ||
       (filter === "delivered" && req.delivered) ||
       (filter === "missing" && !req.delivered);
-    return matchesDept && matchesSearch && matchesFilter;
+    return matchesSearch && matchesDept && matchesFilter;
   });
 
   return (
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
-      <div className=" mx-auto flex flex-col">
-        <Space direction="vertical" size="small">
-          <Title
-            level={4}
-            className="text-2xl sm:text-3xl font-bold !text-gray-900 mb-2"
-          >
-            Auditoría Puebla 2024
-          </Title>
-          <Title level={5} className="!text-gray-600">
-            Requerimientos de documentación
-          </Title>
-        </Space>
+      <div className="mx-auto flex flex-col">
+        <AuditHeader />
+
+        <Title level={5} className="!text-gray-600 mb-4">
+          Requerimientos de documentación
+        </Title>
 
         <Space className="flex flex-wrap gap-4 mb-4">
           <Input
@@ -84,7 +85,30 @@ export default function ResumePage() {
             <Option value="missing">Faltantes</Option>
           </Select>
         </Space>
-        <StatsCards />
+
+        <Space className="flex flex-wrap gap-4 mb-4 w-full">
+          <Card size="small" className="flex-1 min-w-[200px]">
+            <Statistic
+              title="Total Requerimientos"
+              value={requirements.length}
+              prefix={<FileOutlined style={{ color: colors.primary }} />}
+            />
+          </Card>
+          <Card size="small" className="flex-1 min-w-[200px]">
+            <Statistic
+              title="Entregados"
+              value={requirements.filter((r) => r.delivered).length}
+              prefix={<FileDoneOutlined style={{ color: colors.secondary }} />}
+            />
+          </Card>
+          <Card size="small" className="flex-1 min-w-[200px]">
+            <Statistic
+              title="Faltantes"
+              value={requirements.filter((r) => !r.delivered).length}
+              prefix={<ClockCircleOutlined style={{ color: colors.black }} />}
+            />
+          </Card>
+        </Space>
 
         <div className="overflow-x-auto">
           <RequirementsTable filteredRequirements={filteredRequirements} />
