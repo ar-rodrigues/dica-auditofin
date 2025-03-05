@@ -205,7 +205,7 @@ export const findingsAtom = atom({
         "Cheques y depósitos en transito\nDerivado de la revisión de las conciliaciones bancarias de enero a diciembre, se detectó que existen partidas en conciliación con una antigüedad mayor a un mes, toda vez que, existen tres cheques en circulación en la cuenta contable 1112031700000000 Recaudación 2022 y cuenta bancaria 1174664555, por un importe total de $67,985.93 y dos cheques en circulación en la cuenta contable\n1112031000000000 Rem. de Ingresos Fiscales y cuenta bancaria 0592606321 por un importe total de $13,990.12.",
       legalBasis: [
         "Artículos 42, 43 y 70 fracción I de la Ley General de Contabilidad Gubernamental",
-        "359 fracciones IV y V y 367 del Código Hacendario para el Estado de Veracruz de Ignacio de la Llave",
+        "359 fracciones IV y V y 367 del Código Hacendario para el Estado ",
         "181 fracción IV, 190, 191 y 193 de la Ley General de Títulos y Operaciones de Crédito",
       ],
       fundingSource: "Ingresos Fiscales",
@@ -219,7 +219,7 @@ export const findingsAtom = atom({
         "Investigar si los cheques ya fueron entregados a los beneficiarios o instancias correspondientes y realizar una revisión de hechos posteriores en los estados de cuenta del mes de enero de 2025 para verificar si ya fueron cobrados, en caso contrario ordenar la cancelación de los cheques por reposición de gastos, para realizar la reexpedición de los mismos, citando a los beneficiarios para investigar si el gasto es real y en caso contrario realizar los registros contables correspondientes.",
       ],
       responsible: {
-        name: "Mtro. Héctor José González Herrera",
+        name: "Lic. Roberto Sánchez Mendoza",
         administrativeUnit: "Tesorería",
       },
       commitmentDate: null,
