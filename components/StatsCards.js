@@ -12,25 +12,25 @@ export default function StatsCards() {
   const colors = useAtomValue(colorsAtoms);
 
   return (
-    <Space className="flex flex-wrap gap-4 mb-4">
-      <Card size="small">
+    <Space className="flex flex-wrap gap-4 mb-4 w-full">
+      <Card size="small" className="flex-1 min-w-[200px]">
         <Statistic
           title="Total Requerimientos"
           value={requirements.length}
           prefix={<FileOutlined style={{ color: colors.primary }} />}
         />
       </Card>
-      <Card size="small">
+      <Card size="small" className="flex-1 min-w-[200px]">
         <Statistic
-          title="Copias Certificadas"
-          value={requirements.filter((r) => r.certified).length}
+          title="Entregados"
+          value={requirements.filter((r) => r.delivered).length}
           prefix={<FileDoneOutlined style={{ color: colors.secondary }} />}
         />
       </Card>
-      <Card size="small" className="sm:col-span-2 lg:col-span-1">
+      <Card size="small" className="flex-1 min-w-[200px]">
         <Statistic
-          title="Originales Requeridos"
-          value={requirements.filter((r) => r.original).length}
+          title="Faltantes"
+          value={requirements.filter((r) => !r.delivered).length}
           prefix={<ClockCircleOutlined style={{ color: colors.black }} />}
         />
       </Card>

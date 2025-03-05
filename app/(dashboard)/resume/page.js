@@ -31,8 +31,8 @@ export default function ResumePage() {
       .includes(searchTerm.toLowerCase());
     const matchesFilter =
       filter === "all" ||
-      (filter === "certified" && req.certified) ||
-      (filter === "original" && req.original);
+      (filter === "delivered" && req.delivered) ||
+      (filter === "missing" && !req.delivered);
     return matchesDept && matchesSearch && matchesFilter;
   });
 
@@ -44,7 +44,7 @@ export default function ResumePage() {
             level={4}
             className="text-2xl sm:text-3xl font-bold !text-gray-900 mb-2"
           >
-            Auditoría Xalapa 2024
+            Auditoría Puebla 2024
           </Title>
           <Title level={5} className="!text-gray-600">
             Requerimientos de documentación
@@ -80,8 +80,8 @@ export default function ResumePage() {
             popupMatchSelectWidth={false}
           >
             <Option value="all">Todos los documentos</Option>
-            <Option value="certified">Copia certificada</Option>
-            <Option value="original">Original requerido</Option>
+            <Option value="delivered">Entregados</Option>
+            <Option value="missing">Faltantes</Option>
           </Select>
         </Space>
         <StatsCards />

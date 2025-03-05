@@ -9,6 +9,7 @@ import {
   sidebarItems,
   sidebarLogoStyle,
   MOBILE_BREAKPOINT,
+  findMenuItem,
 } from "@/utils/atoms";
 import { useAtom, useAtomValue } from "jotai";
 import { useRouter, usePathname } from "next/navigation";
@@ -32,7 +33,7 @@ export default function Sidebar() {
 
   const handleClick = async ({ key }) => {
     setLoading(true);
-    const selectedItem = sidebarItems.find((item) => item.key === key);
+    const selectedItem = findMenuItem(sidebarItems, key);
     if (selectedItem?.url) {
       setCurrent(key);
       router.push(selectedItem.url);
@@ -66,7 +67,7 @@ export default function Sidebar() {
         theme="dark"
         defaultSelectedKeys={[current]}
         selectedKeys={[current]}
-        mode="vertical"
+        mode="inline"
         items={sidebarItems}
         onClick={handleClick}
       />

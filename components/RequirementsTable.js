@@ -23,12 +23,10 @@ export default function RequirementsTable({ filteredRequirements }) {
       title: "Estado",
       key: "status",
       render: (_, record) =>
-        record.certified ? (
-          <Tag color="green">Copia Certificada</Tag>
-        ) : record.original ? (
-          <Tag color="gold">Original Requerido</Tag>
+        record.delivered ? (
+          <Tag color="green">Entregado</Tag>
         ) : (
-          <Tag color="default">Copia Simple</Tag>
+          <Tag color="red">Faltante</Tag>
         ),
     },
   ];
