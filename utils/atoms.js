@@ -313,3 +313,17 @@ export const findMenuItem = (items, key) => {
   }
   return null;
 };
+
+// Dashboards configuration atom
+export const dashboardsAtom = atom([
+  {
+    id: "puebla",
+    name: "Organismo Operador del Servicio de Limpia del Municipio de Puebla",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiZTI2NmE1ZGMtNmZhNy00NTFhLWE3MjEtZDJlY2UyODA2ZmFjIiwidCI6Ijk2NDYyYWMzLTYwMzktNGE1YS1iYWI5LTBjMmY5YjNkYzFiYSJ9&pageName=8ae6bf7bf1366a5a9756",
+  },
+  {
+    id: "xalapa",
+    name: "Municipio de Xalapa del Estado de Veracruz",
+    url: "https://app.powerbi.com/view?r=eyJrIjoiNmQ2YmQzMTEtZjU1Yi00M2RmLWE3MzYtNTM0NjcxMGE0ZTAxIiwidCI6Ijk2NDYyYWMzLTYwMzktNGE1YS1iYWI5LTBjMmY5YjNkYzFiYSJ9&pageName=8ae6bf7bf1366a5a9756",
+  },
+]);
