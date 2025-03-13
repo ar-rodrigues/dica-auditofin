@@ -25,7 +25,7 @@ export const metadata = {
     template: APP_TITLE_TEMPLATE,
   },
   description: APP_DESCRIPTION,
-  manifest: "/public/manifest.json",
+  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     title: APP_NAME,
@@ -40,10 +40,10 @@ export const metadata = {
     description: APP_DESCRIPTION,
     url: "https://dica-auditofin.vercel.app",
     siteName: APP_NAME,
-    images: "/public/images/android-chrome-512x512.png",
+    images: "/images/android-chrome-512x512.png",
   },
   icons: {
-    icon: "/public/images/android-chrome-512x512.png",
+    icon: "/images/android-chrome-512x512.png",
   },
 };
 export const viewport = {
@@ -60,21 +60,21 @@ export default function RootLayout({ children }) {
           <link
             rel="apple-touch-icon"
             sizes="180x180"
-            href="/public/favicon/apple-touch-icon.png"
+            href="/favicon/apple-touch-icon.png"
           />
           <link
             rel="icon"
             type="image/png"
             sizes="32x32"
-            href="/public/favicon/favicon-32x32.png"
+            href="/favicon/favicon-32x32.png"
           />
           <link
             rel="icon"
             type="image/png"
             sizes="16x16"
-            href="/public/favicon/favicon-16x16.png"
+            href="/favicon/favicon-16x16.png"
           />
-          <link rel="manifest" href="/site.webmanifest" />
+          <link rel="manifest" href="/manifest.json" />
         </header>
         <Provider>{children}</Provider>
       </body>

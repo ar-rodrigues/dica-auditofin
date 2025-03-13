@@ -3,6 +3,7 @@ import { login, signup } from "@/app/(auth)/login/actions";
 import { Form, Input, Button, Spin, Flex } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import InstallPWA from "./InstallPWA";
 
 export default function Login({ setIsResetPassword }) {
   const [loading, setLoading] = useState(false);
@@ -94,9 +95,12 @@ export default function Login({ setIsResetPassword }) {
             <Spin indicator={<LoadingOutlined spin />} size="large" />
           </Flex>
         ) : (
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
+          <>
+            <InstallPWA />
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </>
         )}
       </Form.Item>
     </Form>
