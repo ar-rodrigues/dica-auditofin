@@ -31,7 +31,6 @@ export const metadata = {
     title: APP_NAME,
     statusBarStyle: "black-translucent",
   },
-  themeColor: "#020381",
   formatDetection: {
     telephone: false,
   },
@@ -45,14 +44,24 @@ export const metadata = {
   icons: {
     icon: "/images/android-chrome-512x512.png",
   },
-};
-export const viewport = {
-  themeColor: "#020381",
+  viewport: {
+    themeColor: "#020381",
+  },
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="es-MX">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="theme-color" content="#000000" />
+        <title>Dica México</title>
+        <meta
+          name="description"
+          content="Aplicación de auditoría de Dica México"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
