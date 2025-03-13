@@ -51,9 +51,6 @@ export const viewport = {
 export default function AuthLayout({ children }) {
   return (
     <html lang="es-MX">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-      </head>
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased `}
