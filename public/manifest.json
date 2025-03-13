@@ -2,15 +2,24 @@
   "name": "Dica México",
   "short_name": "Dica México",
   "description": "Aplicación de auditoría de Dica México",
-  "start_url": "/login",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "theme_color": "#A2C224",
   "background_color": "#020381",
   "icons": [
     {
       "src": "/images/android-chrome-512x512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

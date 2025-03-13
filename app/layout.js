@@ -34,57 +34,21 @@ export const metadata = {
   formatDetection: {
     telephone: false,
   },
-  openGraph: {
-    title: APP_DEFAULT_TITLE,
-    description: APP_DESCRIPTION,
-    url: "https://dica-auditofin.vercel.app",
-    siteName: APP_NAME,
-    images: "/images/android-chrome-512x512.png",
-  },
   icons: {
-    icon: "/images/android-chrome-512x512.png",
+    icon: "/favicon.ico",
   },
-  viewport: {
-    themeColor: "#020381",
-  },
+};
+
+export const viewport = {
+  themeColor: "#020381",
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="es-MX">
-      <head>
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
-        <meta name="theme-color" content="#000000" />
-        <title>Dica México</title>
-        <meta
-          name="description"
-          content="Aplicación de auditoría de Dica México"
-        />
-      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <header>
-          <link
-            rel="apple-touch-icon"
-            sizes="180x180"
-            href="/favicon/apple-touch-icon.png"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="32x32"
-            href="/favicon/favicon-32x32.png"
-          />
-          <link
-            rel="icon"
-            type="image/png"
-            sizes="16x16"
-            href="/favicon/favicon-16x16.png"
-          />
-          <link rel="manifest" href="/manifest.json" />
-        </header>
         <Provider>{children}</Provider>
       </body>
     </html>
