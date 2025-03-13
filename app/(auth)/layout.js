@@ -18,24 +18,42 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const APP_NAME = "Dica México";
+const APP_DEFAULT_TITLE = "Dica México";
+const APP_TITLE_TEMPLATE = "%s - Dica México";
+const APP_DESCRIPTION = "Aplicación de auditoría de Dica México";
+
 export const metadata = {
-  title: "Dica Auditofin",
-  description: "Web Plataform for public audits",
-  icons: {
-    icon: "/icon.png", // /public/icon.png
-    shortcut: "/shortcut-icon.png",
-    apple: "/apple-icon.png",
-    // you can specify multiple sizes
-    other: {
-      rel: "apple-touch-icon-precomposed",
-      url: "/apple-touch-icon-precomposed.png",
-    },
+  applicationName: APP_NAME,
+  title: {
+    default: APP_DEFAULT_TITLE,
+    template: APP_TITLE_TEMPLATE,
   },
+  description: APP_DESCRIPTION,
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    title: APP_NAME,
+    statusBarStyle: "black-translucent",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: "/favicon.ico",
+  },
+};
+
+export const viewport = {
+  themeColor: "#020381",
 };
 
 export default function AuthLayout({ children }) {
   return (
     <html lang="es-MX">
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+      </head>
       <body
         suppressHydrationWarning
         className={`${geistSans.variable} ${geistMono.variable} antialiased `}
