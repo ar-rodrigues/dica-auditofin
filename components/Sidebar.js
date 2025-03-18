@@ -13,7 +13,7 @@ import {
 } from "@/utils/atoms";
 import { useAtom, useAtomValue } from "jotai";
 import { useRouter, usePathname } from "next/navigation";
-
+import { useUserRole } from "@/utils/hooks/useUserRole";
 const { Sider } = Layout;
 
 export default function Sidebar() {
@@ -22,6 +22,7 @@ export default function Sidebar() {
   const [loading, setLoading] = useAtom(loadingAtom);
   const router = useRouter();
   const pathname = usePathname();
+  const { userRole, loading: loadingUserRole } = useUserRole();
 
   // Find the current key based on the pathname
   const getCurrentKey = () => {
@@ -68,7 +69,12 @@ export default function Sidebar() {
         defaultSelectedKeys={[current]}
         selectedKeys={[current]}
         mode="inline"
-        items={sidebarItems}
+        // if permissions is empty, show all items
+        items={sidebarItems.filter((item) =>
+          item.permissions.length === 0
+            ? true
+            : item.permissions.includes(userRole)
+        )}
         onClick={handleClick}
       />
     </Sider>

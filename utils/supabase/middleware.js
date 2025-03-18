@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
-
+import { allowAdminOnly } from "@/utils/permissions";
 export async function updateSession(request) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -46,6 +46,7 @@ export async function updateSession(request) {
   } = await supabase.auth.getUser();
 
   const allowedPages = ["/"];
+  const adminOnlyPages = allowAdminOnly;
 
   if (
     !user &&
@@ -57,6 +58,22 @@ export async function updateSession(request) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
+  }
+
+  // **Check if the user is an admin before allowing access to "/users" page**
+  if (user && adminOnlyPages.includes(request.nextUrl.pathname)) {
+    const { data: adminProfile, error } = await supabase
+      .from("profiles")
+      .select("role, role:roles(role)")
+      .eq("id", user.id)
+      .single();
+
+    console.log("adminProfile", adminProfile);
+    if (error || !adminProfile || adminProfile.role.role !== "admin") {
+      const url = request.nextUrl.clone();
+      url.pathname = "/unauthorized"; // Redirect to a custom unauthorized page
+      return NextResponse.redirect(url);
+    }
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

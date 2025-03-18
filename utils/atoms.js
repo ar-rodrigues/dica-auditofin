@@ -5,7 +5,12 @@ import Office from "@/public/images/content/office.png";
 import Team from "@/public/images/content/team.jpg";
 import Team2 from "@/public/images/content/team2.jpg";
 import Team3 from "@/public/images/content/team3.jpg";
-import { DesktopOutlined, PieChartOutlined } from "@ant-design/icons";
+import {
+  DesktopOutlined,
+  PieChartOutlined,
+  UserOutlined,
+  BankOutlined,
+} from "@ant-design/icons";
 
 // Loading state atom
 export const loadingAtom = atom(false);
@@ -273,23 +278,41 @@ export const sidebarItems = [
     label: "Dashboard",
     icon: <PieChartOutlined />,
     url: "/dashboard",
+    permissions: [],
   },
   {
     key: "2",
     label: "Resumen",
     icon: <DesktopOutlined />,
+    permissions: [],
     children: [
       {
         key: "2.1",
         label: "Requerimientos",
         url: "/resume",
+        permissions: [],
       },
       {
         key: "2.2",
         label: "Hallazgos",
         url: "/findings",
+        permissions: [],
       },
     ],
+  },
+  {
+    key: "3",
+    label: "Usuarios",
+    icon: <UserOutlined />,
+    url: "/users",
+    permissions: ["admin"],
+  },
+  {
+    key: "4",
+    label: "Entidades",
+    icon: <BankOutlined />,
+    url: "/entities",
+    permissions: ["admin"],
   },
 ];
 
@@ -327,3 +350,25 @@ export const dashboardsAtom = atom([
     url: "https://app.powerbi.com/view?r=eyJrIjoiNmQ2YmQzMTEtZjU1Yi00M2RmLWE3MzYtNTM0NjcxMGE0ZTAxIiwidCI6Ijk2NDYyYWMzLTYwMzktNGE1YS1iYWI5LTBjMmY5YjNkYzFiYSJ9&pageName=8ae6bf7bf1366a5a9756",
   },
 ]);
+
+// Users atom
+export const usersAtom = atom();
+
+// Admin only pages atom
+export const adminOnlyPagesAtom = atom(["/users", "/entity"]);
+
+// Entities data atom
+export const entitiesAtom = atom({
+  entities: [
+    {
+      id: 1,
+      name: "Organismo Operador del Servicio de Limpia",
+      type: "Municipal",
+      location: "Puebla",
+      status: "active",
+      createdAt: "2024-03-20",
+      lastAudit: "2024-01-15",
+    },
+    // Add more sample entities as needed
+  ],
+});
