@@ -68,7 +68,7 @@ export async function updateSession(request) {
       .eq("id", user.id)
       .single();
 
-    console.log("adminProfile", adminProfile);
+    //console.log("adminProfile", adminProfile);
     if (error || !adminProfile || adminProfile.role.role !== "admin") {
       const url = request.nextUrl.clone();
       url.pathname = "/unauthorized"; // Redirect to a custom unauthorized page

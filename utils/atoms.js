@@ -10,6 +10,7 @@ import {
   PieChartOutlined,
   UserOutlined,
   BankOutlined,
+  FileTextOutlined,
 } from "@ant-design/icons";
 
 // Loading state atom
@@ -314,6 +315,13 @@ export const sidebarItems = [
     url: "/entities",
     permissions: ["admin"],
   },
+  {
+    key: "5",
+    label: "Requerimientos",
+    icon: <FileTextOutlined />,
+    url: "/requirements",
+    permissions: ["admin"],
+  },
 ];
 
 export const sidebarLogoStyle = {
@@ -355,7 +363,11 @@ export const dashboardsAtom = atom([
 export const usersAtom = atom();
 
 // Admin only pages atom
-export const adminOnlyPagesAtom = atom(["/users", "/entity"]);
+export const adminOnlyPagesAtom = atom([
+  "/users",
+  "/entities",
+  "/requirements",
+]);
 
 // Entities data atom
 export const entitiesAtom = atom({
@@ -372,3 +384,82 @@ export const entitiesAtom = atom({
     // Add more sample entities as needed
   ],
 });
+
+// Mock requirements data
+export const mockRequirementsAtom = atom([
+  {
+    id: 1,
+    ref_code: "REQ-001",
+    info: "Relación de actas de Sesión de Cabildo",
+    required_format: {
+      id: "simple",
+      format: "Copia Simple",
+    },
+    file_type: {
+      id: 1,
+      type: "PDF",
+    },
+    frequency_by_day: 30,
+    days_to_deliver: 5,
+    created_at: "2024-03-20",
+  },
+  {
+    id: 2,
+    ref_code: "REQ-002",
+    info: "Estados financieros mensuales y cortes de caja",
+    required_format: {
+      id: "authenticated",
+      format: "Copia Autenticada",
+    },
+    file_type: {
+      id: 2,
+      type: "Excel",
+    },
+    frequency_by_day: 30,
+    days_to_deliver: 7,
+    created_at: "2024-03-20",
+  },
+  {
+    id: 3,
+    ref_code: "REQ-003",
+    info: "Expedientes unitarios de obras y acciones",
+    required_format: {
+      id: "original",
+      format: "Original",
+    },
+    file_type: {
+      id: 1,
+      type: "PDF",
+    },
+    frequency_by_day: 15,
+    days_to_deliver: 3,
+    created_at: "2024-03-20",
+  },
+]);
+
+// Mock ,file types data
+export const mockFileTypesAtom = atom([
+  { id: 1, type: "PDF", extension: ".pdf" },
+  { id: 2, type: "Excel", extension: ".xlsx" },
+  { id: 3, type: "Word", extension: ".docx" },
+  { id: 4, type: "Imagen", extension: ".jpg,.png" },
+]);
+
+// Mock require,d formats data
+export const mockRequiredFormatsAtom = atom([
+  {
+    id: "simple",
+    format: "Copia Simple",
+    description: "Documento en copia simple",
+  },
+  {
+    id: "authenticated",
+    format: "Copia Autenticada",
+    description: "Documento autenticado por notario",
+  },
+  {
+    id: "original",
+    format: "Original",
+    description: "Documento original",
+  },
+]);

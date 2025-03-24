@@ -17,6 +17,7 @@ export const useUserRole = () => {
           }
 
           const data = await response.json();
+
           setUserRole(data[0].role.role);
         }
       } catch (error) {

@@ -1,9 +1,27 @@
-import { Table, Tag, Button, Space, Avatar } from "antd";
-import { EditOutlined, DeleteOutlined, UserOutlined } from "@ant-design/icons";
+import { Table, Tag, Button, Space, Avatar, Modal } from "antd";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  UserOutlined,
+  ExclamationCircleOutlined,
+} from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
 export default function UsersTable({ data, onDelete }) {
   const router = useRouter();
+
+  const handleDelete = (userId) => {
+    Modal.confirm({
+      title: "Confirmar eliminación",
+      icon: <ExclamationCircleOutlined />,
+      content: "¿Estás seguro de querer eliminar este usuario?",
+      okText: "Sí",
+      cancelText: "No",
+      onOk() {
+        onDelete(userId);
+      },
+    });
+  };
 
   const columns = [
     {
@@ -73,7 +91,7 @@ export default function UsersTable({ data, onDelete }) {
             type="primary"
             danger
             icon={<DeleteOutlined />}
-            onClick={() => onDelete?.(record)}
+            onClick={() => handleDelete(record.id)}
           />
         </Space>
       ),

@@ -7,147 +7,141 @@ import {
   Row,
   Col,
   Card,
-  Avatar,
-  Upload,
-  Progress,
-  Tooltip,
   message,
+  Switch,
+  Tooltip,
 } from "antd";
 import { useRouter } from "next/navigation";
-import {
-  UserOutlined,
-  UploadOutlined,
-  KeyOutlined,
-  EyeInvisibleOutlined,
-  EyeTwoTone,
-} from "@ant-design/icons";
 import { useState, useEffect } from "react";
-import {
-  generateStrongPassword,
-  checkPasswordStrength,
-} from "@/utils/passwordUtils";
-import { createClient } from "@/utils/supabase/client";
+import { KeyOutlined, CheckOutlined } from "@ant-design/icons";
+
+import { useUploadFile } from "@/hooks/useUploadFile";
+import { useFormSubmit } from "@/hooks/useFormSubmit";
+import ImageUpload from "@/components/common/ImageUpload";
+import PasswordInput from "@/components/common/PasswordInput";
 
 const { Option } = Select;
 
 export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
   const [form] = Form.useForm();
   const router = useRouter();
-  const [photoUrl, setPhotoUrl] = useState(initialValues?.photo);
+
+  const [loading, setLoading] = useState(false);
+  const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
+  const [resetPasswordSuccess, setResetPasswordSuccess] = useState(false);
+  const [passwordIsStrong, setPasswordIsStrong] = useState(false);
+
   const [photoFile, setPhotoFile] = useState(null);
+  const { uploadFile } = useUploadFile();
+  const { handleSubmit: handleFormSubmit } = useFormSubmit("/api/users");
+
   const [roles, setRoles] = useState([]);
   const [entities, setEntities] = useState([]);
-  const [passwordVisible, setPasswordVisible] = useState(false);
-  const [passwordStrength, setPasswordStrength] = useState(null);
-  const [loading, setLoading] = useState(false);
-
-  console.log("initialValues", initialValues);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch roles
-        const rolesResponse = await fetch("/api/roles");
-        const rolesData = await rolesResponse.json();
-        setRoles(rolesData);
+        setLoading(true);
+        // Fetch roles and entities
+        const [rolesResponse, entitiesResponse] = await Promise.all([
+          fetch("/api/roles"),
+          fetch("/api/entities"),
+        ]);
 
-        // Fetch entities
-        const entitiesResponse = await fetch("/api/entities");
-        const entitiesData = await entitiesResponse.json();
+        const [rolesData, entitiesData] = await Promise.all([
+          rolesResponse.json(),
+          entitiesResponse.json(),
+        ]);
+
+        setRoles(rolesData);
         setEntities(entitiesData);
       } catch (error) {
         console.error("Error fetching data:", error);
-        message.error("Error loading form data");
+        message.error("Error al cargar los datos");
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchData();
   }, []);
 
-  const handleSubmit = async (values) => {
-    setLoading(true);
+  const handleResetPassword = async () => {
     try {
-      const supabase = createClient();
+      setResetPasswordLoading(true);
+      const baseUrl = window.location.origin;
+      const response = await fetch("/api/reset-password", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: form.getFieldValue("email"),
+          baseUrl,
+        }),
+      });
 
-      // Handle photo upload if there's a new photo
-      let photoUrl = values.photo;
-      if (photoFile) {
-        const { data: uploadData, error: uploadError } = await supabase.storage
-          .from("user-photos")
-          .upload(`${Date.now()}-${photoFile.name}`, photoFile);
+      const data = await response.json();
 
-        if (uploadError) throw uploadError;
-
-        // Get public URL
-        const {
-          data: { publicUrl },
-        } = supabase.storage.from("user-photos").getPublicUrl(uploadData.path);
-
-        photoUrl = publicUrl;
+      if (response.ok) {
+        setResetPasswordSuccess(true);
+        message.success(
+          "Se ha enviado un correo para restablecer la contraseña"
+        );
+      } else {
+        throw new Error(data.error || "Error al enviar el correo");
       }
+    } catch (error) {
+      console.error("Error resetting password:", error);
+      message.error("Error al enviar el correo de restablecimiento");
+    } finally {
+      setResetPasswordLoading(false);
+    }
+  };
 
-      // Prepare user data
-      const userData = {
+  const handleSubmit = async (values) => {
+    try {
+      setLoading(true);
+
+      const cleanValues = {
         ...values,
-        photo: photoUrl,
-        last_change: new Date().toISOString(),
       };
 
-      // If there's a password change in edit mode, update auth.users
-      if (mode === "edit" && values.password) {
-        const { error: passwordError } = await supabase.auth.updateUser({
-          password: values.password,
-        });
-        if (passwordError) throw passwordError;
+      if (photoFile) {
+        try {
+          const path = initialValues?.id ? `${initialValues.id}` : "temp";
+
+          const photoUrl = await uploadFile(photoFile, "profiles", path);
+          cleanValues.photo = photoUrl;
+        } catch (error) {
+          console.error("Error uploading photo:", error);
+          message.error("Error al subir la foto");
+          return;
+        }
+      } else if (initialValues?.photo) {
+        cleanValues.photo = initialValues.photo;
       }
 
-      await onSubmit(userData);
+      await handleFormSubmit(cleanValues, initialValues?.id);
+
       message.success(
         `Usuario ${mode === "create" ? "creado" : "actualizado"} exitosamente`
       );
       router.push("/users");
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error al procesar el formulario:", error);
       message.error("Error al procesar el formulario");
     } finally {
       setLoading(false);
     }
   };
 
-  const handlePasswordGenerate = () => {
-    const newPassword = generateStrongPassword();
-    form.setFieldsValue({ password: newPassword });
-    setPasswordStrength(checkPasswordStrength(newPassword));
+  const handleImageChange = ({ file }) => {
+    setPhotoFile(file);
   };
 
-  const handlePasswordChange = (e) => {
-    const password = e.target.value;
-    if (password) {
-      setPasswordStrength(checkPasswordStrength(password));
-    } else {
-      setPasswordStrength(null);
-    }
-  };
-
-  const normFile = (e) => {
-    if (Array.isArray(e)) {
-      return e;
-    }
-    return e?.fileList;
-  };
-
-  const handlePhotoChange = (info) => {
-    if (info.file.status === "done") {
-      setPhotoFile(info.file.originFileObj);
-      setPhotoUrl(URL.createObjectURL(info.file.originFileObj));
-    }
-  };
-
-  const getPasswordStrengthColor = (score) => {
-    if (!score) return "#ff4d4f";
-    if (score <= 2) return "#ff4d4f";
-    if (score <= 3) return "#faad14";
-    return "#52c41a";
+  const handlePasswordStrengthChange = (isStrong) => {
+    setPasswordIsStrong(isStrong);
   };
 
   return (
@@ -157,32 +151,21 @@ export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
         layout="vertical"
         initialValues={{
           ...initialValues,
+          role: initialValues?.role?.id,
+          entity: initialValues?.entity?.id,
+          is_active: initialValues?.is_active ?? true,
         }}
         onFinish={handleSubmit}
         className="w-full"
       >
         <Row gutter={[24, 0]} align="top">
           <Col xs={24} md={8} className="text-center mb-6">
-            <div className="mb-4">
-              <Avatar size={120} icon={<UserOutlined />} src={photoUrl} />
-            </div>
-            <Form.Item
-              name="photo"
-              valuePropName="fileList"
-              getValueFromEvent={normFile}
-            >
-              <Upload
-                accept="image/*"
-                maxCount={1}
-                showUploadList={false}
-                onChange={handlePhotoChange}
-                beforeUpload={() => false} // Prevent auto upload
-              >
-                <Button icon={<UploadOutlined />} block>
-                  Cambiar Foto
-                </Button>
-              </Upload>
-            </Form.Item>
+            <ImageUpload
+              initialImage={initialValues?.photo}
+              uploadText="Agregar Foto"
+              changeText="Cambiar Foto"
+              onImageChange={handleImageChange}
+            />
           </Col>
 
           <Col xs={24} md={16}>
@@ -231,70 +214,54 @@ export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
               </Col>
 
               <Col xs={24}>
-                <Form.Item
-                  name="password"
-                  label={
-                    mode === "create"
-                      ? "Contraseña"
-                      : "Nueva Contraseña (opcional)"
-                  }
-                  rules={[
-                    mode === "create" && {
-                      required: true,
-                      message: "Por favor ingrese la contraseña",
-                    },
-                    {
-                      validator: (_, value) => {
-                        if (!value || checkPasswordStrength(value).isStrong) {
-                          return Promise.resolve();
-                        }
-                        return Promise.reject(
-                          "La contraseña no es lo suficientemente fuerte"
-                        );
+                {mode === "create" ? (
+                  <Form.Item
+                    name="password"
+                    label="Contraseña"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Por favor ingrese la contraseña",
                       },
-                    },
-                  ].filter(Boolean)}
-                >
-                  <Input.Password
-                    placeholder={
-                      mode === "create"
-                        ? "Ingrese la contraseña"
-                        : "Ingrese nueva contraseña"
-                    }
-                    onChange={handlePasswordChange}
-                    iconRender={(visible) =>
-                      visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                    }
-                    addonAfter={
-                      <Tooltip title="Generar contraseña fuerte">
-                        <Button
-                          type="text"
-                          icon={<KeyOutlined />}
-                          onClick={handlePasswordGenerate}
-                        />
-                      </Tooltip>
-                    }
-                  />
-                </Form.Item>
-                {passwordStrength && (
-                  <div className="mb-4">
-                    <Progress
-                      percent={passwordStrength.score * 20}
-                      strokeColor={getPasswordStrengthColor(
-                        passwordStrength.score
-                      )}
-                      showInfo={false}
+                      {
+                        validator: (_, value) => {
+                          if (!value || passwordIsStrong) {
+                            return Promise.resolve();
+                          }
+                          return Promise.reject(
+                            "La contraseña no es lo suficientemente fuerte"
+                          );
+                        },
+                      },
+                    ]}
+                  >
+                    <PasswordInput
+                      mode={mode}
+                      form={form}
+                      onStrengthChange={handlePasswordStrengthChange}
                     />
-                    <div className="text-xs mt-1">
-                      {passwordStrength.isStrong ? (
-                        <span className="text-green-600">
-                          Contraseña fuerte
-                        </span>
+                  </Form.Item>
+                ) : (
+                  <Form.Item label="Contraseña">
+                    <Tooltip
+                      title="Se enviará un enlace al usuario para restablecer la contraseña"
+                      placement="top"
+                    >
+                      {resetPasswordSuccess ? (
+                        <Button icon={<CheckOutlined />} disabled>
+                          Correo enviado
+                        </Button>
                       ) : (
-                        <span className="text-red-600">Contraseña débil</span>
+                        <Button
+                          icon={<KeyOutlined />}
+                          onClick={handleResetPassword}
+                          loading={resetPasswordLoading}
+                        >
+                          Restablecer contraseña
+                        </Button>
                       )}
-                    </div>
-                  </div>
+                    </Tooltip>
+                  </Form.Item>
                 )}
               </Col>
 
@@ -306,9 +273,16 @@ export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
                     { required: true, message: "Por favor seleccione un rol" },
                   ]}
                 >
-                  <Select placeholder="Seleccione un rol">
+                  <Select
+                    placeholder="Seleccione un rol"
+                    loading={roles.length === 0}
+                  >
                     {roles.map((role) => (
-                      <Option key={role.id} value={role.id}>
+                      <Option
+                        key={role.id}
+                        value={role.id}
+                        label={role.role?.toUpperCase()}
+                      >
                         {role.role?.toUpperCase()}
                       </Option>
                     ))}
@@ -329,7 +303,11 @@ export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
                 >
                   <Select placeholder="Seleccione una entidad">
                     {entities.map((entity) => (
-                      <Option key={entity.id} value={entity.id}>
+                      <Option
+                        key={entity.id}
+                        value={entity.id}
+                        label={entity.entity_name}
+                      >
                         {entity.entity_name}
                       </Option>
                     ))}
@@ -340,18 +318,10 @@ export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
               <Col xs={24} sm={12}>
                 <Form.Item
                   name="is_active"
-                  label="Estado"
-                  rules={[
-                    {
-                      required: true,
-                      message: "Por favor seleccione un estado",
-                    },
-                  ]}
+                  label="Activo"
+                  valuePropName="checked"
                 >
-                  <Select placeholder="Seleccione un estado">
-                    <Option value={true}>Activo</Option>
-                    <Option value={false}>Inactivo</Option>
-                  </Select>
+                  <Switch checked={initialValues?.is_active ?? true} />
                 </Form.Item>
               </Col>
             </Row>

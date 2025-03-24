@@ -13,7 +13,7 @@ import {
 } from "@/utils/atoms";
 import { useAtom, useAtomValue } from "jotai";
 import { useRouter, usePathname } from "next/navigation";
-import { useUserRole } from "@/utils/hooks/useUserRole";
+import { useUserRole } from "@/hooks/useUserRole";
 const { Sider } = Layout;
 
 export default function Sidebar() {

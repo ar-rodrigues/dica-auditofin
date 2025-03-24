@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Input, Select, Space, Typography, Button } from "antd";
+import { Input, Select, Space, Typography, Button, message } from "antd";
 import { SearchOutlined, UserAddOutlined } from "@ant-design/icons";
 import { useAtom } from "jotai";
 import { loadingAtom, usersAtom } from "@/utils/atoms";
@@ -41,9 +41,19 @@ export default function UsersPage() {
     return matchesSearch && matchesRole && matchesStatus;
   });
 
-  const handleDelete = (user) => {
-    // Implement delete functionality
-    console.log("Delete user:", user);
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`/api/users/${id}`, {
+        method: "DELETE",
+      });
+      if (response.ok) {
+        message.success("Usuario eliminado correctamente");
+        setUsersData(usersData.filter((user) => user.id !== id));
+      }
+    } catch (error) {
+      message.error("Error al eliminar el usuario");
+      console.error(error);
+    }
   };
 
   return (

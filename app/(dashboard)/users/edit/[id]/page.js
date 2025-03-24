@@ -6,7 +6,7 @@ import { useAtom } from "jotai";
 import { loadingAtom } from "@/utils/atoms";
 import UserForm from "@/components/UserForm";
 import { useParams } from "next/navigation";
-
+import NotFoundContent from "@/components/NotFoundContent";
 const { Title } = Typography;
 
 export default function EditUserPage() {
@@ -20,13 +20,11 @@ export default function EditUserPage() {
       setLoading(true);
       const response = await fetch(`/api/users/${id}`);
       const data = await response.json();
-      setUser(data);
+      setUser(data[0]);
       setLoading(false);
     };
     fetchUser();
   }, [id, setLoading]);
-
-  console.log("user", user);
 
   const handleSubmit = async (values) => {
     setLoading(true);
@@ -44,31 +42,15 @@ export default function EditUserPage() {
     }
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!user) {
+  if (!user || user.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
-        <div className="mx-auto max-w-lg flex flex-col items-center justify-center h-[60vh] text-center">
-          <div className="bg-white p-8 rounded-lg shadow-md w-full">
-            <Title level={3} className="!text-red-600 mb-2">
-              Usuario no encontrado
-            </Title>
-            <p className="text-gray-600 mb-6">
-              Lo sentimos, el usuario que estás buscando no existe o ha sido
-              eliminado.
-            </p>
-            <button
-              onClick={() => window.history.back()}
-              className="bg-primary hover:bg-primary/80 text-white font-semibold py-2 px-6 rounded-md transition-colors"
-            >
-              Volver atrás
-            </button>
-          </div>
-        </div>
-      </div>
+      <NotFoundContent
+        title="Usuario no encontrado"
+        message="Lo sentimos, el usuario que estás buscando no existe o ha sido eliminado."
+        buttonText="Volver atrás"
+        buttonAction={() => window.history.back()}
+        buttonStyles="bg-primary hover:bg-primary/80 text-white font-semibold py-2 px-6 rounded-md transition-colors"
+      />
     );
   }
 
@@ -79,18 +61,7 @@ export default function EditUserPage() {
           Editar Usuario
         </Title>
 
-        <UserForm
-          mode="edit"
-          initialValues={{
-            first_name: user[0]?.first_name,
-            last_name: user[0]?.last_name,
-            email: user[0]?.email,
-            role: user[0]?.role.role,
-            entity: user[0]?.entity.entity_name,
-            is_active: user[0]?.is_active,
-          }}
-          onSubmit={handleSubmit}
-        />
+        <UserForm mode="edit" initialValues={user} onSubmit={handleSubmit} />
       </div>
     </div>
   );
