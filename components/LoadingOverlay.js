@@ -9,7 +9,7 @@ export default function LoadingOverlay() {
   if (!loading) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-[1001] flex items-center justify-center">
+    <div className="fixed inset-0 bg-black/20 backdrop-blur-xs z-1001 flex items-center justify-center">
       <Spin size="large" />
     </div>
   );

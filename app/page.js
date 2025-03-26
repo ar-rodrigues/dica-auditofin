@@ -1,4 +1,5 @@
 "use client";
+import "./globals.css";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Layout, Button, Typography, Carousel, Flex, Card } from "antd";
@@ -32,7 +33,7 @@ export default function Home() {
   }, []);
 
   return (
-    <Layout className="min-h-screen bg-terciary">
+    <Layout className="min-h-screen bg-white">
       <Content>
         <HomeCarousel
           speed={2000}
@@ -40,7 +41,7 @@ export default function Home() {
           carouselItems={carouselItems}
           redirectRoute="/login"
           containerStyles=""
-          buttonStyles="!bg-secondary !text-white"
+          buttonStyles="bg-secondary! text-white!"
           mounted={mounted}
         />
 
@@ -73,7 +74,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bg-gradient-to-r from-secondary to-white/180 text-white py-20 px-8">
+        <div className="bg-linear-to-r from-secondary to-white/180 text-white py-20 px-8">
           <div className="max-w-4xl mx-auto text-center space-y-8">
             <Title level={2} className="text-white drop-shadow-lg">
               Impulsa tu Negocio al Siguiente Nivel
@@ -87,7 +88,7 @@ export default function Home() {
               size={"large"}
               icon={<ArrowRightOutlined />}
               text={"Agenda una Consulta"}
-              buttonStyles={"!bg-primary"}
+              buttonStyles={"bg-primary!"}
             />
           </div>
         </div>

@@ -1,17 +1,11 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
-
 import { Provider } from "jotai";
+import { AntdRegistry } from "@ant-design/nextjs-registry";
+import "@ant-design/v5-patch-for-react-19";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
+import { Layout } from "antd";
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import { Content, Footer } from "antd/es/layout/layout";
+import Navbar from "@/components/Navbar";
 
 const APP_NAME = "Dica México";
 const APP_DEFAULT_TITLE = "Dica México";
@@ -25,7 +19,6 @@ export const metadata = {
     template: APP_TITLE_TEMPLATE,
   },
   description: APP_DESCRIPTION,
-  manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     title: APP_NAME,
@@ -35,7 +28,7 @@ export const metadata = {
     telephone: false,
   },
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon-32x32.png",
   },
 };
 
@@ -44,12 +37,23 @@ export const viewport = {
 };
 
 export default function RootLayout({ children }) {
+  const isDashboard = children?.props?.childPropSegment === "dashboard";
   return (
     <html lang="es-MX">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <Provider>{children}</Provider>
+      <body>
+        <Provider>
+          <AntdRegistry>
+            <Layout style={{ maxWidth: "100%" }}>
+              {isDashboard ? <Navbar /> : null}
+              <Content>{children}</Content>
+              {isDashboard ? (
+                <Footer className="bg-primary! text-white! text-center">
+                  Dica ©2025 Created by Dica
+                </Footer>
+              ) : null}
+            </Layout>
+          </AntdRegistry>
+        </Provider>
       </body>
     </html>
   );

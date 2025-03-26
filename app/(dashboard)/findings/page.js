@@ -46,7 +46,7 @@ export default function FindingsPage() {
       <div className="mx-auto flex flex-col">
         <AuditHeader />
 
-        <Title level={5} className="!text-gray-600 mb-4">
+        <Title level={5} className="text-gray-600! mb-4">
           Hallazgos y observaciones
         </Title>
 

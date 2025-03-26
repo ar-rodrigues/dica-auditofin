@@ -8,12 +8,12 @@ export default function AuditHeader() {
   const colors = useAtomValue(colorsAtoms);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+    <div className="bg-white rounded-lg shadow-2xs p-6 mb-6">
       <Space direction="vertical" size="small" className="w-full">
         <div className="flex items-center justify-between">
           <Title
             level={4}
-            className="text-2xl sm:text-3xl font-bold !text-gray-900 mb-0"
+            className="text-2xl sm:text-3xl font-bold text-gray-900! mb-0"
           >
             Auditoría de Cuenta Pública
           </Title>

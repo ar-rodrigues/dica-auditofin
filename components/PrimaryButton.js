@@ -9,7 +9,7 @@ export default function PrimaryButton({
   type = "primary",
   text = "Button",
   icon,
-  buttonStyles = "!bg-primary !text-terciary",
+  buttonStyles = "bg-primary! text-terciary!",
   handleClick,
   ...props
 }) {

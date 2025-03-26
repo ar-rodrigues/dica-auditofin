@@ -105,7 +105,7 @@ export default function UsersTable({ data, onDelete, userRole }) {
       columns={columns}
       dataSource={data}
       rowKey="id"
-      className="bg-white rounded-lg shadow"
+      className="bg-white rounded-lg shadow-xs"
       scroll={{ x: "max-content" }}
       pagination={{
         pageSize: 10,

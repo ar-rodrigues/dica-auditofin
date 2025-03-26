@@ -51,7 +51,7 @@ export default function DashboardContent({ dashboards }) {
           </div>
 
           {isLoading && (
-            <div className="w-full h-[calc(100vh-theme(spacing.32))] flex items-center justify-center">
+            <div className="w-full h-[calc(100vh-(--spacing(32)))] flex items-center justify-center">
               <Spin size="large">
                 <div className="p-12 text-center">
                   <p className="text-gray-500 mt-3">Cargando dashboard...</p>
@@ -61,7 +61,7 @@ export default function DashboardContent({ dashboards }) {
           )}
 
           <div
-            className={`w-full aspect-[3/2] min-h-[400px] relative ${
+            className={`w-full aspect-3/2 min-h-[400px] relative ${
               isLoading ? "hidden" : ""
             }`}
           >

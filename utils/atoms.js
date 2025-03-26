@@ -50,7 +50,7 @@ export const carouselContentAtom = atom([
     title: "Soluciones Tecnológicas Avanzadas",
     description:
       "Impulsamos la transformación digital de tu empresa con innovación y eficiencia",
-    bgColor: "from-primary/90 to-primary/60",
+    bgColor: "from-terciary/10 to-terciary/3",
     image: Office,
     buttonText: "Explorar Soluciones",
   },
@@ -58,14 +58,14 @@ export const carouselContentAtom = atom([
     title: "Auditoría Profesional Integral",
     description:
       "Evaluaciones exhaustivas y recomendaciones estratégicas para tu negocio",
-    bgColor: "from-primary/90 to-primary/60",
+    bgColor: "from-terciary/10 to-terciary/3",
     image: Team,
     buttonText: "Conocer Servicios",
   },
   {
     title: "Consultoría Empresarial Experta",
     description: "Asesoramiento estratégico respaldado por años de experiencia",
-    bgColor: "from-primary/90 to-primary/60",
+    bgColor: "from-terciary/10 to-terciary/3",
     image: Team2,
     buttonText: "Consultar Ahora",
   },
@@ -73,7 +73,7 @@ export const carouselContentAtom = atom([
     title: "Soporte Técnico Especializado",
     description:
       "Asistencia continua y soluciones inmediatas para tu infraestructura",
-    bgColor: "from-primary/90 to-primary/60",
+    bgColor: "from-terciary/10 to-terciary/3",
     image: Team3,
     buttonText: "Solicitar Soporte",
   },

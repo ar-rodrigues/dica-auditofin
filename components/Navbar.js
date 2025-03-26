@@ -41,7 +41,7 @@ export default function Navbar() {
   const isMobile = windowWidth <= 768;
 
   return (
-    <Flex className="bg-primary w-full h-20 items-center justify-between !px-10">
+    <Flex className="bg-primary w-full h-20 items-center justify-between px-10!">
       {/* Logo on the left */}
       <Flex className="hover:scale-105 transition-transform duration-300">
         <Link href="/">
@@ -75,7 +75,7 @@ export default function Navbar() {
             >
               <Button
                 type="primary"
-                className="!bg-secondary"
+                className="bg-secondary!"
                 shape="circle"
                 size="large"
                 icon={<MenuOutlined />}
@@ -88,7 +88,7 @@ export default function Navbar() {
                 <Link
                   key={index}
                   href={link}
-                  className="relative text-white text-lg px-2 py-1 transition-all duration-300 hover:text-secondary"
+                  className="relative text-white! text-lg px-2 py-1 transition-all duration-300 hover:text-secondary"
                   onMouseEnter={() => setActiveMenu(index)}
                   onMouseLeave={() => setActiveMenu(null)}
                 >

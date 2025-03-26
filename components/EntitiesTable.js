@@ -24,7 +24,7 @@ export default function EntitiesTable({ data, onDelete }) {
       dataIndex: "description",
       key: "description",
       render: (text) => (
-        <Paragraph ellipsis={{ rows: 2 }} className="!mb-0">
+        <Paragraph ellipsis={{ rows: 2 }} className="mb-0!">
           {text}
         </Paragraph>
       ),
@@ -67,7 +67,7 @@ export default function EntitiesTable({ data, onDelete }) {
       columns={columns}
       dataSource={data}
       rowKey="id"
-      className="bg-white rounded-lg shadow align-middle"
+      className="bg-white rounded-lg shadow-xs align-middle"
       scroll={{ x: "max-content" }}
       pagination={{
         pageSize: 1,
