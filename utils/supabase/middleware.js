@@ -1,6 +1,6 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse } from "next/server";
-import { allowAdminOnly } from "@/utils/permissions";
+import { allowAdminOnly, rolesAllowed } from "@/utils/permissions";
 export async function updateSession(request) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -68,8 +68,11 @@ export async function updateSession(request) {
       .eq("id", user.id)
       .single();
 
-    //console.log("adminProfile", adminProfile);
-    if (error || !adminProfile || adminProfile.role.role !== "admin") {
+    if (
+      error ||
+      !adminProfile ||
+      !rolesAllowed.includes(adminProfile.role.role)
+    ) {
       const url = request.nextUrl.clone();
       url.pathname = "/unauthorized"; // Redirect to a custom unauthorized page
       return NextResponse.redirect(url);

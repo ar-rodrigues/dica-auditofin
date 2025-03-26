@@ -1,9 +1,19 @@
 import { createClient } from "@/utils/supabase/server";
 
-export async function getRoles() {
+export async function getRoles(getAll = false) {
   const supabase = await createClient();
+
   try {
-    const { data: roles, error } = await supabase.from("roles").select("*");
+    // If getAll is true, select all roles
+    // Otherwise, exclude super admin role
+    let query = supabase.from("roles").select("*");
+
+    if (getAll == "false") {
+      query = query.not("role", "eq", "super admin");
+    }
+
+    const { data: roles, error } = await query;
+
     if (error) throw error;
     return roles;
   } catch (error) {

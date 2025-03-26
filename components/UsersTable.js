@@ -7,7 +7,7 @@ import {
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
-export default function UsersTable({ data, onDelete }) {
+export default function UsersTable({ data, onDelete, userRole }) {
   const router = useRouter();
 
   const handleDelete = (userId) => {
@@ -87,12 +87,14 @@ export default function UsersTable({ data, onDelete }) {
             icon={<EditOutlined />}
             onClick={() => router.push(`/users/edit/${record.id}`)}
           />
-          <Button
-            type="primary"
-            danger
-            icon={<DeleteOutlined />}
-            onClick={() => handleDelete(record.id)}
-          />
+          {userRole === "super admin" && (
+            <Button
+              type="primary"
+              danger
+              icon={<DeleteOutlined />}
+              onClick={() => handleDelete(record.id)}
+            />
+          )}
         </Space>
       ),
     },

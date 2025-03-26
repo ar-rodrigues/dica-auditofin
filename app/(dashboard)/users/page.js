@@ -7,7 +7,7 @@ import { useAtom } from "jotai";
 import { loadingAtom, usersAtom } from "@/utils/atoms";
 import UsersTable from "@/components/UsersTable";
 import { useRouter } from "next/navigation";
-
+import { useUserRole } from "@/hooks/useUserRole";
 const { Option } = Select;
 const { Title } = Typography;
 
@@ -18,6 +18,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useAtom(loadingAtom);
   const [usersData, setUsersData] = useAtom(usersAtom);
   const router = useRouter();
+  const { userRole } = useUserRole();
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -102,7 +103,11 @@ export default function UsersPage() {
           </Button>
         </div>
 
-        <UsersTable data={filteredUsers} onDelete={handleDelete} />
+        <UsersTable
+          data={filteredUsers}
+          onDelete={handleDelete}
+          userRole={userRole}
+        />
       </div>
     </div>
   );

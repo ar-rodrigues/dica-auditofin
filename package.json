@@ -18,7 +18,7 @@
     "antd": "^5.23.4",
     "generate-password": "^1.7.1",
     "jotai": "^2.12.1",
-    "next": "15.1.6",
+    "next": "^15.2.4",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",

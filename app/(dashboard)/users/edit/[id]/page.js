@@ -7,13 +7,18 @@ import { loadingAtom } from "@/utils/atoms";
 import UserForm from "@/components/UserForm";
 import { useParams } from "next/navigation";
 import NotFoundContent from "@/components/NotFoundContent";
+import { useUserRole } from "@/hooks/useUserRole";
+import { useRoles } from "@/hooks/useRoles";
+import { useEntities } from "@/hooks/useEntities";
 const { Title } = Typography;
 
 export default function EditUserPage() {
   const [loading, setLoading] = useAtom(loadingAtom);
   const [user, setUser] = useState([]);
+
   const params = useParams();
   const id = params.id;
+  const { userRole } = useUserRole();
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,6 +30,17 @@ export default function EditUserPage() {
     };
     fetchUser();
   }, [id, setLoading]);
+
+  const {
+    roles,
+    loading: rolesLoading,
+    error: rolesError,
+  } = useRoles(userRole);
+  const {
+    entities,
+    loading: entitiesLoading,
+    error: entitiesError,
+  } = useEntities();
 
   const handleSubmit = async (values) => {
     setLoading(true);
@@ -61,7 +77,17 @@ export default function EditUserPage() {
           Editar Usuario
         </Title>
 
-        <UserForm mode="edit" initialValues={user} onSubmit={handleSubmit} />
+        <UserForm
+          mode="edit"
+          initialValues={user}
+          onSubmit={handleSubmit}
+          roles={roles}
+          entities={entities}
+          rolesLoading={rolesLoading}
+          entitiesLoading={entitiesLoading}
+          rolesError={rolesError}
+          entitiesError={entitiesError}
+        />
       </div>
     </div>
   );

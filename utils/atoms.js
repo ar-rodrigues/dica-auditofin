@@ -11,6 +11,7 @@ import {
   UserOutlined,
   BankOutlined,
   FileTextOutlined,
+  LinkOutlined,
 } from "@ant-design/icons";
 
 // Loading state atom
@@ -306,21 +307,41 @@ export const sidebarItems = [
     label: "Usuarios",
     icon: <UserOutlined />,
     url: "/users",
-    permissions: ["admin"],
+    permissions: ["admin", "super admin"],
   },
   {
     key: "4",
     label: "Entidades",
     icon: <BankOutlined />,
     url: "/entities",
-    permissions: ["admin"],
+    permissions: ["admin", "super admin"],
   },
   {
     key: "5",
     label: "Requerimientos",
     icon: <FileTextOutlined />,
     url: "/requirements",
-    permissions: ["admin"],
+    permissions: ["admin", "super admin"],
+  },
+  {
+    key: "6",
+    label: "Gestión de Requerimientos",
+    icon: <LinkOutlined />,
+    permissions: ["admin", "super admin"],
+    children: [
+      {
+        key: "6.1",
+        label: "Asignar Requerimientos",
+        url: "/requirements-assignment",
+        permissions: ["admin", "super admin"],
+      },
+      {
+        key: "6.2",
+        label: "Requerimientos por Entidad",
+        url: "/entity-requirements",
+        permissions: ["admin", "super admin"],
+      },
+    ],
   },
 ];
 

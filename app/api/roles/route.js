@@ -1,9 +1,12 @@
 import { getRoles } from "./roles";
 import { NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const getAll = searchParams.get("getAll");
+
   try {
-    const roles = await getRoles();
+    const roles = await getRoles(getAll);
     return NextResponse.json(roles);
   } catch (error) {
     console.error("Error fetching roles:", error);

@@ -26,7 +26,10 @@ export default function Sidebar() {
 
   // Find the current key based on the pathname
   const getCurrentKey = () => {
-    const item = sidebarItems.find((item) => item.url === pathname);
+    const item = sidebarItems.find((item) => {
+      const path = pathname.split("/").slice(0, 2).join("/");
+      return item.url === path;
+    });
     return item ? item.key : "1";
   };
 

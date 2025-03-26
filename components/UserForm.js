@@ -22,7 +22,17 @@ import PasswordInput from "@/components/common/PasswordInput";
 
 const { Option } = Select;
 
-export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
+export default function UserForm({
+  initialValues,
+  onSubmit,
+  mode = "create",
+  roles,
+  entities,
+  rolesLoading,
+  entitiesLoading,
+  rolesError,
+  entitiesError,
+}) {
   const [form] = Form.useForm();
   const router = useRouter();
 
@@ -34,37 +44,6 @@ export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
   const [photoFile, setPhotoFile] = useState(null);
   const { uploadFile } = useUploadFile();
   const { handleSubmit: handleFormSubmit } = useFormSubmit("/api/users");
-
-  const [roles, setRoles] = useState([]);
-  const [entities, setEntities] = useState([]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        // Fetch roles and entities
-        const [rolesResponse, entitiesResponse] = await Promise.all([
-          fetch("/api/roles"),
-          fetch("/api/entities"),
-        ]);
-
-        const [rolesData, entitiesData] = await Promise.all([
-          rolesResponse.json(),
-          entitiesResponse.json(),
-        ]);
-
-        setRoles(rolesData);
-        setEntities(entitiesData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        message.error("Error al cargar los datos");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const handleResetPassword = async () => {
     try {
@@ -275,9 +254,10 @@ export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
                 >
                   <Select
                     placeholder="Seleccione un rol"
-                    loading={roles.length === 0}
+                    loading={rolesLoading}
+                    disabled={rolesLoading}
                   >
-                    {roles.map((role) => (
+                    {roles?.map((role) => (
                       <Option
                         key={role.id}
                         value={role.id}
@@ -301,8 +281,12 @@ export default function UserForm({ initialValues, onSubmit, mode = "create" }) {
                     },
                   ]}
                 >
-                  <Select placeholder="Seleccione una entidad">
-                    {entities.map((entity) => (
+                  <Select
+                    placeholder="Seleccione una entidad"
+                    loading={entitiesLoading}
+                    disabled={entitiesLoading}
+                  >
+                    {entities?.map((entity) => (
                       <Option
                         key={entity.id}
                         value={entity.id}
