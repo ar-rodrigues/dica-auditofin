@@ -10,8 +10,8 @@ import {
   PieChartOutlined,
   UserOutlined,
   BankOutlined,
-  FileTextOutlined,
   LinkOutlined,
+  ContainerOutlined,
 } from "@ant-design/icons";
 
 // Loading state atom
@@ -319,7 +319,7 @@ export const sidebarItems = [
   {
     key: "5",
     label: "Requerimientos",
-    icon: <FileTextOutlined />,
+    icon: <ContainerOutlined />,
     url: "/requirements",
     permissions: ["admin", "super admin"],
   },

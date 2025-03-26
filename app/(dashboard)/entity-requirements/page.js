@@ -27,6 +27,31 @@ const mockAreas = [
   { id: 5, name: "Recursos Humanos" },
 ];
 
+// Mock data for requirements - this would come from your backend later
+const mockRequirements = [
+  {
+    id: 1,
+    ref_code: "REQ-001",
+    info: "Relación de actas de Sesión de Cabildo",
+    area: "Educación",
+    areaId: 1,
+  },
+  {
+    id: 2,
+    ref_code: "REQ-002",
+    info: "Estados financieros mensuales",
+    area: "Educación",
+    areaId: 1,
+  },
+  {
+    id: 3,
+    ref_code: "REQ-003",
+    info: "Presupuesto anual",
+    area: "Finanzas",
+    areaId: 3,
+  },
+];
+
 export default function EntityRequirementsPage() {
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [searchText, setSearchText] = useState("");

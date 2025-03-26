@@ -52,7 +52,7 @@ export default function Home() {
                 <Card
                   key={index}
                   className="w-[350px] shadow-md hover:shadow-lg transition-shadow"
-                  bordered={false}
+                  variant="outlined"
                 >
                   <Flex vertical gap="middle" align="start">
                     {feature.icon && (
