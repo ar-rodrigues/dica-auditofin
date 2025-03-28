@@ -26,14 +26,38 @@ export default function Sidebar() {
 
   // Find the current key based on the pathname
   const getCurrentKey = () => {
-    const item = sidebarItems.find((item) => {
-      const path = pathname.split("/").slice(0, 2).join("/");
-      return item.url === path;
-    });
-    return item ? item.key : "1";
+    // First check for exact matches
+    for (const item of sidebarItems) {
+      if (item.url === pathname) {
+        return item.key;
+      }
+
+      // Check children for exact matches
+      if (item.children) {
+        const childMatch = item.children.find(
+          (child) => child.url === pathname
+        );
+        if (childMatch) return childMatch.key;
+      }
+    }
+
+    // If no exact match, try partial matches (for dynamic routes)
+    const pathSegments = pathname.split("/").filter(Boolean);
+    if (pathSegments.length >= 1) {
+      const basePath = `/${pathSegments[0]}`;
+      const item = sidebarItems.find((item) => item.url === basePath);
+      return item ? item.key : "1";
+    }
+
+    return "1"; // Default to dashboard
   };
 
   const [current, setCurrent] = useState(getCurrentKey());
+
+  // Update selected key when path changes
+  useEffect(() => {
+    setCurrent(getCurrentKey());
+  }, [pathname]);
 
   const handleClick = async ({ key }) => {
     setLoading(true);
@@ -44,6 +68,26 @@ export default function Sidebar() {
     }
     setTimeout(() => setLoading(false), 500);
   };
+
+  // Handle sidebar collapse
+  const handleCollapse = (isCollapsed) => {
+    setCollapsed(isCollapsed);
+
+    // Save state to localStorage
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem("sidebarCollapsed", JSON.stringify(isCollapsed));
+    }
+  };
+
+  // Load saved state on mount
+  useEffect(() => {
+    if (typeof localStorage !== "undefined") {
+      const savedState = localStorage.getItem("sidebarCollapsed");
+      if (savedState !== null) {
+        setCollapsed(JSON.parse(savedState));
+      }
+    }
+  }, [setCollapsed]);
 
   useEffect(() => {
     const handleResize = () => {
@@ -57,28 +101,59 @@ export default function Sidebar() {
     return () => window.removeEventListener("resize", handleResize);
   }, [setCollapsed]);
 
+  // Filter items based on user role
+  const filteredItems = sidebarItems.filter(
+    (item) =>
+      item.permissions.length === 0 || item.permissions.includes(userRole)
+  );
+
   return (
     <Sider
       collapsible
       collapsed={collapsed}
-      onCollapse={setCollapsed}
-      breakpoint="sm"
+      onCollapse={handleCollapse}
+      breakpoint="lg"
+      width={256}
+      collapsedWidth={80}
+      style={{
+        height: "100%",
+        minHeight: "100vh",
+        position: "fixed",
+        left: 0,
+        top: 0,
+        bottom: 0,
+        zIndex: 10,
+      }}
     >
-      <Flex style={sidebarLogoStyle}>
-        <Image width={50} height={50} src={logo} alt="Logo" />
+      <Flex
+        align="center"
+        justify="center"
+        style={{
+          ...sidebarLogoStyle,
+          height: "50px",
+          margin: "10px",
+          background: "var(--color-white)",
+          overflow: "hidden",
+        }}
+      >
+        <Image
+          width={collapsed ? 32 : 40}
+          height={collapsed ? 32 : 40}
+          src={logo}
+          alt="Logo"
+        />
       </Flex>
       <Menu
         theme="dark"
         defaultSelectedKeys={[current]}
         selectedKeys={[current]}
         mode="inline"
-        // if permissions is empty, show all items
-        items={sidebarItems.filter((item) =>
-          item.permissions.length === 0
-            ? true
-            : item.permissions.includes(userRole)
-        )}
+        items={filteredItems}
         onClick={handleClick}
+        style={{
+          height: "calc(100vh - 70px)",
+          overflowY: "auto",
+        }}
       />
     </Sider>
   );

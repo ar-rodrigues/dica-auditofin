@@ -1,0 +1,22 @@
+@import "tailwindcss";
+
+@theme {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: #020381;
+  --color-secondary: #a2c224;
+  --color-terciary: #e5e7eb;
+  --color-quaternary: #161617;
+  --color-white: #ffffff;
+
+  --animate-fade-in: fadeIn 0.5s ease-in;
+  --animate-slide-in: slideIn 0.5s ease-out;
+}
+
+html,
+body {
+  background-color: var(--color-background);
+  margin: 0 !important;
+  padding: 0;
+  height: 100vh;
+}

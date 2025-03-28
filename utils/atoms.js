@@ -12,6 +12,7 @@ import {
   BankOutlined,
   LinkOutlined,
   ContainerOutlined,
+  AuditOutlined,
 } from "@ant-design/icons";
 
 // Loading state atom
@@ -343,6 +344,26 @@ export const sidebarItems = [
       },
     ],
   },
+  {
+    key: "7",
+    label: "Auditoría",
+    icon: <AuditOutlined />,
+    permissions: [],
+    children: [
+      {
+        key: "7.1",
+        label: "Mis Requerimientos",
+        url: "/audit",
+        permissions: [],
+      },
+      {
+        key: "7.2",
+        label: "Auditar Entidades",
+        url: "/auditor",
+        permissions: ["admin", "super admin"],
+      },
+    ],
+  },
 ];
 
 export const sidebarLogoStyle = {
@@ -390,22 +411,6 @@ export const adminOnlyPagesAtom = atom([
   "/requirements",
 ]);
 
-// Entities data atom
-export const entitiesAtom = atom({
-  entities: [
-    {
-      id: 1,
-      name: "Organismo Operador del Servicio de Limpia",
-      type: "Municipal",
-      location: "Puebla",
-      status: "active",
-      createdAt: "2024-03-20",
-      lastAudit: "2024-01-15",
-    },
-    // Add more sample entities as needed
-  ],
-});
-
 // Mock requirements data
 export const mockRequirementsAtom = atom([
   {
@@ -423,6 +428,18 @@ export const mockRequirementsAtom = atom([
     frequency_by_day: 30,
     days_to_deliver: 5,
     created_at: "2024-03-20",
+    status: "pending",
+    dueDate: "2024-03-31",
+    history: [
+      {
+        id: "h1",
+        type: "comment",
+        user: "Juan Pérez",
+        date: "2024-03-20T10:00:00",
+        comment: "Por favor proporcione el último estado financiero",
+      },
+    ],
+    latestFile: null,
   },
   {
     id: 2,
@@ -439,6 +456,28 @@ export const mockRequirementsAtom = atom([
     frequency_by_day: 30,
     days_to_deliver: 7,
     created_at: "2024-03-20",
+    status: "approved",
+    dueDate: "2024-03-25",
+    history: [
+      {
+        id: "h2",
+        type: "file",
+        user: "María García",
+        date: "2024-03-22T14:30:00",
+        fileUrl: "/files/estados-financieros-2023.xlsx",
+      },
+      {
+        id: "h3",
+        type: "comment",
+        user: "Auditor",
+        date: "2024-03-23T09:15:00",
+        comment: "Documento aprobado",
+      },
+    ],
+    latestFile: {
+      name: "estados-financieros-2023.xlsx",
+      url: "/files/estados-financieros-2024.xlsx",
+    },
   },
   {
     id: 3,
@@ -455,10 +494,48 @@ export const mockRequirementsAtom = atom([
     frequency_by_day: 15,
     days_to_deliver: 3,
     created_at: "2024-03-20",
+    status: "missing",
+    dueDate: "2024-03-15",
+    history: [
+      {
+        id: "h4",
+        type: "comment",
+        user: "Sistema",
+        date: "2024-03-16T00:00:00",
+        comment: "Documento vencido",
+      },
+    ],
+    latestFile: null,
   },
 ]);
 
-// Mock ,file types data
+// Entities data atom
+export const entitiesAtom = atom({
+  entities: [
+    {
+      id: "puebla",
+      name: "Organismo Operador del Servicio de Limpia del Municipio de Puebla",
+      description: "Organismo público descentralizado",
+      logo: "/logos/puebla.png",
+      requirements: mockRequirementsAtom,
+      status: "active",
+      createdAt: "2024-03-20",
+      lastAudit: "2024-01-15",
+    },
+    {
+      id: "xalapa",
+      name: "Municipio de Xalapa del Estado de Veracruz",
+      description: "Gobierno municipal",
+      logo: "/logos/xalapa.png",
+      requirements: mockRequirementsAtom,
+      status: "active",
+      createdAt: "2024-03-20",
+      lastAudit: "2024-01-15",
+    },
+  ],
+});
+
+// Mock file types data
 export const mockFileTypesAtom = atom([
   { id: 1, type: "PDF", extension: ".pdf" },
   { id: 2, type: "Excel", extension: ".xlsx" },
@@ -466,7 +543,7 @@ export const mockFileTypesAtom = atom([
   { id: 4, type: "Imagen", extension: ".jpg,.png" },
 ]);
 
-// Mock require,d formats data
+// Mock required formats data
 export const mockRequiredFormatsAtom = atom([
   {
     id: "simple",

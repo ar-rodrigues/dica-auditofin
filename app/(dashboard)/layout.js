@@ -1,60 +1,41 @@
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import "@ant-design/v5-patch-for-react-19";
-
-import { Layout, Space } from "antd";
+import "./globals.css";
+import { Layout } from "antd";
 
 import { Header, Content, Footer } from "antd/es/layout/layout";
 import Sidebar from "@/components/Sidebar";
 import LogoutButton from "@/components/Logout";
 import LoadingOverlay from "@/components/LoadingOverlay";
-
-// export const metadata = {
-//   title: "Dica Auditofin",
-//   description: "Web Plataform for public audits",
-//   icons: {
-//     icon: "/icon.png", // /public/icon.png
-//     shortcut: "/shortcut-icon.png",
-//     apple: "/apple-icon.png",
-//     // you can specify multiple sizes
-//     other: {
-//       rel: "apple-touch-icon-precomposed",
-//       url: "/apple-touch-icon-precomposed.png",
-//     },
-//   },
-// };
+import DashboardClientLayout from "@/components/DashboardClientLayout";
 
 export default function DashboardLayout({ children }) {
   return (
-    <>
-      <LoadingOverlay />
-      <Layout
-        hasSider={true}
-        style={{
-          height: "100%",
-        }}
-      >
-        <Sidebar />
-        <Layout>
-          <Header
-            style={{
-              backgroundColor: "white",
-              display: "flex",
-              justifyContent: "end",
-            }}
-          >
-            <LogoutButton />
-          </Header>
-          <Content>{children}</Content>
-
-          <Footer
-            style={{
-              textAlign: "center",
-            }}
-          >
-            Dica ©{new Date().getFullYear()}
-          </Footer>
-        </Layout>
-      </Layout>
-    </>
+    <html lang="es-MX">
+      <head>
+        <link
+          rel="icon"
+          type="image/png"
+          href="/favicon-96x96.png"
+          sizes="96x96"
+        />
+        <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+        <link rel="shortcut icon" href="/favicon.ico" />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href="/apple-touch-icon.png"
+        />
+        <meta name="apple-mobile-web-app-title" content="Dica Mx" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="manifest" href="/site.webmanifest" />
+      </head>
+      <body className="h-screen">
+        <AntdRegistry>
+          <LoadingOverlay />
+          <DashboardClientLayout>{children}</DashboardClientLayout>
+        </AntdRegistry>
+      </body>
+    </html>
   );
 }
