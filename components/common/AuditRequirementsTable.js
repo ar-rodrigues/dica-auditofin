@@ -1,14 +1,16 @@
 import React from "react";
-import { useAtom } from "jotai";
-import { mockRequirementsAtom } from "@/utils/atoms";
+import { Table, Button, Space, Tag } from "antd";
+import { EyeOutlined } from "@ant-design/icons";
 
 const AuditRequirementsTable = ({
+  requirements,
   onRequirementClick,
-  searchTerm = "",
   filterStatus = "all",
+  searchTerm = "",
+  buttonColor = "var(--color-primary)",
+  buttonTextColor = "var(--color-white)",
+  buttonSize = "middle",
 }) => {
-  const [requirements] = useAtom(mockRequirementsAtom);
-
   const filteredRequirements = requirements.filter((req) => {
     const matchesSearch =
       req.ref_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -16,19 +18,6 @@ const AuditRequirementsTable = ({
     const matchesStatus = filterStatus === "all" || req.status === filterStatus;
     return matchesSearch && matchesStatus;
   });
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "approved":
-        return "bg-green-100 text-green-800";
-      case "pending":
-        return "bg-yellow-100 text-yellow-800";
-      case "missing":
-        return "bg-red-100 text-red-800";
-      default:
-        return "bg-gray-100 text-gray-800";
-    }
-  };
 
   // Format date string to avoid hydration issues
   const formatDate = (dateString) => {
@@ -40,70 +29,88 @@ const AuditRequirementsTable = ({
     }
   };
 
+  // Get color for status tag
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "aprobado":
+        return "success";
+      case "pendiente":
+        return "warning";
+      case "faltante":
+        return "error";
+      default:
+        return "default";
+    }
+  };
+
+  const columns = [
+    {
+      title: "Código de Referencia",
+      dataIndex: "ref_code",
+      key: "ref_code",
+      sorter: (a, b) => a.ref_code.localeCompare(b.ref_code),
+    },
+    {
+      title: "Requerimiento",
+      dataIndex: "info",
+      key: "info",
+      ellipsis: true,
+    },
+    {
+      title: "Estado",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => <Tag color={getStatusColor(status)}>{status}</Tag>,
+      filters: [
+        { text: "Aprobado", value: "aprobado" },
+        { text: "Pendiente", value: "pendiente" },
+        { text: "Faltante", value: "faltante" },
+      ],
+      onFilter: (value, record) => record.status === value,
+    },
+    {
+      title: "Fecha de Vencimiento",
+      dataIndex: "dueDate",
+      key: "dueDate",
+      render: (dueDate) => formatDate(dueDate),
+      sorter: (a, b) => new Date(a.dueDate) - new Date(b.dueDate),
+    },
+    {
+      title: "Acciones",
+      key: "actions",
+      render: (_, record) => (
+        <Button
+          type="default"
+          size={buttonSize}
+          icon={<EyeOutlined />}
+          style={{
+            backgroundColor: buttonColor,
+            color: buttonTextColor,
+          }}
+          onClick={() => onRequirementClick(record.id)}
+        >
+          Ver Detalles
+        </Button>
+      ),
+    },
+  ];
+
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full divide-y divide-gray-200">
-        <thead className="bg-gray-50">
-          <tr>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Reference Code
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Requirement
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Status
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Due Date
-            </th>
-            <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-              Actions
-            </th>
-          </tr>
-        </thead>
-        <tbody className="bg-white divide-y divide-gray-200">
-          {filteredRequirements.length > 0 ? (
-            filteredRequirements.map((req) => (
-              <tr key={req.id} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                  {req.ref_code}
-                </td>
-                <td className="px-6 py-4 text-sm text-gray-500">
-                  <div className="max-w-sm truncate">{req.info}</div>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span
-                    className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(
-                      req.status
-                    )}`}
-                  >
-                    {req.status.charAt(0).toUpperCase() + req.status.slice(1)}
-                  </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {formatDate(req.dueDate)}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  <button
-                    onClick={() => onRequirementClick(req.id)}
-                    className="text-indigo-600 hover:text-indigo-900"
-                  >
-                    View Details
-                  </button>
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan="5" className="px-6 py-10 text-center text-gray-500">
-                No requirements found matching your criteria
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
-    </div>
+    <Table
+      columns={columns}
+      dataSource={filteredRequirements}
+      rowKey="id"
+      className="bg-white"
+      pagination={{
+        pageSize: 10,
+        showSizeChanger: true,
+        showTotal: (total) => `Total ${total} requerimientos`,
+      }}
+      locale={{
+        emptyText:
+          "No se encontraron requerimientos con los criterios seleccionados",
+      }}
+    />
   );
 };
 

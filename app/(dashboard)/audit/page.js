@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import AuditHeader from "@/components/AuditHeader";
 import AuditStats from "@/components/common/AuditStats";
 import AuditRequirementsTable from "@/components/common/AuditRequirementsTable";
+import SearchAndFilters from "@/components/common/SearchAndFilters";
 import { useAtom } from "jotai";
 import { mockRequirementsAtom } from "@/utils/atoms";
 
@@ -22,47 +23,53 @@ export default function AuditPage() {
   };
 
   const handleRequirementClick = (requirementId) => {
-    router.push(`/audit/${requirementId}`);
+    router.push(`/audit/requirement/${requirementId}`);
+  };
+
+  // Define the status filter options
+  const statusFilter = {
+    id: "status",
+    value: filterStatus,
+    onChange: setFilterStatus,
+    placeholder: "Filtrar por estado",
+    options: [
+      { value: "all", label: "Todos los estados" },
+      { value: "approved", label: "Aprobados" },
+      { value: "pending", label: "Pendientes" },
+      { value: "missing", label: "Faltantes" },
+    ],
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <AuditHeader
-        title="My Requirements"
-        subtitle="View and manage your requirements"
-      />
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
+      <div className="mx-auto flex flex-col">
+        <AuditHeader
+          title="Mis Requerimientos"
+          subtitle="Ver y gestionar tus requerimientos"
+        />
 
-      <div className="mt-8">
-        <AuditStats stats={stats} />
-      </div>
+        <div className="mt-8">
+          <AuditStats stats={stats} />
+        </div>
 
-      <div className="mt-8">
-        <div className="bg-white shadow-md rounded-lg p-6">
-          <div className="flex flex-col md:flex-row gap-4 mb-4">
-            <input
-              type="text"
-              placeholder="Search requirements..."
-              className="flex-1 px-4 py-2 border rounded-lg"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+        <div className="mt-8">
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <SearchAndFilters
+              searchTerm={searchTerm}
+              onSearch={setSearchTerm}
+              searchPlaceholder="Buscar requerimientos..."
+              filters={[statusFilter]}
             />
-            <select
-              className="px-4 py-2 border rounded-lg"
-              value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value)}
-            >
-              <option value="all">All Status</option>
-              <option value="approved">Approved</option>
-              <option value="pending">Pending</option>
-              <option value="missing">Missing</option>
-            </select>
-          </div>
 
-          <AuditRequirementsTable
-            onRequirementClick={handleRequirementClick}
-            filterStatus={filterStatus}
-            searchTerm={searchTerm}
-          />
+            <AuditRequirementsTable
+              requirements={requirements}
+              onRequirementClick={handleRequirementClick}
+              filterStatus={filterStatus}
+              searchTerm={searchTerm}
+              buttonColor="var(--color-white)"
+              buttonTextColor="var(--color-black)"
+            />
+          </div>
         </div>
       </div>
     </div>

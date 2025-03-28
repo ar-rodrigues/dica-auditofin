@@ -8,6 +8,7 @@
   --color-terciary: #e5e7eb;
   --color-quaternary: #161617;
   --color-white: #ffffff;
+  --color-black: #000000;
 
   --animate-fade-in: fadeIn 0.5s ease-in;
   --animate-slide-in: slideIn 0.5s ease-out;

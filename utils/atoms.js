@@ -326,7 +326,7 @@ export const sidebarItems = [
   },
   {
     key: "6",
-    label: "Gestión de Requerimientos",
+    label: "Auditoría",
     icon: <LinkOutlined />,
     permissions: ["admin", "super admin"],
     children: [
@@ -349,20 +349,14 @@ export const sidebarItems = [
     label: "Auditoría",
     icon: <AuditOutlined />,
     permissions: [],
-    children: [
-      {
-        key: "7.1",
-        label: "Mis Requerimientos",
-        url: "/audit",
-        permissions: [],
-      },
-      {
-        key: "7.2",
-        label: "Auditar Entidades",
-        url: "/auditor",
-        permissions: ["admin", "super admin"],
-      },
-    ],
+    url: "/audit",
+  },
+  {
+    key: "8",
+    label: "Auditor",
+    icon: <AuditOutlined />,
+    permissions: [],
+    url: "/auditor",
   },
 ];
 
@@ -428,7 +422,7 @@ export const mockRequirementsAtom = atom([
     frequency_by_day: 30,
     days_to_deliver: 5,
     created_at: "2024-03-20",
-    status: "pending",
+    status: "pendiente",
     dueDate: "2024-03-31",
     history: [
       {
@@ -456,7 +450,7 @@ export const mockRequirementsAtom = atom([
     frequency_by_day: 30,
     days_to_deliver: 7,
     created_at: "2024-03-20",
-    status: "approved",
+    status: "aprobado",
     dueDate: "2024-03-25",
     history: [
       {
@@ -494,7 +488,7 @@ export const mockRequirementsAtom = atom([
     frequency_by_day: 15,
     days_to_deliver: 3,
     created_at: "2024-03-20",
-    status: "missing",
+    status: "faltante",
     dueDate: "2024-03-15",
     history: [
       {
