@@ -1,78 +1,144 @@
 import React from "react";
 import { useAtom } from "jotai";
-import { entitiesAtom } from "@/lib/atoms";
+import { entitiesAtom } from "@/utils/atoms";
+import {
+  FileTextOutlined,
+  ClockCircleOutlined,
+  CheckCircleOutlined,
+  ExclamationCircleOutlined,
+  BankOutlined,
+} from "@ant-design/icons";
+import { Card, Avatar, Row, Col, Typography, Divider } from "antd";
+import StatCard from "./StatCard";
 
-const EntityCard = ({ entity, stats, onClick }) => (
-  <div
-    onClick={onClick}
-    className="bg-white rounded-lg shadow-lg p-6 cursor-pointer hover:shadow-xl transition-shadow duration-200"
-  >
-    <div className="flex items-center space-x-4 mb-4">
-      <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center">
-        {entity.logo ? (
-          <img
-            src={entity.logo}
-            alt={entity.name}
-            className="w-12 h-12 object-contain"
-          />
-        ) : (
-          <span className="text-2xl font-bold text-gray-400">
-            {entity.name.charAt(0)}
-          </span>
-        )}
-      </div>
-      <div>
-        <h3 className="text-lg font-semibold text-gray-900">{entity.name}</h3>
-        <p className="text-sm text-gray-500">{entity.description}</p>
-      </div>
-    </div>
+const { Title, Text, Paragraph } = Typography;
 
-    <div className="grid grid-cols-2 gap-4">
-      <div className="bg-blue-50 p-3 rounded-lg">
-        <p className="text-sm text-blue-600">Total</p>
-        <p className="text-xl font-semibold text-blue-900">{stats.total}</p>
-      </div>
-      <div className="bg-yellow-50 p-3 rounded-lg">
-        <p className="text-sm text-yellow-600">Pending</p>
-        <p className="text-xl font-semibold text-yellow-900">{stats.pending}</p>
-      </div>
-      <div className="bg-green-50 p-3 rounded-lg">
-        <p className="text-sm text-green-600">Approved</p>
-        <p className="text-xl font-semibold text-green-900">{stats.approved}</p>
-      </div>
-      <div className="bg-red-50 p-3 rounded-lg">
-        <p className="text-sm text-red-600">Missing</p>
-        <p className="text-xl font-semibold text-red-900">{stats.missing}</p>
-      </div>
-    </div>
-  </div>
-);
+// Colores consistentes para las estadísticas
+const COLORS = {
+  total: "#1890ff", // Azul
+  pendiente: "#faad14", // Amarillo
+  aprobado: "#52c41a", // Verde
+  faltante: "#f5222d", // Rojo
+};
 
-const EntityCards = ({ onEntityClick }) => {
-  const [entities] = useAtom(entitiesAtom);
+const EntityCard = ({ entity, onClick }) => {
+  // Si la entidad tiene estadísticas directamente, usarlas, de lo contrario calcular
+  const stats = entity.stats || {
+    total: entity.requirements?.length || 0,
+    pendiente:
+      entity.requirements?.filter((r) => r.status === "pendiente").length || 0,
+    aprobado:
+      entity.requirements?.filter((r) => r.status === "aprobado").length || 0,
+    faltante:
+      entity.requirements?.filter((r) => r.status === "faltante").length || 0,
+  };
+
+  const statConfig = [
+    {
+      title: "Total",
+      value: stats.total,
+      icon: <FileTextOutlined />,
+      color: COLORS.total,
+    },
+    {
+      title: "Pendientes",
+      value: stats.pendiente,
+      icon: <ClockCircleOutlined />,
+      color: COLORS.pendiente,
+    },
+    {
+      title: "Aprobados",
+      value: stats.aprobado,
+      icon: <CheckCircleOutlined />,
+      color: COLORS.aprobado,
+    },
+    {
+      title: "Faltantes",
+      value: stats.faltante,
+      icon: <ExclamationCircleOutlined />,
+      color: COLORS.faltante,
+    },
+  ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {entities.map((entity) => (
-        <EntityCard
-          key={entity.id}
-          entity={entity}
-          stats={{
-            total: entity.requirements?.length || 0,
-            pending:
-              entity.requirements?.filter((r) => r.status === "pending")
-                .length || 0,
-            approved:
-              entity.requirements?.filter((r) => r.status === "approved")
-                .length || 0,
-            missing:
-              entity.requirements?.filter((r) => r.status === "missing")
-                .length || 0,
+    <Card
+      hoverable
+      className="w-full transition-all duration-300 hover:shadow-lg"
+      onClick={onClick}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        padding: "16px",
+      }}
+      bodyStyle={{ padding: "0", height: "100%" }}
+    >
+      <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <Avatar
+          size={{ xs: 64, sm: 64, md: 72 }}
+          icon={!entity.logo && <BankOutlined />}
+          src={entity.logo || null}
+          className="flex-shrink-0"
+          style={{
+            backgroundColor: !entity.logo ? COLORS.total : undefined,
+            boxShadow: `0 0 0 2px ${COLORS.total}20`,
           }}
-          onClick={() => onEntityClick(entity.id)}
         />
+        <div className="flex-grow overflow-hidden">
+          <Title
+            level={5}
+            ellipsis={{ rows: 2 }}
+            className="!mb-0 !text-base sm:!text-lg"
+          >
+            {entity.name}
+          </Title>
+          <Paragraph
+            type="secondary"
+            ellipsis={{ rows: 1 }}
+            className="!mb-0 !text-xs sm:!text-sm opacity-80"
+          >
+            {entity.description}
+          </Paragraph>
+        </div>
+      </div>
+
+      <Divider className="my-3" />
+
+      <div className="mt-auto">
+        <Row gutter={[12, 12]}>
+          {statConfig.map((stat, index) => (
+            <Col xs={12} sm={6} md={6} lg={6} xl={6} key={index}>
+              <StatCard
+                title={stat.title}
+                value={stat.value}
+                icon={stat.icon}
+                iconColor={stat.color}
+                className="h-full"
+              />
+            </Col>
+          ))}
+        </Row>
+      </div>
+    </Card>
+  );
+};
+
+const EntityCards = ({ onEntityClick, entities: providedEntities }) => {
+  const [entitiesData] = useAtom(entitiesAtom);
+
+  // Usar entidades proporcionadas por props o entidades del átomo
+  const entities = providedEntities || entitiesData.entities;
+
+  return (
+    <Row gutter={[16, 16]} className="w-full">
+      {entities.map((entity) => (
+        <Col xs={24} sm={24} md={24} lg={24} xl={24} key={entity.id}>
+          <EntityCard
+            entity={entity}
+            onClick={() => onEntityClick(entity.id)}
+          />
+        </Col>
       ))}
-    </div>
+    </Row>
   );
 };
 

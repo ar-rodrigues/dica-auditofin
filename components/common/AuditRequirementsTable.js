@@ -1,9 +1,11 @@
 import React from "react";
 import { Table, Button, Space, Tag } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
+import { useAtom } from "jotai";
+import { mockRequirementsAtom } from "@/utils/atoms";
 
 const AuditRequirementsTable = ({
-  requirements,
+  requirements: providedRequirements,
   onRequirementClick,
   filterStatus = "all",
   searchTerm = "",
@@ -11,11 +13,22 @@ const AuditRequirementsTable = ({
   buttonTextColor = "var(--color-white)",
   buttonSize = "middle",
 }) => {
+  const [defaultRequirements] = useAtom(mockRequirementsAtom);
+  const requirements = providedRequirements || defaultRequirements;
+
   const filteredRequirements = requirements.filter((req) => {
     const matchesSearch =
-      req.ref_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      req.info.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = filterStatus === "all" || req.status === filterStatus;
+      req.ref_code?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      req.info?.toLowerCase().includes(searchTerm.toLowerCase());
+
+    // Manejar tanto nombres en inglés como en español para status
+    const matchesStatus =
+      filterStatus === "all" ||
+      req.status === filterStatus ||
+      (filterStatus === "aprobado" && req.status === "approved") ||
+      (filterStatus === "pendiente" && req.status === "pending") ||
+      (filterStatus === "faltante" && req.status === "missing");
+
     return matchesSearch && matchesStatus;
   });
 
@@ -33,13 +46,30 @@ const AuditRequirementsTable = ({
   const getStatusColor = (status) => {
     switch (status) {
       case "aprobado":
+      case "approved":
         return "success";
       case "pendiente":
+      case "pending":
         return "warning";
       case "faltante":
+      case "missing":
         return "error";
       default:
         return "default";
+    }
+  };
+
+  // Get localized status text
+  const getStatusText = (status) => {
+    switch (status) {
+      case "approved":
+        return "Aprobado";
+      case "pending":
+        return "Pendiente";
+      case "missing":
+        return "Faltante";
+      default:
+        return status;
     }
   };
 
@@ -60,7 +90,9 @@ const AuditRequirementsTable = ({
       title: "Estado",
       dataIndex: "status",
       key: "status",
-      render: (status) => <Tag color={getStatusColor(status)}>{status}</Tag>,
+      render: (status) => (
+        <Tag color={getStatusColor(status)}>{getStatusText(status)}</Tag>
+      ),
       filters: [
         { text: "Aprobado", value: "aprobado" },
         { text: "Pendiente", value: "pendiente" },
