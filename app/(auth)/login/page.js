@@ -1,5 +1,5 @@
 "use client";
-import "../globals.css";
+import "../../globals.css";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Col, Row, Space } from "antd";
