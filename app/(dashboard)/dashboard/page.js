@@ -12,5 +12,9 @@ export default function Dashboard() {
     setLoading(false);
   }, [setLoading]);
 
-  return <DashboardContent dashboards={dashboards} />;
+  return (
+    <div className="w-full max-w-full overflow-x-hidden">
+      <DashboardContent dashboards={dashboards} />
+    </div>
+  );
 }

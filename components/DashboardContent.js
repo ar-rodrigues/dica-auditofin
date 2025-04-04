@@ -1,11 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Spin, Layout, Select } from "antd";
-import Script from "next/script";
+import { Spin, Layout, Select, Typography, Card } from "antd";
 
 const { Content } = Layout;
 const { Option } = Select;
+const { Title } = Typography;
 
 export default function DashboardContent({ dashboards }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -21,7 +21,6 @@ export default function DashboardContent({ dashboards }) {
   const handleDashboardChange = (value) => {
     setIsLoading(true);
     setSelectedDashboard(value);
-    // Add a small delay to show loading state when switching dashboards
     setTimeout(() => setIsLoading(false), 800);
   };
 
@@ -29,18 +28,24 @@ export default function DashboardContent({ dashboards }) {
     dashboards.find((d) => d.id === selectedDashboard) || dashboards[0];
 
   return (
-    <Layout className="h-[100vh] bg-gray-50">
-      <Content className="p-4 sm:p-6 md:p-8 h-fit">
-        <div className="w-full h-full bg-white rounded-lg shadow-md">
-          <div className="p-4 border-b flex justify-start gap-4 items-center">
-            <p className="text-gray-600 mb-2">
-              Selecciona un tablero para visualizar:
-            </p>
+    <div className="w-full overflow-x-hidden">
+      <div className="px-4 py-6 w-full max-w-fit">
+        <Card
+          className="overflow-hidden shadow-sm border-0"
+          styles={{ body: { padding: "1rem" } }}
+        >
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
+            <Title level={5} className="m-0 text-gray-800">
+              Dashboard
+            </Title>
             <Select
               value={selectedDashboard}
               onChange={handleDashboardChange}
-              className="w-full max-w-md"
+              className="w-full md:w-64"
               placeholder="Seleccionar Dashboard"
+              size="middle"
+              variant="outlined"
+              popupMatchSelectWidth={false}
             >
               {dashboards.map((dashboard) => (
                 <Option key={dashboard.id} value={dashboard.id}>
@@ -50,47 +55,29 @@ export default function DashboardContent({ dashboards }) {
             </Select>
           </div>
 
-          {isLoading && (
-            <div className="w-full h-[calc(100vh-(--spacing(32)))] flex items-center justify-center">
-              <Spin size="large">
-                <div className="p-12 text-center">
-                  <p className="text-gray-500 mt-3">Cargando dashboard...</p>
-                </div>
-              </Spin>
-            </div>
-          )}
-
-          <div
-            className={`w-full aspect-3/2 min-h-[400px] relative ${
-              isLoading ? "hidden" : ""
-            }`}
-          >
-            <iframe
-              title={currentDashboard.name}
-              className="absolute top-0 left-0 w-full h-[80%] rounded-lg"
-              src={currentDashboard.url}
-              allowFullScreen={true}
-              width={200}
-              height={200}
-            ></iframe>
+          <div className="w-full bg-gray-50 rounded-lg overflow-hidden">
+            {isLoading ? (
+              <div className="flex items-center justify-center h-[50vh] md:h-[60vh]">
+                <Spin size="large">
+                  <div className="p-6 text-center">
+                    <p className="text-gray-500 mt-2">Cargando dashboard...</p>
+                  </div>
+                </Spin>
+              </div>
+            ) : (
+              <div className="w-full h-[50vh] md:h-[60vh]">
+                <iframe
+                  title={currentDashboard.name}
+                  className="w-full h-full rounded-lg border-0"
+                  src={currentDashboard.url}
+                  allowFullScreen={true}
+                  style={{ maxWidth: "100%" }}
+                ></iframe>
+              </div>
+            )}
           </div>
-        </div>
-      </Content>
-      {/* <Script
-        src="https://cdn.voiceflow.com/widget-next/bundle.mjs"
-        type="text/javascript"
-        strategy="afterInteractive"
-        onLoad={() => {
-          window.voiceflow.chat.load({
-            verify: { projectID: "67b8c131e50f77be72ba5f9f" },
-            url: "https://general-runtime.voiceflow.com",
-            versionID: "production",
-            voice: {
-              url: "https://runtime-api.voiceflow.com",
-            },
-          });
-        }}
-      /> */}
-    </Layout>
+        </Card>
+      </div>
+    </div>
   );
 }
