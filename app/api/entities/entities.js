@@ -31,8 +31,6 @@ export async function getEntityById(id) {
 
 export async function updateEntity(id, data) {
   const supabase = await createClient();
-  console.log("API UPDATE ENTITY", data);
-  console.log("API UPDATE ENTITY ID", id);
   try {
     const { data: updatedEntity, error } = await supabase
       .from("entities")

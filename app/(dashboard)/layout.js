@@ -4,7 +4,7 @@ import "./globals.css";
 import { headers } from "next/headers";
 
 import LoadingOverlay from "@/components/LoadingOverlay";
-import DashboardClientLayout from "@/components/DashboardClientLayout";
+import DashboardClientLayout from "@/components/layouts/DashboardClientLayout";
 
 function isMobileDevice(userAgent) {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -12,10 +12,12 @@ function isMobileDevice(userAgent) {
   );
 }
 
-export default function DashboardLayout({ children }) {
-  const headersList = headers();
-  const userAgent = headersList.get("user-agent");
+export default async function DashboardLayout({ children }) {
+  const headersList = await headers();
+  const userAgent = await headersList.get("user-agent");
   const isMobile = isMobileDevice(userAgent);
+
+  console.log("isMobile", isMobile);
 
   return (
     <html lang="es-MX">

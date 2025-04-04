@@ -2,10 +2,24 @@
 
 import { useState, useEffect } from "react";
 import { Spin, Layout, Select, Typography, Card } from "antd";
-
 const { Content } = Layout;
 const { Option } = Select;
 const { Title } = Typography;
+
+import dynamic from "next/dynamic";
+
+// Create a client-side only component that uses Power BI
+const PowerBIReport = dynamic(
+  () => import("@/components/Report/PowerBIReport"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="text-center py-4">
+        <div className="text-gray-600">Cargando reporte...</div>
+      </div>
+    ),
+  }
+);
 
 export default function DashboardContent({ dashboards }) {
   const [isLoading, setIsLoading] = useState(true);
@@ -29,7 +43,7 @@ export default function DashboardContent({ dashboards }) {
 
   return (
     <div className="w-full overflow-x-hidden">
-      <div className="px-4 py-6 w-full max-w-fit">
+      <div className="px-4 py-6 w-full sm:max-w-fit md:max-w-full h-full">
         <Card
           className="overflow-hidden shadow-sm border-0"
           styles={{ body: { padding: "1rem" } }}
@@ -66,13 +80,7 @@ export default function DashboardContent({ dashboards }) {
               </div>
             ) : (
               <div className="w-full h-[50vh] md:h-[60vh]">
-                <iframe
-                  title={currentDashboard.name}
-                  className="w-full h-full rounded-lg border-0"
-                  src={currentDashboard.url}
-                  allowFullScreen={true}
-                  style={{ maxWidth: "100%" }}
-                ></iframe>
+                <PowerBIReport />
               </div>
             )}
           </div>

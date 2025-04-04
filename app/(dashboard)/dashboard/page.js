@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 import { useAtom, useAtomValue } from "jotai";
 import { loadingAtom, dashboardsAtom } from "@/utils/atoms";
-import DashboardContent from "@/components/DashboardContent";
+import DashboardContent from "@/components/Dashboard/DashboardContent";
 
 export default function Dashboard() {
   const [, setLoading] = useAtom(loadingAtom);
