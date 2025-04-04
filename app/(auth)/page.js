@@ -1,6 +1,7 @@
 "use client";
 import "./globals.css";
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Layout, Button, Typography, Carousel, Flex, Card } from "antd";
 import { ArrowRightOutlined } from "@ant-design/icons";
 import { useAtomValue } from "jotai";

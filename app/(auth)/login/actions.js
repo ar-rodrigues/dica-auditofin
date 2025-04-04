@@ -7,51 +7,25 @@ import { createClient } from "@/utils/supabase/server";
 const { headers } = require("next/headers");
 
 export async function login(formData) {
-  try {
-    const supabase = await createClient();
+  const supabase = await createClient();
 
-    // Validate inputs
-    if (!formData.email || !formData.password) {
-      throw new Error("Email and password are required");
-    }
+  //console.log(formData);
 
-    const data = {
-      email: formData.email,
-      password: formData.password,
-    };
+  // type-casting here for convenience
+  // in practice, you should validate your inputs
+  const data = {
+    email: formData.email,
+    password: formData.password,
+  };
 
-    const { error } = await supabase.auth.signInWithPassword(data);
+  const { error } = await supabase.auth.signInWithPassword(data);
 
-    if (error) {
-      // Handle specific error cases
-      switch (error.message) {
-        case "Invalid login credentials":
-          return {
-            success: false,
-            error: "Email o contraseña incorrectos",
-          };
-        case "Email not confirmed":
-          return {
-            success: false,
-            error: "Por favor confirma tu email antes de iniciar sesión",
-          };
-        default:
-          return {
-            success: false,
-            error: "Error al iniciar sesión. Por favor intenta de nuevo.",
-          };
-      }
-    }
-
-    revalidatePath("/", "layout");
-    return { success: true };
-  } catch (error) {
-    console.error("Login error:", error);
-    return {
-      success: false,
-      error: "Ocurrió un error inesperado. Por favor intenta de nuevo.",
-    };
+  if (error) {
+    console.log(error);
+    return { success: false, error };
   }
+  revalidatePath("/", "layout");
+  return { success: true };
 }
 
 export async function signup(formData) {

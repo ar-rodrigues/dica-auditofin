@@ -1,7 +1,6 @@
 import { Col, Row } from "antd";
 import ConfirmPassword from "@/components/ConfirmPassword";
 import { createClient } from "@/utils/supabase/server";
-import "../../globals.css";
 
 export default async function ResetPage() {
   const supabase = await createClient();
