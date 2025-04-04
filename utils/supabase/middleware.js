@@ -45,8 +45,20 @@ export async function updateSession(request) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const allowedPages = ["/"];
+  const allowedPages = ["/", "/manifest.json"];
   const adminOnlyPages = allowAdminOnly;
+
+  // Allow access to public assets without authentication
+  if (
+    request.nextUrl.pathname.startsWith("/_next") ||
+    request.nextUrl.pathname.startsWith("/static") ||
+    request.nextUrl.pathname.startsWith("/images") ||
+    request.nextUrl.pathname.endsWith(".png") ||
+    request.nextUrl.pathname.endsWith(".svg") ||
+    request.nextUrl.pathname.endsWith(".ico")
+  ) {
+    return supabaseResponse;
+  }
 
   if (
     !user &&
