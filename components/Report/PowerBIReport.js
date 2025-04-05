@@ -86,6 +86,8 @@ export default function PowerBIReport() {
                 visible: true,
               },
             },
+            defaultPage: "Dashboard",
+            zoomLevel: isMobile ? 1 : 0.45,
           },
         };
 
@@ -97,6 +99,12 @@ export default function PowerBIReport() {
 
         report.on("loaded", () => {
           setLoading(false);
+          // Open on the first page
+          report.getPages().then((pages) => {
+            if (pages && pages.length > 0) {
+              pages[0].setActive();
+            }
+          });
         });
 
         report.on("error", (event) => {
