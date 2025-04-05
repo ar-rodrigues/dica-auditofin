@@ -383,11 +383,11 @@ export const findMenuItem = (items, key) => {
 
 // Dashboards configuration atom
 export const dashboardsAtom = atom([
-  {
-    id: "puebla",
-    name: "Organismo Operador del Servicio de Limpia del Municipio de Puebla",
-    url: "https://app.powerbi.com/view?r=eyJrIjoiMmQ5YjhkYTgtNDI0OS00ZDhiLTgxN2YtODM3NmRlYmExYmMyIiwidCI6Ijk2NDYyYWMzLTYwMzktNGE1YS1iYWI5LTBjMmY5YjNkYzFiYSJ9&pageName=7a804872d4560903f8f2",
-  },
+  // {
+  //   id: "puebla",
+  //   name: "Organismo Operador del Servicio de Limpia del Municipio de Puebla",
+  //   url: "https://app.powerbi.com/view?r=eyJrIjoiMmQ5YjhkYTgtNDI0OS00ZDhiLTgxN2YtODM3NmRlYmExYmMyIiwidCI6Ijk2NDYyYWMzLTYwMzktNGE1YS1iYWI5LTBjMmY5YjNkYzFiYSJ9&pageName=7a804872d4560903f8f2",
+  // },
   {
     id: "xalapa",
     name: "Municipio de Xalapa del Estado de Veracruz",
