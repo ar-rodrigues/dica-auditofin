@@ -42,11 +42,18 @@ export default function DashboardContent({ dashboards }) {
     dashboards.find((d) => d.id === selectedDashboard) || dashboards[0];
 
   return (
-    <div className="w-full overflow-x-hidden">
-      <div className="px-4 py-6 w-full sm:max-w-fit md:max-w-full h-full">
+    <div className="w-full overflow-x-hidden h-full flex flex-col">
+      <div className="px-4 py-6 w-full flex-grow flex flex-col">
         <Card
-          className="overflow-hidden shadow-sm border-0"
-          styles={{ body: { padding: "1rem" } }}
+          className="overflow-hidden shadow-sm border-0 flex flex-col flex-grow h-full"
+          styles={{
+            body: {
+              padding: "1rem",
+              height: "100%",
+              display: "flex",
+              flexDirection: "column",
+            },
+          }}
         >
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
             <Title level={5} className="m-0 text-gray-800">
@@ -69,9 +76,9 @@ export default function DashboardContent({ dashboards }) {
             </Select>
           </div>
 
-          <div className="w-full bg-gray-50 rounded-lg overflow-hidden">
+          <div className="w-full bg-gray-50 rounded-lg overflow-hidden flex-grow">
             {isLoading ? (
-              <div className="flex items-center justify-center h-[50vh] md:h-[60vh]">
+              <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)]">
                 <Spin size="large">
                   <div className="p-6 text-center">
                     <p className="text-gray-500 mt-2">Cargando dashboard...</p>
@@ -79,7 +86,7 @@ export default function DashboardContent({ dashboards }) {
                 </Spin>
               </div>
             ) : (
-              <div className="w-full h-[50vh] md:h-[60vh]">
+              <div className="w-full h-full min-h-[calc(100vh-200px)]">
                 <PowerBIReport />
               </div>
             )}

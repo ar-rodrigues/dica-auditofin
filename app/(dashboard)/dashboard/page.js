@@ -13,7 +13,7 @@ export default function Dashboard() {
   }, [setLoading]);
 
   return (
-    <div className="w-full max-w-full overflow-x-hidden">
+    <div className="w-full max-w-full overflow-x-hidden h-screen flex flex-col">
       <DashboardContent dashboards={dashboards} />
     </div>
   );

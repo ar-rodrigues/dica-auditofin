@@ -86,8 +86,19 @@ export default function PowerBIReport() {
                 visible: true,
               },
             },
+            visualRenderedEvents: true,
+            zoomLevel: 0.65,
+            background: powerbi.models.BackgroundType.Transparent,
           },
         };
+
+        // For custom layout, we can adjust the viewport size
+        if (!isMobile) {
+          config.settings.customLayout = {
+            displayOption: powerbi.models.DisplayOption.FitToWidth,
+            zoomLevel: 0.45,
+          };
+        }
 
         const report = powerbiServiceRef.current.embed(
           reportContainerRef.current,
@@ -129,8 +140,8 @@ export default function PowerBIReport() {
       )}
       <div
         ref={reportContainerRef}
-        className="w-full"
-        style={{ height: "800px" }}
+        className="w-full h-full"
+        style={{ minHeight: "100%" }}
       />
     </>
   );
