@@ -56,7 +56,7 @@ export default function Login({ setIsResetPassword }) {
         rules={[
           {
             required: true,
-            message: "Please input your email!",
+            message: "Por favor ingrese su correo!",
           },
         ]}
       >
@@ -70,7 +70,7 @@ export default function Login({ setIsResetPassword }) {
         rules={[
           {
             required: true,
-            message: "Please input your password!",
+            message: "Por favor ingrese su contraseña!",
           },
         ]}
       >
@@ -78,7 +78,7 @@ export default function Login({ setIsResetPassword }) {
       </Form.Item>
       <Form.Item className="flex m-0 p-0" style={{ width: "100%" }}>
         <Button type="link" onClick={() => setIsResetPassword(true)}>
-          Forgot Password?
+          ¿Olvidaste tu contraseña?
         </Button>
       </Form.Item>
 
@@ -97,7 +97,7 @@ export default function Login({ setIsResetPassword }) {
           <>
             {/* <InstallPWA /> */}
             <Button type="primary" htmlType="submit">
-              Submit
+              Iniciar Sesión
             </Button>
           </>
         )}

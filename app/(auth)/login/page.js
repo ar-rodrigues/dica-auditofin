@@ -8,6 +8,7 @@ import "@ant-design/v5-patch-for-react-19";
 import Logo from "@/components/Logo";
 import ResetPassword from "@/components/ResetPassword";
 import Login from "@/components/Login";
+import InstallButton from "@/components/InstallButton";
 
 export default function LoginPage() {
   const supabase = createClient();
@@ -33,46 +34,65 @@ export default function LoginPage() {
   }, []);
 
   return (
-    <Space direction="vertical" size="middle" style={{ display: "flex" }}>
-      <Row
-        gutter={[16, 16]}
-        style={{ padding: "5px" }}
-        justify={"center"}
-        align={"middle"}
+    <div
+      style={{
+        minHeight: "calc(100vh - 64px - 70px)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <Space
+        direction="vertical"
+        size="middle"
+        style={{ flex: 1, display: "flex", padding: "16px 0" }}
       >
-        {!isResetPassword && (
-          <Col
-            xs={24}
-            md={8}
-            justify="center"
-            align="center"
-            style={{ maxWidth: "200px" }}
-          >
-            <Logo />
-          </Col>
-        )}
-        <Col
-          xs={24}
-          md={16}
-          justify="center"
-          align="center"
-          style={{ padding: "24px" }}
+        <Row
+          gutter={[16, 16]}
+          style={{ flex: 1 }}
+          justify={"center"}
+          align={"middle"}
         >
           {!isResetPassword && (
-            <Login
-              isResetPassword={isResetPassword}
-              setIsResetPassword={setIsResetPassword}
-            />
+            <Col
+              xs={24}
+              md={8}
+              style={{
+                maxWidth: "200px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <Logo />
+            </Col>
           )}
+          <Col
+            xs={24}
+            md={16}
+            style={{
+              padding: "24px",
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            {!isResetPassword && (
+              <Login
+                isResetPassword={isResetPassword}
+                setIsResetPassword={setIsResetPassword}
+              />
+            )}
 
-          {isResetPassword && (
-            <ResetPassword
-              isResetPassword={isResetPassword}
-              setIsResetPassword={setIsResetPassword}
-            />
-          )}
-        </Col>
-      </Row>
-    </Space>
+            {isResetPassword && (
+              <ResetPassword
+                isResetPassword={isResetPassword}
+                setIsResetPassword={setIsResetPassword}
+              />
+            )}
+          </Col>
+        </Row>
+      </Space>
+      <InstallButton />
+    </div>
   );
 }
