@@ -10,6 +10,7 @@ import {
   MOBILE_BREAKPOINT,
 } from "@/utils/atoms";
 import { useUserRole } from "@/hooks/useUserRole";
+import Logout from "@/components/Logout";
 
 export default function TabMenu() {
   const [loading, setLoading] = useAtom(loadingAtom);
@@ -163,6 +164,7 @@ export default function TabMenu() {
           </div>
         );
       })}
+      <Logout isTextVisible={true} isMobile={true} />
     </div>
   );
 }

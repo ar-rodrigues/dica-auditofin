@@ -87,7 +87,7 @@ export default function PowerBIReport() {
               },
             },
             defaultPage: "Dashboard",
-            zoomLevel: isMobile ? 1 : 0.45,
+            zoomLevel: isMobile ? 0.8 : 0.85,
           },
         };
 
@@ -138,7 +138,7 @@ export default function PowerBIReport() {
       <div
         ref={reportContainerRef}
         className="w-full h-full"
-        style={{ minHeight: "100%" }}
+        style={{ minHeight: "100%", minWidth: "100%" }}
       />
     </>
   );

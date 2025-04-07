@@ -86,7 +86,7 @@ export default function DashboardContent({ dashboards }) {
                 </Spin>
               </div>
             ) : (
-              <div className="w-full h-full min-h-[calc(100vh-200px)]">
+              <div className="w-full h-full min-h-[calc(100vh-200px)] overflow-hidden">
                 <PowerBIReport />
               </div>
             )}
