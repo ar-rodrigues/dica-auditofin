@@ -43,12 +43,15 @@ export default function DashboardContent({ dashboards }) {
 
   return (
     <div className="w-full overflow-x-hidden h-full flex flex-col">
-      <div className="px-4 py-6 w-full flex-grow flex flex-col">
+      <div className="px-2 sm:px-4 py-4 sm:py-6 w-full flex-grow flex flex-col">
         <Card
           className="overflow-hidden shadow-sm border-0 flex flex-col flex-grow h-full"
           styles={{
             body: {
-              padding: "1rem",
+              padding: "0.5rem",
+              "@media (minWidth: 640px)": {
+                padding: "1rem",
+              },
               height: "100%",
               display: "flex",
               flexDirection: "column",
@@ -76,7 +79,7 @@ export default function DashboardContent({ dashboards }) {
             </Select>
           </div>
 
-          <div className="w-full bg-gray-50 rounded-lg overflow-hidden flex-grow">
+          <div className="w-full bg-gray-50 rounded-lg overflow-hidden flex-grow px-0 sm:px-2">
             {isLoading ? (
               <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)]">
                 <Spin size="large">

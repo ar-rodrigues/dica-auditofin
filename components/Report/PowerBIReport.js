@@ -87,7 +87,8 @@ export default function PowerBIReport() {
               },
             },
             defaultPage: "Dashboard",
-            zoomLevel: isMobile ? 0.8 : 0.85,
+            zoomLevel: isMobile ? 0.7 : 0.85,
+            background: powerbi.models.BackgroundType.Transparent,
           },
         };
 
@@ -138,7 +139,12 @@ export default function PowerBIReport() {
       <div
         ref={reportContainerRef}
         className="w-full h-full"
-        style={{ minHeight: "100%", minWidth: "100%" }}
+        style={{
+          minHeight: "100%",
+          minWidth: "100%",
+          padding: isMobile ? "0 0.25rem" : "0",
+          overflowX: "hidden",
+        }}
       />
     </>
   );
