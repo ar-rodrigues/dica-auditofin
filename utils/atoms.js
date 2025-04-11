@@ -13,6 +13,7 @@ import {
   LinkOutlined,
   ContainerOutlined,
   AuditOutlined,
+  FundProjectionScreenOutlined,
 } from "@ant-design/icons";
 
 // Loading state atom
@@ -281,25 +282,25 @@ export const sidebarItems = [
     label: "Dashboard",
     icon: <PieChartOutlined />,
     url: "/dashboard",
-    permissions: ["invitadoXalapa", "invitado"],
+    permissions: ["invitadoXalapa", "invitado", "admin", "super admin"],
   },
   {
     key: "2",
     label: "Resumen",
     icon: <DesktopOutlined />,
-    permissions: ["admin"],
+    permissions: ["admin", "super admin"],
     children: [
       {
         key: "2.1",
         label: "Requerimientos",
         url: "/resume",
-        permissions: ["admin"],
+        permissions: ["admin", "super admin"],
       },
       {
         key: "2.2",
         label: "Hallazgos",
         url: "/findings",
-        permissions: ["admin"],
+        permissions: ["admin", "super admin"],
       },
     ],
   },
@@ -348,15 +349,22 @@ export const sidebarItems = [
     key: "7",
     label: "Auditoría",
     icon: <AuditOutlined />,
-    permissions: ["admin"],
+    permissions: ["admin", "super admin"],
     url: "/audit",
   },
   {
     key: "8",
     label: "Auditor",
     icon: <AuditOutlined />,
-    permissions: ["admin"],
+    permissions: ["admin", "super admin"],
     url: "/auditor",
+  },
+  {
+    key: "9",
+    label: "Reportes",
+    icon: <FundProjectionScreenOutlined />,
+    permissions: ["admin", "super admin"],
+    url: "/reports",
   },
 ];
 
