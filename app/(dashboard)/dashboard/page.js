@@ -1,20 +1,23 @@
 "use client";
 import { useEffect } from "react";
-import { useAtom, useAtomValue } from "jotai";
-import { loadingAtom, dashboardsAtom } from "@/utils/atoms";
-import DashboardContent from "@/components/Dashboard/DashboardContent";
+import PowerBIContent from "@/components/Dashboard/PowerBIContent";
+import { useReports } from "@/hooks/useReports";
+import { Spin } from "antd";
 
 export default function Dashboard() {
-  const [, setLoading] = useAtom(loadingAtom);
-  const dashboards = useAtomValue(dashboardsAtom);
+  const { reports, fetchReports, loading: reportsLoading } = useReports();
 
-  useEffect(() => {
-    setLoading(false);
-  }, [setLoading]);
+  if (reportsLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-full overflow-hidden h-screen flex flex-col">
-      <DashboardContent dashboards={dashboards} />
+      <PowerBIContent reports={reports} />
     </div>
   );
 }

@@ -58,6 +58,9 @@ export default function EditReportPage() {
   } = usePermissions();
   const { user } = useFetchUser();
 
+  console.log("selectedPermissions", selectedPermissions);
+  console.log("reportId", reportId);
+
   useEffect(() => {
     const fetchReport = async () => {
       const report = await fetchReportById(reportId);
@@ -77,8 +80,8 @@ export default function EditReportPage() {
     const loadPermissions = async () => {
       const permissions = await fetchPermissions({
         assetId: reportId,
-        tableAsset: "reports",
       });
+      console.log("permissions useEffect", permissions);
       if (permissions && permissions.length > 0) {
         const permission = permissions[0];
         setSelectedPermissions({
@@ -89,6 +92,7 @@ export default function EditReportPage() {
         });
       }
     };
+
     loadPermissions();
   }, []);
 

@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useRef } from "react";
 import * as powerbi from "powerbi-client";
+import { Result, Button, Card } from "antd";
+import { ReloadOutlined } from "@ant-design/icons";
 
-export default function PowerBIReport() {
+export default function PowerBIReport({ id, reportId }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -48,7 +50,7 @@ export default function PowerBIReport() {
           );
         }
 
-        const response = await fetch("/api/getEmbedInfo");
+        const response = await fetch(`/api/getEmbedInfo?id=${id}`);
         const embedInfo = await response.json();
 
         if (embedInfo.status !== 200) {
@@ -71,7 +73,7 @@ export default function PowerBIReport() {
           tokenType: powerbi.models.TokenType.Embed,
           accessToken: embedInfo.accessToken,
           embedUrl: embedInfo.embedUrl,
-          id: process.env.NEXT_PUBLIC_REPORT_ID,
+          id: reportId,
           permissions: powerbi.models.Permissions.All,
           settings: {
             layoutType: isMobile
@@ -129,11 +131,38 @@ export default function PowerBIReport() {
         </div>
       )}
       {error && (
-        <div
-          className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-          role="alert"
-        >
-          <span className="block sm:inline">{error}</span>
+        <div className="w-full h-full flex items-center justify-center p-4">
+          <Card className="max-w-md w-full shadow-sm border-0">
+            <Result
+              status="error"
+              title="Error al cargar el reporte"
+              subTitle={
+                error.includes("No se encontró el contenedor")
+                  ? "El contenedor del reporte no está disponible. Por favor, recargue la página."
+                  : error.includes("Missing report ID")
+                  ? "No se ha especificado un ID de reporte válido."
+                  : error.includes("Report not found")
+                  ? "El reporte solicitado no existe o no está disponible."
+                  : error.includes("Missing required Power BI credentials")
+                  ? "Las credenciales de Power BI no están configuradas correctamente."
+                  : error.includes("Failed to authenticate")
+                  ? "Error de autenticación con Azure AD. Por favor, contacte al administrador."
+                  : error.includes("Failed to generate Power BI embed token")
+                  ? "No se pudo generar el token de Power BI. Por favor, intente nuevamente más tarde."
+                  : error
+              }
+              extra={[
+                <Button
+                  key="reload"
+                  type="primary"
+                  icon={<ReloadOutlined />}
+                  onClick={() => window.location.reload()}
+                >
+                  Recargar
+                </Button>,
+              ]}
+            />
+          </Card>
         </div>
       )}
       <div

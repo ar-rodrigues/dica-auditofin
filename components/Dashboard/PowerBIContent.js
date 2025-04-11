@@ -21,25 +21,23 @@ const PowerBIReport = dynamic(
   }
 );
 
-export default function DashboardContent({ dashboards }) {
+export default function PowerBIContent({ reports }) {
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedDashboard, setSelectedDashboard] = useState(
-    dashboards[0]?.id || ""
-  );
+  const [selectedReport, setSelectedReport] = useState(reports[0]?.id);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleDashboardChange = (value) => {
+  const handleReportChange = (value) => {
     setIsLoading(true);
-    setSelectedDashboard(value);
+    setSelectedReport(value);
     setTimeout(() => setIsLoading(false), 800);
   };
 
-  const currentDashboard =
-    dashboards.find((d) => d.id === selectedDashboard) || dashboards[0];
+  const currentReport =
+    reports.find((report) => report.id === selectedReport) || reports[0];
 
   return (
     <div className="w-full overflow-x-hidden h-full flex flex-col">
@@ -58,22 +56,22 @@ export default function DashboardContent({ dashboards }) {
             },
           }}
         >
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4">
-            <Title level={5} className="m-0 text-gray-800">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4 mb-4 ml-2 mr-2">
+            <Title level={4} className="m-0 text-gray-800">
               Dashboard
             </Title>
             <Select
-              value={selectedDashboard}
-              onChange={handleDashboardChange}
-              className="w-full md:w-64"
-              placeholder="Seleccionar Dashboard"
+              value={selectedReport}
+              onChange={handleReportChange}
+              className="md:w-fit sm:w-48"
+              placeholder="Seleccionar Reporte"
               size="middle"
               variant="outlined"
               popupMatchSelectWidth={false}
             >
-              {dashboards.map((dashboard) => (
-                <Option key={dashboard.id} value={dashboard.id}>
-                  {dashboard.name}
+              {reports.map((report) => (
+                <Option key={report.id} value={report.id}>
+                  {report.name}
                 </Option>
               ))}
             </Select>
@@ -90,7 +88,10 @@ export default function DashboardContent({ dashboards }) {
               </div>
             ) : (
               <div className="w-full h-full min-h-[calc(100vh-200px)] overflow-hidden">
-                <PowerBIReport />
+                <PowerBIReport
+                  id={currentReport.id}
+                  reportId={currentReport.reportId}
+                />
               </div>
             )}
           </div>
