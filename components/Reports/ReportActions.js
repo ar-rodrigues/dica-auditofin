@@ -10,7 +10,7 @@ export default function ReportActions({ record, onDelete }) {
       <Button
         type="primary"
         icon={<EditOutlined />}
-        onClick={() => router.push(`/reports/${record.id}/edit`)}
+        onClick={() => router.push(`/reports/edit/${record.id}`)}
       />
       <Popconfirm
         title="¿Estás seguro de eliminar este reporte?"

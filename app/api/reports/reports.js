@@ -6,9 +6,12 @@ export async function getReportsById(id) {
   const supabase = await createClient();
   const userData = await getUserData();
 
-  // if user is super admin, return all reports
+  // if user is super admin, return the report
   if (userData?.[0]?.role.role === "super admin") {
-    const { data, error } = await supabase.from("reports").select("*");
+    const { data, error } = await supabase
+      .from("reports")
+      .select("*, entity_name:entities(entity_name)")
+      .eq("id", id);
     return data || [];
   }
 
@@ -59,7 +62,7 @@ export async function getReportsById(id) {
   try {
     const { data, error } = await supabase
       .from("reports")
-      .select("*")
+      .select("*, entity_name:entities(entity_name)")
       .eq("id", id);
     return data || [];
   } catch (error) {
@@ -74,7 +77,9 @@ export async function getReports() {
 
   // if user is super admin, return all reports
   if (userData?.[0]?.role.role === "super admin") {
-    const { data, error } = await supabase.from("reports").select("*");
+    const { data, error } = await supabase
+      .from("reports")
+      .select("*, entity_name:entities(entity_name)");
     return data || [];
   }
 
@@ -126,7 +131,7 @@ export async function getReports() {
     // Fetch only the reports that user has permission to see
     const { data: reports, error: reportsError } = await supabase
       .from("reports")
-      .select("*")
+      .select("*, entity_name:entities(entity_name)")
       .in("id", allowedAssetIds);
 
     if (reportsError) {
@@ -260,45 +265,6 @@ export async function deleteReport(id) {
 
 export async function createReport(reportData) {
   const supabase = await createClient();
-  const userData = await getUserData();
-
-  // Check if user has permission to create reports
-  const permissions = await fetchPermissions({
-    table_asset: "reports",
-  });
-
-  // If there are no permissions, return empty array (no access)
-  if (!permissions || permissions.length === 0) {
-    return [];
-  }
-
-  // Check if user has access to any of the permissions
-  const hasPermission = permissions.some((permission) => {
-    if (
-      permission.entities?.length > 0 &&
-      permission.entities.includes(userData?.[0]?.entity.id)
-    ) {
-      return true;
-    }
-    if (
-      permission.roles?.length > 0 &&
-      permission.roles.includes(userData?.[0]?.role.id)
-    ) {
-      return true;
-    }
-    if (
-      permission.users?.length > 0 &&
-      permission.users.includes(userData?.[0]?.id)
-    ) {
-      return true;
-    }
-    return false;
-  });
-
-  // If user doesn't have permission, return empty array
-  if (!hasPermission) {
-    return [];
-  }
 
   try {
     const { data, error } = await supabase

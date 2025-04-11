@@ -1,38 +1,36 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Form,
   Button,
+  message,
   Card,
   Steps,
-  Typography,
-  message,
+  Table,
   Spin,
-  Modal,
-  Space,
+  Typography,
 } from "antd";
 import { useRouter } from "next/navigation";
-import {
-  UserOutlined,
-  TeamOutlined,
-  BankOutlined,
-  ExclamationCircleOutlined,
-} from "@ant-design/icons";
+import { UserOutlined, TeamOutlined, BankOutlined } from "@ant-design/icons";
+import { useParams } from "next/navigation";
 import ReportForm from "@/components/Reports/ReportForm";
 import PermissionCard from "@/components/Reports/PermissionCard";
 import PermissionModal from "@/components/Reports/PermissionModal";
-import WarningModal from "@/components/common/WarningModal";
 import { useRoles } from "@/hooks/useRoles";
 import { useEntities } from "@/hooks/useEntities";
 import { useUsers } from "@/hooks/useUsers";
 import { useReports } from "@/hooks/useReports";
 import { usePermissions } from "@/hooks/usePermissions";
 import { useFetchUser } from "@/hooks/useFetchUser";
+import WarningModal from "@/components/common/WarningModal";
 
-const { Text, Title } = Typography;
+const { Step } = Steps;
+const { Title } = Typography;
 
-export default function CreateReportPage() {
+export default function EditReportPage() {
+  const params = useParams();
+  const reportId = params.id;
   const [form] = Form.useForm();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({});
@@ -50,14 +48,49 @@ export default function CreateReportPage() {
   const { roles } = useRoles();
   const { entities } = useEntities();
   const { users } = useUsers();
-  const { reports, loading, error, fetchReports, createReport, deleteReport } =
+  const { loading, error, fetchReportById, updateReport, deleteReport } =
     useReports();
   const {
     loading: permissionsLoading,
     error: permissionsError,
-    createPermission,
+    fetchPermissions,
+    updatePermission,
   } = usePermissions();
   const { user } = useFetchUser();
+
+  useEffect(() => {
+    const fetchReport = async () => {
+      const report = await fetchReportById(reportId);
+      if (report && report[0]) {
+        const reportData = report[0];
+        setFormData(reportData);
+        form.setFieldsValue({
+          ...reportData,
+          entity_id: reportData.entity_id,
+        });
+      }
+    };
+    fetchReport();
+  }, []);
+
+  useEffect(() => {
+    const loadPermissions = async () => {
+      const permissions = await fetchPermissions({
+        assetId: reportId,
+        tableAsset: "reports",
+      });
+      if (permissions && permissions.length > 0) {
+        const permission = permissions[0];
+        setSelectedPermissions({
+          id: permission.id,
+          users: permission.users || [],
+          roles: permission.roles || [],
+          entities: permission.entities || [],
+        });
+      }
+    };
+    loadPermissions();
+  }, []);
 
   const getFilteredData = (type, searchQuery) => {
     const data = type === "users" ? users : type === "roles" ? roles : entities;
@@ -83,7 +116,7 @@ export default function CreateReportPage() {
   };
 
   const getColumns = (type) => {
-    const baseColumns = [
+    const columns = [
       {
         title: "Nombre",
         key: "name",
@@ -100,14 +133,14 @@ export default function CreateReportPage() {
     ];
 
     if (type === "users") {
-      baseColumns.push({
+      columns.push({
         title: "Email",
         key: "email",
         render: (_, record) => record.email,
       });
     }
 
-    baseColumns.push({
+    columns.push({
       title: "Acciones",
       key: "actions",
       render: (_, record) => (
@@ -126,7 +159,7 @@ export default function CreateReportPage() {
       ),
     });
 
-    return baseColumns;
+    return columns;
   };
 
   const handlePermissionSelection = (type, id) => {
@@ -150,38 +183,7 @@ export default function CreateReportPage() {
     );
   };
 
-  const proceedWithReportCreation = async () => {
-    try {
-      const reportResult = await createReport(formData);
-      if (!reportResult) {
-        throw new Error("Error al crear el reporte");
-      }
-
-      const permissionData = {
-        table_asset: "reports",
-        asset_id: reportResult.id,
-        users: [...new Set([...(selectedPermissions.users || []), user?.id])],
-        roles: selectedPermissions.roles || [],
-        entities: selectedPermissions.entities || [],
-      };
-
-      const permissionResult = await createPermission(permissionData);
-      if (!permissionResult) {
-        await deleteReport(reportResult.id);
-        throw new Error("Error al crear los permisos");
-      }
-
-      message.success("Reporte creado exitosamente");
-      router.push("/reports");
-    } catch (error) {
-      console.error("Error in report creation:", error);
-      throw error;
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
-  const handleCreateReport = async () => {
+  const handleUpdateReport = async () => {
     setIsSubmitting(true);
     try {
       const hasPermissions = validatePermissions();
@@ -189,18 +191,44 @@ export default function CreateReportPage() {
       if (!hasPermissions) {
         setIsWarningModalOpen(true);
       } else {
-        await proceedWithReportCreation();
+        const values = await form.validateFields();
+        const reportUpdateResult = await updateReport(reportId, values);
+        if (!reportUpdateResult) {
+          throw new Error("Error al actualizar el reporte");
+        }
+
+        const permissionData = {
+          id: selectedPermissions.id,
+          table_asset: "reports",
+          asset_id: reportId,
+          users: [...new Set([...(selectedPermissions.users || []), user?.id])],
+          roles: selectedPermissions.roles || [],
+          entities: selectedPermissions.entities || [],
+        };
+
+        const permissionUpdateResult = await updatePermission(
+          permissionData.id,
+          permissionData
+        );
+        if (!permissionUpdateResult) {
+          await deleteReport(reportId);
+          throw new Error("Error al actualizar los permisos");
+        }
+
+        message.success("Reporte actualizado exitosamente");
+        router.push("/reports");
       }
     } catch (error) {
-      console.error("Error creating report:", error);
-      message.error("Error al crear el reporte: " + error.message);
+      console.error("Error updating report:", error);
+      message.error("Error al actualizar el reporte: " + error.message);
+    } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleWarningConfirm = async () => {
     setIsWarningModalOpen(false);
-    await proceedWithReportCreation();
+    await handleUpdateReport();
   };
 
   const handleWarningCancel = () => {
@@ -211,7 +239,6 @@ export default function CreateReportPage() {
   const handleNext = async () => {
     try {
       if (currentStep === 0) {
-        // Validate and store form values when moving to next step
         const values = await form.validateFields();
         setFormData(values);
         setCurrentStep(currentStep + 1);
@@ -228,21 +255,21 @@ export default function CreateReportPage() {
       type: "users",
       icon: <UserOutlined className="text-4xl !text-blue-500" />,
       label: "Permisos de Usuario",
-      selectedCount: selectedPermissions.users.length,
+      selectedCount: selectedPermissions?.users?.length,
       data: users,
     },
     {
       type: "roles",
       icon: <TeamOutlined className="text-4xl !text-blue-500" />,
       label: "Permisos de Rol",
-      selectedCount: selectedPermissions.roles.length,
+      selectedCount: selectedPermissions?.roles?.length,
       data: roles,
     },
     {
       type: "entities",
       icon: <BankOutlined className="text-4xl !text-blue-500" />,
       label: "Permisos de Entidad",
-      selectedCount: selectedPermissions.entities.length,
+      selectedCount: selectedPermissions?.entities?.length,
       data: entities,
     },
   ];
@@ -255,7 +282,7 @@ export default function CreateReportPage() {
 
   const steps = [
     {
-      title: "Información Básica",
+      title: "Datos del Reporte",
       content: <ReportForm form={form} entities={entities} />,
     },
     {
@@ -278,7 +305,7 @@ export default function CreateReportPage() {
     <div className="p-6 pb-24">
       <div className="max-w-4xl mx-auto">
         <Card className="p-4">
-          <Title level={3}>Crear nuevo reporte</Title>
+          <Title level={3}>Editar Reporte</Title>
           <Steps current={currentStep} items={steps} className="mb-8" />
 
           {loading || permissionsLoading ? (
@@ -316,11 +343,11 @@ export default function CreateReportPage() {
               ) : (
                 <Button
                   type="primary"
-                  onClick={handleCreateReport}
+                  onClick={handleUpdateReport}
                   loading={isSubmitting}
                   disabled={isSubmitting || loading || permissionsLoading}
                 >
-                  Crear
+                  Actualizar
                 </Button>
               )}
             </div>
@@ -345,14 +372,8 @@ export default function CreateReportPage() {
 
         <WarningModal
           isOpen={isWarningModalOpen}
-          onClose={handleWarningCancel}
           onConfirm={handleWarningConfirm}
-          title="Advertencia de Permisos"
-          content={[
-            "No se han seleccionado permisos para este reporte.",
-            "Si continúa, solo usted tendrá acceso al reporte.",
-            "¿Desea continuar con la creación del reporte?",
-          ]}
+          onCancel={handleWarningCancel}
         />
       </div>
     </div>

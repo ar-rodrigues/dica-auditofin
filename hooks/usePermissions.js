@@ -11,49 +11,74 @@ export const usePermissions = ({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  useEffect(() => {
-    const fetchPermissions = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+  const fetchPermissions = async (params = {}) => {
+    try {
+      setLoading(true);
+      setError(null);
 
-        let url = "/api/permissions";
-        const params = new URLSearchParams();
+      let url = "/api/permissions";
+      const queryParams = new URLSearchParams();
 
-        if (userId) params.append("userId", userId);
-        if (roleId) params.append("roleId", roleId);
-        if (entityId) params.append("entityId", entityId);
-        if (assetId) params.append("assetId", assetId);
-        if (tableAsset) params.append("tableAsset", tableAsset);
+      // Use provided params or fallback to hook params
+      const effectiveParams = {
+        userId: params.userId ?? userId,
+        roleId: params.roleId ?? roleId,
+        entityId: params.entityId ?? entityId,
+        assetId: params.assetId ?? assetId,
+        tableAsset: params.tableAsset ?? tableAsset,
+      };
 
-        const queryString = params.toString();
-        if (queryString) {
-          url += `?${queryString}`;
-        }
+      if (effectiveParams.userId)
+        queryParams.append("userId", effectiveParams.userId);
+      if (effectiveParams.roleId)
+        queryParams.append("roleId", effectiveParams.roleId);
+      if (effectiveParams.entityId)
+        queryParams.append("entityId", effectiveParams.entityId);
+      if (effectiveParams.assetId)
+        queryParams.append("assetId", effectiveParams.assetId);
+      if (effectiveParams.tableAsset)
+        queryParams.append("tableAsset", effectiveParams.tableAsset);
 
-        const response = await fetch(url);
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error || "Failed to fetch permissions");
-        }
-
-        const data = await response.json();
-        setPermissions(data);
-      } catch (err) {
-        setError(err.message);
-        console.error("Error fetching permissions:", err);
-      } finally {
-        setLoading(false);
+      const queryString = queryParams.toString();
+      if (queryString) {
+        url += `?${queryString}`;
       }
-    };
 
+      const response = await fetch(url);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch permissions");
+      }
+
+      const data = await response.json();
+      setPermissions(data);
+      return data;
+    } catch (err) {
+      setError(err.message);
+      console.error("Error fetching permissions:", err);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchPermissions();
   }, [userId, roleId, entityId, assetId, tableAsset]);
 
   const createPermission = async (permissionData) => {
-    if (permissionData.length === 0) {
-      return null;
+    // Check if all permission arrays are empty
+    const isEmpty =
+      !permissionData.users?.length &&
+      !permissionData.roles?.length &&
+      !permissionData.entities?.length;
+
+    if (isEmpty) {
+      throw new Error(
+        "At least one permission (user, role, or entity) must be specified"
+      );
     }
+
     try {
       const response = await fetch("/api/permissions", {
         method: "POST",
@@ -78,9 +103,18 @@ export const usePermissions = ({
   };
 
   const updatePermission = async (id, permissionData) => {
-    if (permissionData.length === 0) {
-      return null;
+    // Check if all permission arrays are empty
+    const isEmpty =
+      !permissionData.users?.length &&
+      !permissionData.roles?.length &&
+      !permissionData.entities?.length;
+
+    if (isEmpty) {
+      throw new Error(
+        "At least one permission (user, role, or entity) must be specified"
+      );
     }
+
     try {
       const response = await fetch(`/api/permissions/${id}`, {
         method: "PUT",
@@ -129,6 +163,23 @@ export const usePermissions = ({
     }
   };
 
+  const getPermissionById = async (id) => {
+    try {
+      const response = await fetch(`/api/permissions/${id}`);
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to fetch permission");
+      }
+
+      const permission = await response.json();
+      return permission;
+    } catch (err) {
+      console.error("Error fetching permission:", err);
+      throw err;
+    }
+  };
+
   return {
     permissions,
     loading,
@@ -136,5 +187,7 @@ export const usePermissions = ({
     createPermission,
     updatePermission,
     deletePermission,
+    getPermissionById,
+    fetchPermissions,
   };
 };
