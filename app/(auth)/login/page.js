@@ -7,8 +7,8 @@ import { createClient } from "@/utils/supabase/client";
 import "@ant-design/v5-patch-for-react-19";
 import Logo from "@/components/Logo";
 import ResetPassword from "@/components/ResetPassword";
-import Login from "@/components/Login";
-import InstallButton from "@/components/InstallButton";
+import Login from "@/components/Login/Login";
+import InstallButton from "@/components/Login/InstallButton";
 
 export default function LoginPage() {
   const supabase = createClient();

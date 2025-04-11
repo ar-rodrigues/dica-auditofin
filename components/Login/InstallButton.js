@@ -1,4 +1,4 @@
-import { Button } from "antd";
+import { Button, Modal } from "antd";
 import { DownloadOutlined } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 
@@ -70,9 +70,52 @@ export default function InstallButton() {
       navigator.userAgent.includes("iPhone") ||
       navigator.userAgent.includes("iPad")
     ) {
-      alert(
-        "Para instalar esta aplicación, ábrela en Safari, toca el botón Compartir y selecciona «Agregar a inicio»."
-      );
+      Modal.info({
+        title: "Instalar aplicación",
+        content: (
+          <div>
+            <p>Para instalar esta aplicación en tu iPhone/iPad:</p>
+            <ol style={{ fontSize: "16px", lineHeight: "1.8" }}>
+              <li>
+                <strong>1.</strong> Abre esta página en Safari{" "}
+                <span role="img" aria-label="safari">
+                  🧭
+                </span>
+              </li>
+              <li>
+                <strong>2.</strong> Toca el botón de Compartir{" "}
+                <span role="img" aria-label="share">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    style={{ verticalAlign: "middle" }}
+                  >
+                    <path
+                      fill="currentColor"
+                      d="M16 5l-1.42 1.42-1.59-1.59V16h-1.98V4.83L9.42 6.42 8 5l4-4 4 4zm4 5v11c0 1.1-.9 2-2 2H6c-1.11 0-2-.9-2-2V10c0-1.11.89-2 2-2h3v2H6v11h12V10h-3V8h3c1.1 0 2 .89 2 2z"
+                    />
+                  </svg>
+                </span>
+              </li>
+              <li>
+                <strong>3.</strong> Selecciona &quot;Agregar a Pantalla de
+                inicio&quot;{" "}
+                <span role="img" aria-label="home">
+                  🏠
+                </span>
+              </li>
+            </ol>
+            <p style={{ marginTop: "12px", fontSize: "14px", color: "#666" }}>
+              Una vez instalada, podrás acceder a la aplicación directamente
+              desde tu pantalla de inicio.
+            </p>
+          </div>
+        ),
+        okText: "Entendido",
+        centered: true,
+        width: 400,
+      });
     }
   };
 

@@ -10,7 +10,7 @@ import dynamic from "next/dynamic";
 
 // Create a client-side only component that uses Power BI
 const PowerBIReport = dynamic(
-  () => import("@/components/Report/PowerBIReport"),
+  () => import("@/components/Dashboard/Report/PowerBIReport"),
   {
     ssr: false,
     loading: () => (
