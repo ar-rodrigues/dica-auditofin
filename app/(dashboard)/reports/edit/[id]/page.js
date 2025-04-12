@@ -58,8 +58,7 @@ export default function EditReportPage() {
   } = usePermissions();
   const { user } = useFetchUser();
 
-  console.log("selectedPermissions", selectedPermissions);
-  console.log("reportId", reportId);
+  console.log("formData", formData);
 
   useEffect(() => {
     const fetchReport = async () => {
@@ -81,7 +80,6 @@ export default function EditReportPage() {
       const permissions = await fetchPermissions({
         assetId: reportId,
       });
-      console.log("permissions useEffect", permissions);
       if (permissions && permissions.length > 0) {
         const permission = permissions[0];
         setSelectedPermissions({
@@ -196,7 +194,7 @@ export default function EditReportPage() {
         setIsWarningModalOpen(true);
       } else {
         const values = await form.validateFields();
-        const reportUpdateResult = await updateReport(reportId, values);
+        const reportUpdateResult = await updateReport(reportId, formData);
         if (!reportUpdateResult) {
           throw new Error("Error al actualizar el reporte");
         }

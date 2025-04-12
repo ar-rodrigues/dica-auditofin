@@ -150,6 +150,16 @@ export async function updateReport(id, updateData) {
   const supabase = await createClient();
   const userData = await getUserData();
 
+  const {
+    name,
+    entity_id,
+    workspaceId,
+    reportId,
+    clientId,
+    clientSecret,
+    tenantId,
+  } = updateData;
+
   // First check permissions for this specific report
   const permissions = await fetchPermissions({
     table_asset: "reports",
@@ -194,13 +204,19 @@ export async function updateReport(id, updateData) {
   try {
     const { data, error } = await supabase
       .from("reports")
-      .update(updateData)
+      .update({
+        name,
+        entity_id,
+        workspaceId,
+        reportId,
+        clientId,
+        clientSecret,
+        tenantId,
+      })
       .eq("id", id)
       .select()
       .single();
 
-    console.log(data);
-    console.log(error);
     if (error) throw error;
     return data;
   } catch (error) {
@@ -265,14 +281,30 @@ export async function deleteReport(id) {
 
 export async function createReport(reportData) {
   const supabase = await createClient();
+  const {
+    name,
+    entity_id,
+    workspaceId,
+    reportId,
+    clientId,
+    clientSecret,
+    tenantId,
+  } = reportData;
 
   try {
     const { data, error } = await supabase
       .from("reports")
-      .insert(reportData)
+      .insert({
+        name,
+        entity_id,
+        workspaceId,
+        reportId,
+        clientId,
+        clientSecret,
+        tenantId,
+      })
       .select()
       .single();
-
     if (error) throw error;
     return data;
   } catch (error) {
