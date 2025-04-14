@@ -25,7 +25,6 @@ export default function PowerBIContent({ reports }) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState(reports[0]?.id);
 
-  console.log(reports);
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
@@ -40,7 +39,7 @@ export default function PowerBIContent({ reports }) {
   const currentReport =
     reports.find((report) => report?.id === selectedReport) || reports[0];
 
-  if (!reports || reports.length === 0) {
+  if (!isLoading && (!reports || reports.length === 0)) {
     return (
       <div className="w-full overflow-x-hidden h-full flex flex-col">
         <div className="px-2 sm:px-4 py-4 sm:py-6 w-full flex-grow flex flex-col">
