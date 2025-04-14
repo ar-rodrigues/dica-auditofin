@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Spin, Layout, Select, Typography, Card } from "antd";
+import { Spin, Layout, Select, Typography, Card, Empty } from "antd";
 const { Content } = Layout;
 const { Option } = Select;
 const { Title } = Typography;
@@ -25,6 +25,7 @@ export default function PowerBIContent({ reports }) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState(reports[0]?.id);
 
+  console.log(reports);
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
@@ -37,7 +38,36 @@ export default function PowerBIContent({ reports }) {
   };
 
   const currentReport =
-    reports.find((report) => report.id === selectedReport) || reports[0];
+    reports.find((report) => report?.id === selectedReport) || reports[0];
+
+  if (!reports || reports.length === 0) {
+    return (
+      <div className="w-full overflow-x-hidden h-full flex flex-col">
+        <div className="px-2 sm:px-4 py-4 sm:py-6 w-full flex-grow flex flex-col">
+          <Card className="overflow-hidden shadow-sm border-0 flex flex-col flex-grow h-full">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4 mb-4 ml-2 mr-2">
+              <Title level={4} className="m-0 text-gray-800">
+                Dashboard
+              </Title>
+            </div>
+            <div className="w-full bg-gray-50 rounded-lg overflow-hidden flex-grow px-0 sm:px-2">
+              <div className="flex items-center justify-center h-full min-h-[calc(100vh-200px)]">
+                <Empty
+                  description={
+                    <span className="text-gray-600">
+                      No tienes acceso a ningún reporte en este momento. Por
+                      favor, contacta al administrador si crees que deberías
+                      tener acceso.
+                    </span>
+                  }
+                />
+              </div>
+            </div>
+          </Card>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full overflow-x-hidden h-full flex flex-col">
@@ -70,8 +100,8 @@ export default function PowerBIContent({ reports }) {
               popupMatchSelectWidth={false}
             >
               {reports.map((report) => (
-                <Option key={report.id} value={report.id}>
-                  {report.name}
+                <Option key={report?.id} value={report?.id}>
+                  {report?.name}
                 </Option>
               ))}
             </Select>
@@ -89,8 +119,8 @@ export default function PowerBIContent({ reports }) {
             ) : (
               <div className="w-full h-full min-h-[calc(100vh-200px)] overflow-hidden">
                 <PowerBIReport
-                  id={currentReport.id}
-                  reportId={currentReport.reportId}
+                  id={currentReport?.id}
+                  reportId={currentReport?.reportId}
                 />
               </div>
             )}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import * as powerbi from "powerbi-client";
-import { Result, Button, Card } from "antd";
+import { Result, Button, Card, Empty } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 
 export default function PowerBIReport({ id, reportId }) {
@@ -13,32 +13,13 @@ export default function PowerBIReport({ id, reportId }) {
   const powerbiServiceRef = useRef(null);
   const reportRef = useRef(null);
 
-  // Handle window resize
   useEffect(() => {
-    const handleResize = () => {
-      const newIsMobile = window.innerWidth <= 768;
-      if (newIsMobile !== isMobile) {
-        setIsMobile(newIsMobile);
-        if (reportRef.current) {
-          const layoutType = newIsMobile
-            ? powerbi.models.LayoutType.MobilePortrait
-            : powerbi.models.LayoutType.Custom;
-          reportRef.current
-            .updateSettings({
-              layoutType: layoutType,
-            })
-            .catch((error) => {
-              console.error("Error al actualizar el layout:", error);
-            });
-        }
-      }
-    };
+    if (!id || !reportId) {
+      setError("No se ha especificado un reporte válido");
+      setLoading(false);
+      return;
+    }
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, [isMobile]);
-
-  useEffect(() => {
     const embedReport = async () => {
       try {
         // Initialize Power BI service if not already initialized
@@ -121,6 +102,31 @@ export default function PowerBIReport({ id, reportId }) {
     };
 
     embedReport();
+  }, [isMobile]);
+
+  // Handle window resize
+  useEffect(() => {
+    const handleResize = () => {
+      const newIsMobile = window.innerWidth <= 768;
+      if (newIsMobile !== isMobile) {
+        setIsMobile(newIsMobile);
+        if (reportRef.current) {
+          const layoutType = newIsMobile
+            ? powerbi.models.LayoutType.MobilePortrait
+            : powerbi.models.LayoutType.Custom;
+          reportRef.current
+            .updateSettings({
+              layoutType: layoutType,
+            })
+            .catch((error) => {
+              console.error("Error al actualizar el layout:", error);
+            });
+        }
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
   }, [isMobile]);
 
   return (
