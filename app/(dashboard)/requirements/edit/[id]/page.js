@@ -1,39 +1,70 @@
 "use client";
 
-import { Typography } from "antd";
-import { useAtom, useAtomValue } from "jotai";
-import { loadingAtom, mockRequirementsAtom } from "@/utils/atoms";
-import RequirementForm from "@/components/RequirementForm";
-import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { Typography, Spin, message } from "antd";
+import RequirementForm from "@/components/Requirements/RequirementForm";
+import useRequirements from "@/hooks/useRequirements";
 import NotFoundContent from "@/components/NotFoundContent";
 
 const { Title } = Typography;
 
 export default function EditRequirementPage() {
-  const [loading, setLoading] = useAtom(loadingAtom);
-  const requirements = useAtomValue(mockRequirementsAtom);
   const router = useRouter();
   const params = useParams();
-  const requirementId = parseInt(params.id);
+  const entityId = params.id;
 
-  // Find the requirement in mock data
-  const requirement = requirements.find((req) => req.id === requirementId);
+  const [requirement, setRequirement] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { updateRequirement, isLoading } = useRequirements();
+
+  useEffect(() => {
+    const fetchRequirement = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch(`/api/requirements/${entityId}`);
+        const result = await response.json();
+
+        if (!response.ok || !result.success) {
+          throw new Error(result.error || "Error al cargar el requerimiento");
+        }
+
+        setRequirement(result.data);
+      } catch (error) {
+        console.error("Error fetching requirement:", error);
+        message.error(error.message || "Error al cargar el requerimiento");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRequirement();
+  }, [entityId]);
 
   const handleSubmit = async (values) => {
     try {
-      setLoading(true);
-      // In a real app, this would be an API call
-      console.log("Updating requirement:", values);
-      router.push("/requirements");
-    } catch (error) {
-      console.error("Error updating requirement:", error);
-    } finally {
-      setLoading(false);
+      const result = await updateRequirement(entityId, values);
+      if (result.success) {
+        message.success("Requerimiento actualizado exitosamente");
+        router.push("/requirements");
+      } else {
+        throw new Error(result.error || "Error al actualizar el requerimiento");
+      }
+    } catch (err) {
+      console.error("Error updating requirement:", err);
+      message.error(err.message || "Error al actualizar el requerimiento");
     }
   };
 
-  if (!requirement) {
+  if (loading && !requirement) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-4 sm:p-8 flex items-center justify-center">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!loading && !requirement) {
     return (
       <NotFoundContent
         title="Requerimiento no encontrado"
@@ -49,21 +80,14 @@ export default function EditRequirementPage() {
     <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
       <div className="mx-auto flex flex-col">
         <Title level={5} className="text-gray-600! mb-4">
-          Editar Requerimiento
+          Editar Requerimiento: {requirement?.ref_code}
         </Title>
 
         <RequirementForm
           mode="edit"
-          initialValues={{
-            id: requirement.id,
-            ref_code: requirement.ref_code,
-            info: requirement.info,
-            required_format: requirement.required_format.id,
-            file_type: requirement.file_type.id,
-            frequency_by_day: requirement.frequency_by_day,
-            days_to_deliver: requirement.days_to_deliver,
-          }}
+          initialValues={requirement}
           onSubmit={handleSubmit}
+          loading={isLoading}
         />
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { Table, Button, Space, Typography, Avatar } from "antd";
-import { EditOutlined, DeleteOutlined, UserOutlined } from "@ant-design/icons";
+import { EditOutlined, DeleteOutlined, BankOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
 const { Paragraph } = Typography;
@@ -14,7 +14,11 @@ export default function EntitiesTable({ data, onDelete }) {
       key: "entity_name",
       render: (_, record) => (
         <Space>
-          <Avatar src={record.entity_logo} icon={<UserOutlined />} size={50} />
+          {!record.entity_logo || record.entity_logo === "" ? (
+            <Avatar icon={<BankOutlined />} size={50} />
+          ) : (
+            <Avatar src={record.entity_logo} size={50} />
+          )}
           <div>{record.entity_name}</div>
         </Space>
       ),
@@ -70,7 +74,7 @@ export default function EntitiesTable({ data, onDelete }) {
       className="bg-white rounded-lg shadow-xs align-middle"
       scroll={{ x: "max-content" }}
       pagination={{
-        pageSize: 1,
+        pageSize: 100,
         showSizeChanger: true,
         showTotal: (total, range) =>
           `${range[0]}-${range[1]} de ${total} entidades`,

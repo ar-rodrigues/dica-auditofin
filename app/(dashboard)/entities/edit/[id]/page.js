@@ -1,18 +1,22 @@
 "use client";
 
-import { Typography } from "antd";
+import { Typography, Form, message } from "antd";
 import { useAtom } from "jotai";
-import { loadingAtom, entitiesAtom } from "@/utils/atoms";
-import EntityForm from "@/components/EntityForm";
-import { useParams } from "next/navigation";
+import { loadingAtom } from "@/utils/atoms";
+import EntityForm from "@/components/Entities/EntityForm";
+import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import NotFoundContent from "@/components/NotFoundContent";
+import { useEntities } from "@/hooks/useEntities";
 const { Title } = Typography;
 
 export default function EditEntityPage() {
+  const [form] = Form.useForm();
   const [loading, setLoading] = useAtom(loadingAtom);
-  const [entity, setEntity] = useState([]);
+  const [entity, setEntity] = useState(null);
+  const { updateEntity, loading: entityLoading } = useEntities();
   const params = useParams();
+  const router = useRouter();
   const entityId = params.id;
 
   useEffect(() => {
@@ -32,22 +36,17 @@ export default function EditEntityPage() {
   }, [entityId, setLoading]);
 
   const handleSubmit = async (values) => {
-    setLoading(true);
     try {
-      // In a real application, you would make an API call here
-      const updatedEntities = entitiesData.entities.map((e) =>
-        e.id === entityId ? { ...e, ...values } : e
-      );
-
-      setEntitiesData({
-        entities: updatedEntities,
-      });
-    } finally {
-      setLoading(false);
+      await updateEntity(entityId, values);
+      message.success("Entidad actualizada exitosamente");
+      router.push("/entities");
+    } catch (error) {
+      console.error("Error al actualizar la entidad:", error);
+      message.error("Error al actualizar la entidad");
     }
   };
 
-  if (!entity || entity.length === 0) {
+  if (!entity) {
     return (
       <NotFoundContent
         title="Entidad no encontrada"
@@ -69,13 +68,14 @@ export default function EditEntityPage() {
         <EntityForm
           mode="edit"
           initialValues={{
-            id: entity.id,
             entity_name: entity.entity_name,
             is_active: entity.is_active,
             description: entity.description,
-            entity_logo: entity.entity_logo,
+            entity_areas: entity.entity_areas || [],
           }}
           onSubmit={handleSubmit}
+          form={form}
+          loading={loading || entityLoading}
         />
       </div>
     </div>

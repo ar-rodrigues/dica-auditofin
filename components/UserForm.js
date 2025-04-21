@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { KeyOutlined, CheckOutlined } from "@ant-design/icons";
 
-import { useUploadFile } from "@/hooks/useUploadFile";
+import { useUploadFile } from "@/hooks/useStorageFile";
 import { useFormSubmit } from "@/hooks/useFormSubmit";
 import ImageUpload from "@/components/common/ImageUpload";
 import PasswordInput from "@/components/common/PasswordInput";

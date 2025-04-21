@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { getEntityById, updateEntity } from "@/app/api/entities/entities";
+import {
+  getEntityById,
+  updateEntity,
+  deleteEntity,
+} from "@/app/api/entities/entities";
 
 export async function GET(request, { params }) {
   try {
@@ -26,6 +30,27 @@ export async function PUT(request, { params }) {
     console.error("Error updating entity:", error);
     return NextResponse.json(
       { error: "Error updating entity" },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request, { params }) {
+  const { id } = await params;
+
+  try {
+    const result = await deleteEntity(id);
+    if (!result) {
+      return NextResponse.json(
+        { error: "Error deleting entity" },
+        { status: 500 }
+      );
+    }
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error("Error deleting entity:", error);
+    return NextResponse.json(
+      { error: "Error deleting entity" },
       { status: 500 }
     );
   }

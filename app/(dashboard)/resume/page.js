@@ -15,7 +15,7 @@ import {
   requirementsAtom,
   departmentsAtom,
 } from "@/utils/atoms";
-import RequirementsTable from "@/components/RequirementsTable";
+import RequirementsTable from "@/components/Requirements/RequirementsTable";
 import AuditHeader from "@/components/AuditHeader";
 
 const { Option } = Select;

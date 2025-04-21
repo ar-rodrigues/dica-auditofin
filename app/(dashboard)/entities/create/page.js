@@ -1,31 +1,29 @@
 "use client";
 
-import { Typography } from "antd";
-import { useAtom } from "jotai";
-import { loadingAtom, entitiesAtom } from "@/utils/atoms";
-import EntityForm from "@/components/EntityForm";
-
+import { Typography, Form, message } from "antd";
+import EntityForm from "@/components/Entities/EntityForm";
+import { useEntities } from "@/hooks/useEntities";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 const { Title } = Typography;
 
 export default function CreateEntityPage() {
-  const [, setLoading] = useAtom(loadingAtom);
-  const [entitiesData, setEntitiesData] = useAtom(entitiesAtom);
+  const [form] = Form.useForm();
+  const { createEntity, loading: entityLoading } = useEntities();
+  const router = useRouter();
 
   const handleSubmit = async (values) => {
-    setLoading(true);
     try {
-      // In a real application, you would make an API call here
       const newEntity = {
         ...values,
-        id: entitiesData.entities.length + 1,
-        createdAt: new Date().toISOString().split("T")[0],
       };
 
-      setEntitiesData({
-        entities: [...entitiesData.entities, newEntity],
-      });
-    } finally {
-      setLoading(false);
+      await createEntity(newEntity);
+      message.success("Entidad creada exitosamente");
+      router.push("/entities");
+    } catch (error) {
+      console.error("Error al crear la entidad:", error);
+      message.error("Error al crear la entidad");
     }
   };
 
@@ -38,11 +36,9 @@ export default function CreateEntityPage() {
 
         <EntityForm
           mode="create"
-          initialValues={{
-            status: "active",
-            type: "Municipal",
-          }}
           onSubmit={handleSubmit}
+          form={form}
+          loading={entityLoading}
         />
       </div>
     </div>

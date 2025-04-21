@@ -39,10 +39,37 @@ export async function updateEntity(id, data) {
       .select();
     if (error) throw error;
 
-    console.log("API UPDATE ENTITY UPDATED", updatedEntity);
     return updatedEntity;
   } catch (error) {
     console.error("Error updating entity:", error);
     return [];
+  }
+}
+
+export async function createEntity(data) {
+  const supabase = await createClient();
+  try {
+    const { data: newEntity, error } = await supabase
+      .from("entities")
+      .insert(data)
+      .select()
+      .single();
+    if (error) throw error;
+    return newEntity;
+  } catch (error) {
+    console.error("Error creating entity:", error);
+    return null;
+  }
+}
+
+export async function deleteEntity(id) {
+  const supabase = await createClient();
+  try {
+    const { error } = await supabase.from("entities").delete().eq("id", id);
+    if (error) throw error;
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting entity:", error);
+    return null;
   }
 }

@@ -17,7 +17,7 @@ export default async function DashboardLayout({ children }) {
   const userAgent = await headersList.get("user-agent");
   const isMobile = isMobileDevice(userAgent);
 
-  console.log("isMobile", isMobile);
+  //console.log("isMobile", isMobile);
 
   return (
     <html lang="es-MX">

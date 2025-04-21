@@ -23,7 +23,15 @@ const DashboardClientLayout = ({ children, isMobile }) => {
       {isMobile ? (
         <Layout>
           <TabMenu />
-          <Content>{children}</Content>
+          <Content
+            style={{
+              padding: "16px",
+              paddingBottom: "96px", // Add extra padding at bottom to account for TabMenu height
+              minHeight: "100vh",
+            }}
+          >
+            {children}
+          </Content>
         </Layout>
       ) : (
         <div className="flex w-full">

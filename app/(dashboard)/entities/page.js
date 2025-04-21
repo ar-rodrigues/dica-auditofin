@@ -5,35 +5,18 @@ import { Input, Select, Space, Typography, Button } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import { useAtom, useAtomValue } from "jotai";
 import { loadingAtom } from "@/utils/atoms";
-import EntitiesTable from "@/components/EntitiesTable";
+import EntitiesTable from "@/components/Entities/EntitiesTable";
 import { useRouter } from "next/navigation";
+import { useEntities } from "@/hooks/useEntities";
 
 const { Option } = Select;
 const { Title } = Typography;
 
 export default function EntitiesPage() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedType, setSelectedType] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const [loading, setLoading] = useState(false);
-  const [entities, setEntities] = useState([]);
+  const { entities, loading, deleteEntity } = useEntities();
   const router = useRouter();
-
-  useEffect(() => {
-    setLoading(true);
-    const fetchEntities = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/entities");
-        const data = await response.json();
-        setEntities(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching entities:", error);
-      }
-    };
-    fetchEntities();
-  }, []);
 
   const filteredEntities = entities.filter((entity) => {
     const matchesSearch =
@@ -44,9 +27,12 @@ export default function EntitiesPage() {
     return matchesSearch && matchesStatus;
   });
 
-  const handleDelete = (entity) => {
-    // Implement delete functionality
-    console.log("Delete entity:", entity);
+  const handleDelete = async (entity) => {
+    try {
+      await deleteEntity(entity.id);
+    } catch (error) {
+      console.error("Error deleting entity:", error);
+    }
   };
 
   return (
@@ -71,8 +57,8 @@ export default function EntitiesPage() {
               style={{ minWidth: 150 }}
             >
               <Option value="all">Status</Option>
-              <Option value="active">Activo</Option>
-              <Option value="inactive">Inactivo</Option>
+              <Option value={true}>Activo</Option>
+              <Option value={false}>Inactivo</Option>
             </Select>
           </Space>
 

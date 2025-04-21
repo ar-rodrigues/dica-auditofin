@@ -1,65 +1,67 @@
-import { Avatar, Upload, Button, Space, Tooltip } from "antd";
+import { Avatar, Upload, Button, Space, Tooltip, Modal, message } from "antd";
 import {
   UserOutlined,
   UploadOutlined,
   DeleteOutlined,
 } from "@ant-design/icons";
-import { usePhotoChange } from "@/hooks/usePhotoChange";
-import { beforeUpload } from "@/lib/uploadImages";
+import { useState, useEffect } from "react";
 
 export default function ImageUpload({
   initialImage = null,
   size = 120,
+  photoLoading = false,
   uploadText = "Agregar Imagen",
   changeText = "Cambiar Imagen",
+  deleteText = "Eliminar Imagen",
   onImageChange = () => {},
+  onImageRemove = () => {},
+  maxSize = 2, // Max size in MB
+  accept = "image/png, image/jpeg, image/jpg",
 }) {
-  const {
-    loading: photoLoading,
-    imageUrl,
-    file,
-    handlePhotoChange,
-    clearImage,
-  } = usePhotoChange(initialImage);
-
-  // Call the parent's onChange whenever our internal state changes
-  const handleChange = (info) => {
-    handlePhotoChange(info);
-    if (info.file.status === "done" || info.file.status === "error") {
-      onImageChange({ file: info.file.originFileObj, imageUrl: imageUrl });
-    }
-  };
-
-  const handleClear = () => {
-    clearImage();
-    onImageChange({ file: null, imageUrl: null });
-  };
+  const [confirmRemove, setConfirmRemove] = useState(false);
 
   return (
-    <div className="text-center">
-      <div className="mb-4">
-        <Avatar
-          size={size}
-          icon={<UserOutlined />}
-          src={imageUrl || undefined}
-        />
-      </div>
+    <Space>
       <Space>
         <Upload
+          listType="picture-card"
           showUploadList={false}
-          onChange={handleChange}
-          beforeUpload={beforeUpload}
+          onChange={() => {}}
+          beforeUpload={false}
+          className="w-full flex justify-end relative group"
         >
-          <Button icon={<UploadOutlined />} loading={photoLoading}>
-            {imageUrl ? changeText : uploadText}
-          </Button>
+          <Space
+            className={`!bg-transparent !border-none absolute bottom-2 left-1/2 -translate-x-1/2 ${
+              initialImage
+                ? "md:opacity-0 md:group-hover:opacity-100"
+                : "opacity-100"
+            } transition-opacity`}
+          >
+            <Tooltip title={uploadText}>
+              <Button icon={<UploadOutlined />} loading={photoLoading} />
+            </Tooltip>
+            {initialImage && (
+              <Tooltip title={deleteText}>
+                <Button
+                  icon={<DeleteOutlined />}
+                  onClick={() => setConfirmRemove(true)}
+                  loading={photoLoading}
+                />
+              </Tooltip>
+            )}
+          </Space>
         </Upload>
-        {imageUrl && (
-          <Tooltip title="Eliminar Imagen">
-            <Button icon={<DeleteOutlined />} onClick={handleClear} danger />
-          </Tooltip>
-        )}
       </Space>
-    </div>
+      <Modal
+        title={deleteText}
+        open={confirmRemove}
+        onOk={() => {}}
+        onCancel={() => setConfirmRemove(false)}
+        okText="Sí, eliminar"
+        cancelText="Cancelar"
+      >
+        <p>¿Estás seguro de querer eliminar esta imagen?</p>
+      </Modal>
+    </Space>
   );
 }

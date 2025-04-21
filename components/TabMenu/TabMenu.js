@@ -102,6 +102,7 @@ export default function TabMenu() {
         justifyContent: "space-around",
         alignItems: "center",
         width: "100%",
+        boxShadow: "0 -2px 8px rgba(0,0,0,0.1)",
       }}
     >
       {filteredItems.map((item) => {

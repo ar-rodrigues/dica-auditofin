@@ -1,42 +1,33 @@
 "use client";
 
-import { Typography } from "antd";
-import { useAtom } from "jotai";
-import { loadingAtom } from "@/utils/atoms";
-import RequirementForm from "@/components/RequirementForm";
 import { useRouter } from "next/navigation";
+import { Typography, message } from "antd";
+import RequirementForm from "@/components/Requirements/RequirementForm";
+import useRequirements from "@/hooks/useRequirements";
 
 const { Title } = Typography;
 
 export default function CreateRequirementPage() {
-  const [loading, setLoading] = useAtom(loadingAtom);
   const router = useRouter();
+  const { createRequirement, isLoading } = useRequirements();
 
   const handleSubmit = async (values) => {
     try {
-      setLoading(true);
-      const response = await fetch("/api/requirements", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(values),
-      });
-
-      if (!response.ok) {
-        throw new Error("Error creating requirement");
+      const result = await createRequirement(values);
+      if (result.success) {
+        message.success("Requerimiento creado exitosamente");
+        router.push("/requirements");
+      } else {
+        throw new Error(result.error || "Error al crear el requerimiento");
       }
-
-      router.push("/requirements");
     } catch (error) {
       console.error("Error creating requirement:", error);
-    } finally {
-      setLoading(false);
+      message.error(error.message || "Error al crear el requerimiento");
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-8 ">
       <div className="mx-auto flex flex-col">
         <Title level={5} className="text-gray-600! mb-4">
           Crear Nuevo Requerimiento
@@ -44,11 +35,15 @@ export default function CreateRequirementPage() {
 
         <RequirementForm
           mode="create"
-          initialValues={{
-            frequency_by_day: 30,
-            days_to_deliver: 5,
-          }}
           onSubmit={handleSubmit}
+          loading={isLoading}
+          initialValues={{
+            ref_code: "",
+            required_information: "",
+            frequency_by_day: 31,
+            days_to_deliver: 5,
+            file_type: [],
+          }}
         />
       </div>
     </div>
