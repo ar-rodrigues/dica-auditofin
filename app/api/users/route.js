@@ -4,7 +4,6 @@ import { createUser, getUsers, createProfile, deleteUser } from "./users";
 export async function GET() {
   try {
     const users = await getUsers();
-    //console.log(users);
     return NextResponse.json(users);
   } catch (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
