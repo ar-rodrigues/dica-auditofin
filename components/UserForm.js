@@ -15,7 +15,7 @@ import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { KeyOutlined, CheckOutlined } from "@ant-design/icons";
 
-import { useUploadFile } from "@/hooks/useStorageFile";
+import { useStorageFile } from "@/hooks/useStorageFile";
 import { useFormSubmit } from "@/hooks/useFormSubmit";
 import ImageUpload from "@/components/common/ImageUpload";
 import PasswordInput from "@/components/common/PasswordInput";
@@ -42,7 +42,7 @@ export default function UserForm({
   const [passwordIsStrong, setPasswordIsStrong] = useState(false);
 
   const [photoFile, setPhotoFile] = useState(null);
-  const { uploadFile } = useUploadFile();
+  const { uploadFile } = useStorageFile();
   const { handleSubmit: handleFormSubmit } = useFormSubmit("/api/users");
 
   const handleResetPassword = async () => {

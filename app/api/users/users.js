@@ -42,11 +42,14 @@ export async function getUserByEmail(email) {
 }
 
 export async function createUser(newUser) {
-  const supabase = await createClient();
+  const supabase = await createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY
+  );
   try {
-    const { data, error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.admin.createUser({
       email: newUser.email,
       password: newUser.password,
+      email_confirm: true, // This will skip email confirmation
     });
 
     if (error) {
@@ -54,7 +57,6 @@ export async function createUser(newUser) {
     }
 
     const user = data.user;
-
     return user;
   } catch (error) {
     console.error(error);

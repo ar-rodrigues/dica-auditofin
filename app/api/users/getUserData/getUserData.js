@@ -9,6 +9,7 @@ export async function getUserData() {
       error,
     } = await supabase.auth.getUser();
 
+    console.log("user", user);
     if (user) {
       const { data: userData, error: userError } = await supabase
         .from("profiles")
