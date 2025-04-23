@@ -1,35 +1,34 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Typography } from "antd";
-import { useAtom } from "jotai";
-import { loadingAtom } from "@/utils/atoms";
-import UserForm from "@/components/UserForm";
-import { useParams } from "next/navigation";
+import { Typography, message } from "antd";
+import UserForm from "@/components/Users/UserForm";
+import { useParams, useRouter } from "next/navigation";
 import NotFoundContent from "@/components/NotFoundContent";
 import { useUserRole } from "@/hooks/useUserRole";
 import { useRoles } from "@/hooks/useRoles";
 import { useEntities } from "@/hooks/useEntities";
+import { useUsers } from "@/hooks/useUsers";
+
 const { Title } = Typography;
 
 export default function EditUserPage() {
-  const [loading, setLoading] = useAtom(loadingAtom);
-  const [user, setUser] = useState([]);
-
+  const [user, setUser] = useState(null);
+  const { getUserById, updateUser, loading } = useUsers();
   const params = useParams();
+  const router = useRouter();
   const id = params.id;
   const { userRole } = useUserRole();
 
   useEffect(() => {
     const fetchUser = async () => {
-      setLoading(true);
-      const response = await fetch(`/api/users/${id}`);
-      const data = await response.json();
-      setUser(data[0]);
-      setLoading(false);
+      const userData = await getUserById(id);
+      if (userData) {
+        setUser(userData[0]);
+      }
     };
     fetchUser();
-  }, [id, setLoading]);
+  }, [id, getUserById]);
 
   const {
     roles,
@@ -43,22 +42,21 @@ export default function EditUserPage() {
   } = useEntities();
 
   const handleSubmit = async (values) => {
-    setLoading(true);
     try {
-      // In a real application, you would make an API call here
-      const updatedUsers = usersData.map((u) =>
-        u.id === userId ? { ...u, ...values } : u
-      );
-
-      setUsersData({
-        updatedUsers,
-      });
-    } finally {
-      setLoading(false);
+      const result = await updateUser(id, values);
+      if (result) {
+        message.success("Usuario actualizado correctamente");
+        router.push("/users");
+      } else {
+        message.error("Error al actualizar el usuario");
+      }
+    } catch (error) {
+      message.error("Error al actualizar el usuario");
+      console.error(error);
     }
   };
 
-  if (!user || user.length === 0) {
+  if (!user) {
     return (
       <NotFoundContent
         title="Usuario no encontrado"
@@ -87,6 +85,7 @@ export default function EditUserPage() {
           entitiesLoading={entitiesLoading}
           rolesError={rolesError}
           entitiesError={entitiesError}
+          loading={loading}
         />
       </div>
     </div>

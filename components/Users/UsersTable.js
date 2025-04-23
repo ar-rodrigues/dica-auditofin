@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Table, Tag, Button, Space, Avatar, Modal } from "antd";
 import {
   EditOutlined,
@@ -7,8 +8,9 @@ import {
 } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
-export default function UsersTable({ data, onDelete, userRole }) {
+export default function UsersTable({ data, onDelete, userRole, loading }) {
   const router = useRouter();
+  const [deletingId, setDeletingId] = useState(null);
 
   const handleDelete = (userId) => {
     Modal.confirm({
@@ -17,8 +19,10 @@ export default function UsersTable({ data, onDelete, userRole }) {
       content: "¿Estás seguro de querer eliminar este usuario?",
       okText: "Sí",
       cancelText: "No",
-      onOk() {
-        onDelete(userId);
+      onOk: async () => {
+        setDeletingId(userId);
+        await onDelete(userId);
+        setDeletingId(null);
       },
     });
   };
@@ -92,6 +96,7 @@ export default function UsersTable({ data, onDelete, userRole }) {
               type="primary"
               danger
               icon={<DeleteOutlined />}
+              loading={deletingId === record.id}
               onClick={() => handleDelete(record.id)}
             />
           )}

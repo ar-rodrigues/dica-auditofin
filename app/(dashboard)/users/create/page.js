@@ -1,16 +1,17 @@
 "use client";
 
-import { Typography } from "antd";
-import { useAtom } from "jotai";
-import { loadingAtom, usersAtom } from "@/utils/atoms";
-import UserForm from "@/components/UserForm";
+import { Typography, message } from "antd";
+import UserForm from "@/components/Users/UserForm";
 import { useRoles } from "@/hooks/useRoles";
 import { useEntities } from "@/hooks/useEntities";
+import { useUsers } from "@/hooks/useUsers";
+import { useRouter } from "next/navigation";
+
 const { Title } = Typography;
 
 export default function CreateUserPage() {
-  const [, setLoading] = useAtom(loadingAtom);
-  const [usersData, setUsersData] = useAtom(usersAtom);
+  const { createUser, loading } = useUsers();
+  const router = useRouter();
   const { roles, loading: rolesLoading, error: rolesError } = useRoles();
   const {
     entities,
@@ -19,20 +20,17 @@ export default function CreateUserPage() {
   } = useEntities();
 
   const handleSubmit = async (values) => {
-    setLoading(true);
     try {
-      // In a real application, you would make an API call here
-      const newUser = {
-        ...values,
-        id: usersData.users.length + 1,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-
-      setUsersData({
-        users: [...usersData.users, newUser],
-      });
-    } finally {
-      setLoading(false);
+      const result = await createUser(values);
+      if (result) {
+        message.success("Usuario creado correctamente");
+        router.push("/users");
+      } else {
+        message.error("Error al crear el usuario");
+      }
+    } catch (error) {
+      message.error("Error al crear el usuario");
+      console.error(error);
     }
   };
 
@@ -46,7 +44,7 @@ export default function CreateUserPage() {
         <UserForm
           mode="create"
           initialValues={{
-            status: "active",
+            is_active: true,
             role: "user",
           }}
           onSubmit={handleSubmit}
@@ -56,6 +54,7 @@ export default function CreateUserPage() {
           entitiesLoading={entitiesLoading}
           rolesError={rolesError}
           entitiesError={entitiesError}
+          loading={loading}
         />
       </div>
     </div>

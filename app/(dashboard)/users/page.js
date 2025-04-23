@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Input, Select, Space, Typography, Button, message } from "antd";
 import { SearchOutlined, UserAddOutlined } from "@ant-design/icons";
-import { useAtom } from "jotai";
-import { loadingAtom, usersAtom } from "@/utils/atoms";
-import UsersTable from "@/components/UsersTable";
+import UsersTable from "@/components/Users/UsersTable";
 import { useRouter } from "next/navigation";
 import { useUserRole } from "@/hooks/useUserRole";
+import { useUsers } from "@/hooks/useUsers";
+
 const { Option } = Select;
 const { Title } = Typography;
 
@@ -15,41 +15,30 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedRole, setSelectedRole] = useState("all");
   const [selectedStatus, setSelectedStatus] = useState("all");
-  const [loading, setLoading] = useAtom(loadingAtom);
-  const [usersData, setUsersData] = useAtom(usersAtom);
   const router = useRouter();
   const { userRole } = useUserRole();
+  const { users, loading, deleteUser } = useUsers();
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      setLoading(true);
-      const response = await fetch("/api/users");
-      const data = await response.json();
-      setUsersData(data);
-      setLoading(false);
-    };
-    fetchUsers();
-  }, []);
-
-  const filteredUsers = usersData?.filter((user) => {
+  const filteredUsers = users?.filter((user) => {
     const matchesSearch =
-      user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesRole = selectedRole === "all" || user.role === selectedRole;
+      user.first_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.last_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesRole =
+      selectedRole === "all" || user.role?.id === selectedRole;
     const matchesStatus =
-      selectedStatus === "all" || user.status === selectedStatus;
+      selectedStatus === "all" ||
+      user.is_active === (selectedStatus === "active");
     return matchesSearch && matchesRole && matchesStatus;
   });
 
   const handleDelete = async (id) => {
     try {
-      const response = await fetch(`/api/users/${id}`, {
-        method: "DELETE",
-      });
-      if (response.ok) {
+      const result = await deleteUser(id);
+      if (result) {
         message.success("Usuario eliminado correctamente");
-        setUsersData(usersData.filter((user) => user.id !== id));
+      } else {
+        message.error("Error al eliminar el usuario");
       }
     } catch (error) {
       message.error("Error al eliminar el usuario");
@@ -105,6 +94,7 @@ export default function UsersPage() {
 
         <UsersTable
           data={filteredUsers}
+          loading={loading}
           onDelete={handleDelete}
           userRole={userRole}
         />

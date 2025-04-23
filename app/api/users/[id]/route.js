@@ -28,15 +28,6 @@ export async function PUT(request, { params }) {
 }
 
 export async function DELETE(request, { params }) {
-  const userRole = await getUserById(id);
-
-  if (userRole.role !== "super admin") {
-    return NextResponse.json(
-      { error: "You are not authorized to delete this user" },
-      { status: 403 }
-    );
-  }
-
   try {
     const { id } = await params;
 
