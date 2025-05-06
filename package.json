@@ -19,12 +19,13 @@
     "generate-password": "^1.7.1",
     "jotai": "^2.12.1",
     "next": "^15.2.4",
+    "nodemailer": "^7.0.2",
+    "powerbi-client": "^2.19.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",
     "react-icons": "^5.4.0",
-    "zxcvbn": "^4.4.2",
-    "powerbi-client": "^2.19.2"
+    "zxcvbn": "^4.4.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

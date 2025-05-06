@@ -13,8 +13,6 @@ export default function PowerBIReport({ id, reportId, iframeUrl }) {
   const powerbiServiceRef = useRef(null);
   const reportRef = useRef(null);
 
-  console.log("iframeUrl", iframeUrl);
-
   useEffect(() => {
     // If iframeUrl is present, do not render PowerBIReport logic
     if (iframeUrl) {

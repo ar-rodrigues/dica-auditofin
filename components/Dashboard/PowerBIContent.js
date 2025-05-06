@@ -124,6 +124,7 @@ export default function PowerBIContent({ reports }) {
                     width="100%"
                     height="100%"
                     style={{ border: 0, minHeight: "100%", minWidth: "100%" }}
+                    sandbox="allow-scripts allow-same-origin"
                     allowFullScreen
                   />
                 ) : (
