@@ -35,6 +35,7 @@ export function useReports() {
   };
 
   const createReport = async (reportData) => {
+    //console.log("reportData", reportData);
     try {
       const response = await fetch("/api/reports", {
         method: "POST",
@@ -56,6 +57,7 @@ export function useReports() {
   };
 
   const updateReport = async (id, updateData) => {
+    //console.log("updateData", updateData);
     try {
       const response = await fetch(`/api/reports/${id}`, {
         method: "PUT",

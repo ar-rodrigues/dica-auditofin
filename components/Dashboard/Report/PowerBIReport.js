@@ -5,7 +5,7 @@ import * as powerbi from "powerbi-client";
 import { Result, Button, Card, Empty } from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 
-export default function PowerBIReport({ id, reportId }) {
+export default function PowerBIReport({ id, reportId, iframeUrl }) {
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
@@ -13,7 +13,15 @@ export default function PowerBIReport({ id, reportId }) {
   const powerbiServiceRef = useRef(null);
   const reportRef = useRef(null);
 
+  console.log("iframeUrl", iframeUrl);
+
   useEffect(() => {
+    // If iframeUrl is present, do not render PowerBIReport logic
+    if (iframeUrl) {
+      setError(null);
+      setLoading(false);
+      return;
+    }
     if (!id || !reportId) {
       setError("No se ha especificado un reporte válido");
       setLoading(false);

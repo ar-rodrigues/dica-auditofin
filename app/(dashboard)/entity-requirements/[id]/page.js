@@ -60,7 +60,7 @@ const mockAssignedRequirements = {
   ],
 };
 
-export default function RequirementsAssignmentPage() {
+export default function AssignRequirementsPage() {
   const [selectedEntity, setSelectedEntity] = useState(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [areaAssignments, setAreaAssignments] = useState({});

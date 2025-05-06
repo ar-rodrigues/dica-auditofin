@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Table, Button, message } from "antd";
+import { Table, Button, message, Tooltip } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import Link from "next/link";
 import ReportActions from "@/components/Reports/ReportActions";
@@ -27,14 +27,17 @@ export default function ReportsPage() {
       key: "reportId",
     },
     {
-      title: "Client ID",
-      dataIndex: "clientId",
-      key: "clientId",
-    },
-    {
-      title: "Tenant ID",
-      dataIndex: "tenantId",
-      key: "tenantId",
+      title: "Iframe URL",
+      dataIndex: "iframeUrl",
+      key: "iframeUrl",
+      render: (text) =>
+        text ? (
+          <Tooltip title={text}>
+            {text.length > 30 ? `${text.slice(0, 30)}...` : text}
+          </Tooltip>
+        ) : (
+          ""
+        ),
     },
     {
       title: "Acciones",

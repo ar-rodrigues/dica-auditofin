@@ -1,271 +1,165 @@
 "use client";
 
-import { useState } from "react";
-import {
-  Typography,
-  Select,
-  Card,
-  Table,
-  Button,
-  Space,
-  Tag,
-  Input,
-} from "antd";
+import { useState, useEffect } from "react";
+import { Spin, Result, message } from "antd";
 import { useRouter } from "next/navigation";
-import { EditOutlined, CheckOutlined, StopOutlined } from "@ant-design/icons";
-
-const { Title } = Typography;
-const { Option } = Select;
-const { Search } = Input;
-
-// Mock data for areas - this would come from your backend later
-const mockAreas = [
-  { id: 1, name: "Educación" },
-  { id: 2, name: "Salud" },
-  { id: 3, name: "Finanzas" },
-  { id: 4, name: "Obras Públicas" },
-  { id: 5, name: "Recursos Humanos" },
-];
-
-// Mock data for requirements - this would come from your backend later
-const mockRequirements = [
-  {
-    id: 1,
-    ref_code: "REQ-001",
-    info: "Relación de actas de Sesión de Cabildo",
-    area: "Educación",
-    areaId: 1,
-  },
-  {
-    id: 2,
-    ref_code: "REQ-002",
-    info: "Estados financieros mensuales",
-    area: "Educación",
-    areaId: 1,
-  },
-  {
-    id: 3,
-    ref_code: "REQ-003",
-    info: "Presupuesto anual",
-    area: "Finanzas",
-    areaId: 3,
-  },
-];
+import useEntitiesRequirements from "@/hooks/useEntitiesRequirements";
+import EntityCardList from "@/components/entity-requirements/EntityCardList";
+import RequirementsTable from "@/components/entity-requirements/RequirementsTable";
 
 export default function EntityRequirementsPage() {
   const [selectedEntity, setSelectedEntity] = useState(null);
-  const [searchText, setSearchText] = useState("");
-  const [selectedStatus, setSelectedStatus] = useState("all");
-  const [selectedArea, setSelectedArea] = useState("all");
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const router = useRouter();
+  const {
+    groupedByEntity,
+    loading,
+    error,
+    updateEntityRequirement,
+    fetchEntitiesRequirements,
+  } = useEntitiesRequirements();
 
-  // Mock entities data - replace with your actual entities data
-  const entities = [
-    { id: 1, name: "Municipio de Puebla" },
-    { id: 2, name: "Organismo Operador del Servicio de Limpia" },
-  ];
-
-  // Mock assigned requirements data - replace with your actual data
-  const mockAssignedRequirements = {
-    1: [
-      {
-        id: 1,
-        ref_code: "REQ-001",
-        info: "Relación de actas de Sesión de Cabildo",
-        area: "Educación",
-        areaId: 1,
-        status: "active",
-      },
-      {
-        id: 2,
-        ref_code: "REQ-002",
-        info: "Estados financieros mensuales",
-        area: "Educación",
-        areaId: 1,
-        status: "active",
-      },
-      {
-        id: 3,
-        ref_code: "REQ-003",
-        info: "Presupuesto anual",
-        area: "Finanzas",
-        areaId: 3,
-        status: "inactive",
-      },
-    ],
+  const handleEntitySelect = (entity) => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      setSelectedEntity(entity);
+      setIsTransitioning(false);
+    }, 300);
   };
 
-  const handleEdit = () => {
-    if (!selectedEntity) return;
-    router.push(`/requirements-assignment?entity=${selectedEntity}&edit=true`);
-  };
+  const handleStatusChange = async (requirement) => {
+    if (!requirement || !requirement.id) return;
 
-  const handleStatusChange = (record) => {
-    // Here you would implement the logic to toggle the status
-    console.log("Toggle status for:", record);
-  };
+    // Only send the id and the toggled is_active property
+    const updatedData = {
+      is_active: !requirement.is_active,
+    };
 
-  const columns = [
-    {
-      title: "Código",
-      dataIndex: "ref_code",
-      key: "ref_code",
-      width: 120,
-      sorter: (a, b) => a.ref_code.localeCompare(b.ref_code),
-    },
-    {
-      title: "Información",
-      dataIndex: "info",
-      key: "info",
-      width: 300,
-      sorter: (a, b) => a.info.localeCompare(b.info),
-    },
-    {
-      title: "Área",
-      dataIndex: "area",
-      key: "area",
-      width: 150,
-      sorter: (a, b) => a.area.localeCompare(b.area),
-    },
-    {
-      title: "Estado",
-      dataIndex: "status",
-      key: "status",
-      width: 120,
-      render: (status) => (
-        <Tag color={status === "active" ? "green" : "red"}>
-          {status === "active" ? "Activo" : "Inactivo"}
-        </Tag>
-      ),
-    },
-    {
-      title: "Acciones",
-      key: "actions",
-      width: 200,
-      render: (_, record) => (
-        <Button
-          type="link"
-          onClick={() => handleStatusChange(record)}
-          icon={
-            record.status === "active" ? <StopOutlined /> : <CheckOutlined />
-          }
-          className={
-            record.status === "active" ? "text-red-500" : "text-green-500"
-          }
-        >
-          {record.status === "active" ? "Desactivar" : "Activar"}
-        </Button>
-      ),
-    },
-  ];
+    try {
+      const result = await updateEntityRequirement(requirement.id, updatedData);
 
-  const getFilteredData = () => {
-    if (!selectedEntity || !mockAssignedRequirements[selectedEntity]) {
-      return [];
+      if (result.success) {
+        // Update the local state to reflect the change immediately
+        if (selectedEntity && selectedEntity.requirements) {
+          // Create a new array to trigger re-render
+          const updatedRequirements = selectedEntity.requirements.map((req) => {
+            if (req.id === requirement.id) {
+              // Toggle the is_active property in the local state
+              return { ...req, is_active: !req.is_active };
+            }
+            return req;
+          });
+
+          // Update the selected entity with the new requirements
+          setSelectedEntity({
+            ...selectedEntity,
+            requirements: updatedRequirements,
+          });
+
+          // Show a success message
+          message.success(
+            updatedData.is_active
+              ? "Requerimiento activado"
+              : "Requerimiento desactivado"
+          );
+        }
+      } else {
+        // Show error message
+        message.error("Error al actualizar el estado del requerimiento");
+      }
+    } catch (err) {
+      console.error("Failed to update requirement status:", err);
+      message.error("Error al actualizar el estado del requerimiento");
     }
+  };
 
-    let data = mockAssignedRequirements[selectedEntity];
+  const handleGoBack = () => {
+    setIsTransitioning(true);
+    setTimeout(() => {
+      // Refresh data before going back to ensure list is updated
+      fetchEntitiesRequirements().then(() => {
+        setSelectedEntity(null);
+        setIsTransitioning(false);
+      });
+    }, 300);
+  };
 
-    if (searchText) {
-      const searchLower = searchText.toLowerCase();
-      data = data.filter(
-        (item) =>
-          item.ref_code.toLowerCase().includes(searchLower) ||
-          item.info.toLowerCase().includes(searchLower) ||
-          item.area.toLowerCase().includes(searchLower)
+  const handleAddRequirements = () => {
+    if (selectedEntity) {
+      router.push(
+        `/requirements-assignment?entity=${selectedEntity.id}&edit=true`
       );
     }
-
-    if (selectedStatus !== "all") {
-      data = data.filter((item) => item.status === selectedStatus);
-    }
-
-    if (selectedArea !== "all") {
-      data = data.filter((item) => item.areaId === selectedArea);
-    }
-
-    return data;
   };
 
-  return (
-    <div className="min-h-screen bg-gray-50 p-4 sm:p-8">
-      <div className="mx-auto flex flex-col">
-        <Title level={5} className="text-gray-600! mb-4">
-          Requerimientos por Entidad
-        </Title>
+  useEffect(() => {
+    // Add global CSS for transitions
+    const style = document.createElement("style");
+    style.textContent = `
+      .page-transition-enter {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      .page-transition-enter-active {
+        opacity: 1;
+        transform: translateY(0);
+        transition: opacity 300ms, transform 300ms;
+      }
+      .page-transition-exit {
+        opacity: 1;
+      }
+      .page-transition-exit-active {
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 300ms, transform 300ms;
+      }
+    `;
+    document.head.appendChild(style);
 
-        <Card className="mb-4">
-          <div className="flex flex-wrap items-center gap-4">
-            <div className="flex-1 min-w-[200px]">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Seleccionar Entidad
-              </label>
-              <Select
-                placeholder="Seleccione una entidad"
-                style={{ width: "100%" }}
-                onChange={setSelectedEntity}
-                value={selectedEntity}
-              >
-                {entities.map((entity) => (
-                  <Option key={entity.id} value={entity.id}>
-                    {entity.name}
-                  </Option>
-                ))}
-              </Select>
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-gray-100">
+      <div className="max-w-6xl mx-auto py-6 px-4 sm:px-6">
+        {loading ? (
+          <div className="flex justify-center items-center py-20 bg-white rounded-lg shadow-sm">
+            <div className="text-center">
+              <Spin size="large" />
+              <div className="mt-3 text-gray-600">Cargando entidades...</div>
             </div>
-            {selectedEntity && (
-              <Button
-                type="primary"
-                icon={<EditOutlined />}
-                onClick={handleEdit}
-                className="mt-6"
-              >
-                Editar Requerimientos
-              </Button>
+          </div>
+        ) : error ? (
+          <Result
+            status="error"
+            title="Error al cargar entidades"
+            subTitle={error}
+            className="bg-white rounded-lg shadow-sm"
+          />
+        ) : (
+          <div
+            className={`transition-all duration-300 ${
+              isTransitioning
+                ? "opacity-0 transform translate-y-20"
+                : "opacity-100 transform translate-y-0"
+            }`}
+          >
+            {selectedEntity ? (
+              <RequirementsTable
+                entity={selectedEntity}
+                onBack={handleGoBack}
+                onStatusChange={handleStatusChange}
+                onAddRequirements={handleAddRequirements}
+              />
+            ) : (
+              <EntityCardList
+                entities={groupedByEntity}
+                onEntitySelect={handleEntitySelect}
+              />
             )}
           </div>
-        </Card>
-
-        {selectedEntity && (
-          <Card>
-            <div className="flex flex-wrap items-center gap-4 mb-4">
-              <Search
-                placeholder="Buscar requerimientos..."
-                allowClear
-                onChange={(e) => setSearchText(e.target.value)}
-                style={{ width: 300 }}
-              />
-              <Select
-                placeholder="Filtrar por área"
-                style={{ width: 200 }}
-                value={selectedArea}
-                onChange={setSelectedArea}
-              >
-                <Option value="all">Todas las áreas</Option>
-                {mockAreas.map((area) => (
-                  <Option key={area.id} value={area.id}>
-                    {area.name}
-                  </Option>
-                ))}
-              </Select>
-              <Select
-                placeholder="Filtrar por estado"
-                style={{ width: 200 }}
-                value={selectedStatus}
-                onChange={setSelectedStatus}
-              >
-                <Option value="all">Todos</Option>
-                <Option value="active">Activos</Option>
-                <Option value="inactive">Inactivos</Option>
-              </Select>
-            </div>
-            <Table
-              columns={columns}
-              dataSource={getFilteredData()}
-              rowKey="id"
-              pagination={{ pageSize: 10 }}
-            />
-          </Card>
         )}
       </div>
     </div>

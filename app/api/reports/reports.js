@@ -72,7 +72,7 @@ export async function getReports() {
 
 export async function updateReport(id, updateData) {
   const supabase = await createClient();
-
+  console.log("updateData", updateData);
   // Check if user has permission to update this report
   const hasPermission = await checkResourcePermission("reports", id);
 
@@ -88,6 +88,7 @@ export async function updateReport(id, updateData) {
     clientId,
     clientSecret,
     tenantId,
+    iframeUrl,
   } = updateData;
 
   try {
@@ -101,6 +102,7 @@ export async function updateReport(id, updateData) {
         clientId,
         clientSecret,
         tenantId,
+        iframeUrl,
       })
       .eq("id", id)
       .select()
@@ -137,6 +139,7 @@ export async function deleteReport(id) {
 
 export async function createReport(reportData) {
   const supabase = await createClient();
+  console.log("reportData", reportData);
   const {
     name,
     entity_id,
@@ -145,6 +148,7 @@ export async function createReport(reportData) {
     clientId,
     clientSecret,
     tenantId,
+    iframeUrl,
   } = reportData;
 
   try {
@@ -158,6 +162,7 @@ export async function createReport(reportData) {
         clientId,
         clientSecret,
         tenantId,
+        iframeUrl,
       })
       .select()
       .single();

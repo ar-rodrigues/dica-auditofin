@@ -38,48 +38,32 @@ export default function ReportForm({
         />
       </Form.Item>
 
-      <Form.Item
-        name="workspaceId"
-        label="Workspace ID"
-        rules={[
-          { required: true, message: "Por favor ingresa el Workspace ID" },
-        ]}
-      >
+      <Form.Item name="workspaceId" label="Workspace ID" rules={[]}>
         <Input />
       </Form.Item>
 
-      <Form.Item
-        name="reportId"
-        label="Report ID"
-        rules={[{ required: true, message: "Por favor ingresa el Report ID" }]}
-      >
+      <Form.Item name="reportId" label="Report ID" rules={[]}>
         <Input />
       </Form.Item>
 
-      <Form.Item
-        name="clientId"
-        label="Client ID"
-        rules={[{ required: true, message: "Por favor ingresa el Client ID" }]}
-      >
+      <Form.Item name="clientId" label="Client ID" rules={[]}>
         <Input />
       </Form.Item>
 
-      <Form.Item
-        name="clientSecret"
-        label="Client Secret"
-        rules={[
-          { required: true, message: "Por favor ingresa el Client Secret" },
-        ]}
-      >
+      <Form.Item name="clientSecret" label="Client Secret" rules={[]}>
         <Input.Password />
       </Form.Item>
 
-      <Form.Item
-        name="tenantId"
-        label="Tenant ID"
-        rules={[{ required: true, message: "Por favor ingresa el Tenant ID" }]}
-      >
+      <Form.Item name="tenantId" label="Tenant ID" rules={[]}>
         <Input />
+      </Form.Item>
+
+      <Form.Item
+        name="iframeUrl"
+        label="Iframe URL"
+        rules={[{ type: "url", message: "Debe ser una URL válida" }]}
+      >
+        <Input placeholder="https://..." />
       </Form.Item>
     </Form>
   );

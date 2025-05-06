@@ -117,10 +117,22 @@ export default function PowerBIContent({ reports }) {
               </div>
             ) : (
               <div className="w-full h-full min-h-[calc(100vh-200px)] overflow-hidden">
-                <PowerBIReport
-                  id={currentReport?.id}
-                  reportId={currentReport?.reportId}
-                />
+                {currentReport?.iframeUrl ? (
+                  <iframe
+                    src={currentReport.iframeUrl}
+                    title={currentReport.name || "Reporte"}
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0, minHeight: "100%", minWidth: "100%" }}
+                    allowFullScreen
+                  />
+                ) : (
+                  <PowerBIReport
+                    id={currentReport?.id}
+                    reportId={currentReport?.reportId}
+                    iframeUrl={currentReport?.iframeUrl}
+                  />
+                )}
               </div>
             )}
           </div>

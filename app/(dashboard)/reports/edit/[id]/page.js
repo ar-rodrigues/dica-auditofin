@@ -58,8 +58,6 @@ export default function EditReportPage() {
   } = usePermissions();
   const { user } = useFetchUser();
 
-  console.log("formData", formData);
-
   useEffect(() => {
     const fetchReport = async () => {
       const report = await fetchReportById(reportId);

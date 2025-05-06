@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
+import { useEntities } from "./useEntities";
 
 export default function useEntitiesRequirements() {
+  const { entities, loading: entitiesLoading } = useEntities();
   const [entitiesRequirements, setEntitiesRequirements] = useState([]);
   const [entityRequirement, setEntityRequirement] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [groupedByEntity, setGroupedByEntity] = useState([]);
 
   // Fetch all entities requirements
   const fetchEntitiesRequirements = async () => {
@@ -16,17 +19,83 @@ export default function useEntitiesRequirements() {
 
       if (result.success) {
         setEntitiesRequirements(result.data || []);
+        // Group will be done when both entities and requirements are loaded
       } else {
         setError(result.message || "Failed to fetch entities requirements");
         setEntitiesRequirements([]);
+        setGroupedByEntity([]);
       }
     } catch (err) {
       setError("An error occurred while fetching entities requirements");
       console.error(err);
       setEntitiesRequirements([]);
+      setGroupedByEntity([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Group entities requirements by entity, including entities with no requirements
+  const groupEntitiesByRequirements = () => {
+    if (!entities || entities.length === 0) {
+      return; // Wait for entities to load
+    }
+
+    try {
+      // Create a map to hold entities and their requirements
+      const entitiesMap = new Map();
+
+      // First pass: add all entities from the entities list, even those with no requirements
+      entities.forEach((entity) => {
+        entitiesMap.set(entity.id, {
+          ...entity,
+          requirementsCount: 0,
+          requirements: [],
+        });
+      });
+
+      // Second pass: add requirements to each entity
+      if (entitiesRequirements && entitiesRequirements.length > 0) {
+        entitiesRequirements.forEach((item) => {
+          if (!item.entity) return;
+
+          const entityId =
+            typeof item.entity === "object" ? item.entity.id : item.entity;
+          const requirementData =
+            typeof item.requirement === "object"
+              ? item.requirement
+              : { id: item.requirement, name: "Unknown Requirement" };
+
+          if (entitiesMap.has(entityId)) {
+            const entity = entitiesMap.get(entityId);
+            entity.requirementsCount++;
+            entity.requirements.push({
+              ...item,
+              requirement: requirementData,
+            });
+          }
+        });
+      }
+
+      // Convert map to array
+      const groupedEntities = Array.from(entitiesMap.values());
+      setGroupedByEntity(groupedEntities);
+    } catch (err) {
+      console.error("Error grouping entities by requirements:", err);
+      setGroupedByEntity([]);
+    }
+  };
+
+  // Update grouping when either entities or entitiesRequirements changes
+  useEffect(() => {
+    if (!entitiesLoading && entities.length > 0) {
+      groupEntitiesByRequirements();
+    }
+  }, [entities, entitiesRequirements, entitiesLoading]);
+
+  // Manually trigger regrouping
+  const regroupEntities = () => {
+    groupEntitiesByRequirements();
   };
 
   // Fetch single entity requirement by ID
@@ -106,7 +175,7 @@ export default function useEntitiesRequirements() {
       const result = await response.json();
 
       if (result.success) {
-        // Refresh the list and the current entity after updating
+        // Refresh the list after updating
         await fetchEntitiesRequirements();
         if (entityRequirement && entityRequirement.id === id) {
           setEntityRequirement(result.data);
@@ -171,12 +240,14 @@ export default function useEntitiesRequirements() {
   return {
     entitiesRequirements,
     entityRequirement,
-    loading,
+    loading: loading || entitiesLoading,
     error,
+    groupedByEntity,
     fetchEntitiesRequirements,
     fetchEntityRequirement,
     createEntityRequirement,
     updateEntityRequirement,
     deleteEntityRequirement,
+    regroupEntities,
   };
 }
