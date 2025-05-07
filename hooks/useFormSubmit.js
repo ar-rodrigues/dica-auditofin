@@ -24,9 +24,16 @@ export const useFormSubmit = (route) => {
         },
       });
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "An error occurred");
+      }
+
       setData(data);
     } catch (error) {
-      setError(error);
+      console.error("Form submission error:", error);
+      setError(error.message);
+      throw error; // Re-throw to handle in the component
     } finally {
       setLoading(false);
     }

@@ -40,6 +40,7 @@ export default function UserForm({
   const [resetPasswordLoading, setResetPasswordLoading] = useState(false);
   const [resetPasswordSuccess, setResetPasswordSuccess] = useState(false);
   const [passwordIsStrong, setPasswordIsStrong] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
 
   const [photoFile, setPhotoFile] = useState(null);
   const { uploadFile } = useStorageFile();
@@ -81,6 +82,7 @@ export default function UserForm({
   const handleSubmit = async (values) => {
     try {
       setLoading(true);
+      setSubmitError(null);
 
       const cleanValues = {
         ...values,
@@ -89,7 +91,6 @@ export default function UserForm({
       if (photoFile) {
         try {
           const path = initialValues?.id ? `${initialValues.id}` : "temp";
-
           const photoUrl = await uploadFile(photoFile, "profiles", path);
           cleanValues.photo = photoUrl;
         } catch (error) {
@@ -109,7 +110,8 @@ export default function UserForm({
       router.push("/users");
     } catch (error) {
       console.error("Error al procesar el formulario:", error);
-      message.error("Error al procesar el formulario");
+      setSubmitError(error.message);
+      message.error(error.message || "Error al procesar el formulario");
     } finally {
       setLoading(false);
     }
@@ -125,6 +127,11 @@ export default function UserForm({
 
   return (
     <Card className="w-full max-w-5xl mx-auto">
+      {submitError && (
+        <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-md">
+          <p className="text-red-600">{submitError}</p>
+        </div>
+      )}
       <Form
         form={form}
         layout="vertical"

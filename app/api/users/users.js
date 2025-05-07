@@ -81,12 +81,23 @@ export async function createProfile(user, newUser) {
         is_active: newUser.is_active,
         created_at: user.created_at,
         last_change: user.updated_at,
-      });
+      })
+      .select()
+      .single();
+
+    if (profileError) {
+      console.error("Error creating profile:", profileError);
+      throw new Error(`Error creating profile: ${profileError.message}`);
+    }
+
+    if (!profileData) {
+      throw new Error("No profile data returned after creation");
+    }
 
     return profileData;
   } catch (error) {
-    console.error(error);
-    throw new Error(error.message);
+    console.error("Error in createProfile:", error);
+    throw error;
   }
 }
 
@@ -130,7 +141,7 @@ export async function deleteProfile(id) {
       .eq("id", id);
 
     if (profileError) {
-      console.error(profileError);
+      console.error("Error deleting profile:", profileError);
       throw new Error(profileError.message);
     }
 
@@ -140,6 +151,7 @@ export async function deleteProfile(id) {
       profileData,
     };
   } catch (error) {
-    console.error(error);
+    console.error("Error in deleteProfile:", error);
+    throw error; // Re-throw the error to be handled by the caller
   }
 }
