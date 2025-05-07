@@ -50,7 +50,7 @@ export const getWelcomeEmailTemplate = (name, email, password, baseUrl) => {
                         <img src="${logoDica}" alt="Dica" style="width: 64px; height: 44px; vertical-align: middle; margin-right: 15px;">
                     </div>
                 </div>
-                <p style="margin-top: 20px;">&copy; 2025 DICA & TKS. Todos los derechos reservados.</p>
+                <p style="margin-top: 20px;">&copy; 2025 DICA MX. Todos los derechos reservados.</p>
             </div>
         </div>
     </body>
