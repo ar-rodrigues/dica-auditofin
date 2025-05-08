@@ -1,9 +1,19 @@
-import { Form, Input, Button, Space, Row, Col, Card, Switch } from "antd";
+import {
+  Form,
+  Input,
+  Button,
+  Space,
+  Row,
+  Col,
+  Card,
+  Switch,
+  message,
+} from "antd";
 const { TextArea } = Input;
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
-
+import useEntitiesRequirements from "@/hooks/useEntitiesRequirements";
 export default function EntityForm({
   mode = "create",
   onSubmit,
@@ -13,12 +23,39 @@ export default function EntityForm({
 }) {
   const router = useRouter();
   const [formValues, setFormValues] = useState(initialValues || null);
+  const { entitiesRequirements } = useEntitiesRequirements();
+
+  useEffect(() => {
+    setFormValues(initialValues || null);
+  }, [initialValues]);
 
   useEffect(() => {
     if (formValues) {
       form.setFieldsValue(formValues);
     }
   }, [formValues, form]);
+
+  const handleRemoveArea = (areaToRemove, removeFunction) => {
+    // Get the area ID from the form values
+    const areaId = formValues?.entity_areas?.[areaToRemove]?.id;
+
+    if (!areaId) {
+      // If no ID exists, it's a new area that hasn't been saved yet
+      removeFunction(areaToRemove);
+      return;
+    }
+
+    // Check if the area is being used in any requirements
+    const areasInUse = entitiesRequirements.filter(
+      (requirement) => requirement?.area?.id === areaId
+    );
+
+    if (areasInUse.length > 0) {
+      message.error("No se puede eliminar el área porque está en uso");
+    } else {
+      removeFunction(areaToRemove);
+    }
+  };
 
   return (
     <Card className="w-full max-w-5xl mx-auto">
@@ -114,7 +151,7 @@ export default function EntityForm({
                       </Col>
                       <Col xs={24} md={4} className="flex items-center mb-6">
                         <MinusCircleOutlined
-                          onClick={() => remove(name)}
+                          onClick={() => handleRemoveArea(key, remove)}
                           className="text-red-500 text-xl"
                         />
                       </Col>

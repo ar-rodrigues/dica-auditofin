@@ -7,11 +7,15 @@ export default function useEntitiesAreas() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchEntitiesAreas = useCallback(async () => {
+  const fetchEntitiesAreas = useCallback(async (params = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/entities-areas");
+      const query = new URLSearchParams(params).toString();
+      const url = query
+        ? `/api/entities-areas?${query}`
+        : "/api/entities-areas";
+      const response = await fetch(url);
       const result = await response.json();
 
       if (!result.success) {

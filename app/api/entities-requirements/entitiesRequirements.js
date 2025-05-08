@@ -6,7 +6,9 @@ export async function getEntitiesRequirements() {
   try {
     const { data, error } = await supabase
       .from("entities_requirements")
-      .select("*, entity:entities(*), requirement:requirements(*)");
+      .select(
+        "*, entity:entities(*), requirement:requirements(*), area:entities_areas(*)"
+      );
 
     if (error) {
       throw new Error(

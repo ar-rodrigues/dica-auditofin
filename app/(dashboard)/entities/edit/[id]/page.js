@@ -1,52 +1,125 @@
 "use client";
 
-import { Typography, Form, message } from "antd";
-import { useAtom } from "jotai";
-import { loadingAtom } from "@/utils/atoms";
+import { Typography, Form, message, Skeleton } from "antd";
+
 import EntityForm from "@/components/Entities/EntityForm";
 import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import NotFoundContent from "@/components/NotFoundContent";
 import { useEntities } from "@/hooks/useEntities";
+import useEntitiesAreas from "@/hooks/useEntitiesAreas";
 const { Title } = Typography;
 
 export default function EditEntityPage() {
   const [form] = Form.useForm();
-  const [loading, setLoading] = useAtom(loadingAtom);
-  const [entity, setEntity] = useState(null);
-  const { updateEntity, loading: entityLoading } = useEntities();
+  const [loading, setLoading] = useState(false);
+  const {
+    entities,
+    refreshEntities,
+    updateEntity,
+    loading: entitiesLoading,
+  } = useEntities();
+  const {
+    entitiesAreas,
+    fetchEntitiesAreas,
+    updateEntityArea,
+    createEntityArea,
+    deleteEntityArea,
+    loading: entitiesAreasLoading,
+  } = useEntitiesAreas();
   const params = useParams();
   const router = useRouter();
   const entityId = params.id;
 
-  useEffect(() => {
-    const fetchEntity = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch(`/api/entities/${entityId}`);
-        const data = await response.json();
-        setEntity(data);
-        setLoading(false);
-      } catch (error) {
-        console.error("Error fetching entity:", error);
-        setLoading(false);
-      }
-    };
-    fetchEntity();
-  }, [entityId, setLoading]);
+  const entity = entities.find((e) => e.id === entityId);
+  // Filter areas for this entity
+  const entityAreas = entitiesAreas.filter((a) => {
+    return a.entity === entityId;
+  });
+  //console.log("entityAreas", entityAreas);
 
   const handleSubmit = async (values) => {
+    setLoading(true);
+    const { entity_areas, ...rest } = values;
+    const areasToDelete = [];
+    const areasToCreate = [];
+    const areasToUpdate = [];
+
+    // Get existing areas for this entity
+    const existingAreas = entitiesAreas.filter((a) => a.entity === entityId);
+
+    // Find areas to delete (exist in DB but not in form)
+    existingAreas.forEach((existingArea) => {
+      const stillExists = entity_areas.some(
+        (newArea) => newArea.id === existingArea.id
+      );
+      if (!stillExists) {
+        areasToDelete.push(existingArea.id);
+      }
+    });
+
+    // Process new areas from form
+    entity_areas.forEach((newArea) => {
+      if (newArea.id) {
+        // Area exists in DB - update it
+        areasToUpdate.push({
+          id: newArea.id,
+          area: newArea.area,
+          responsable: newArea.responsable,
+          entity: entityId,
+        });
+      } else {
+        // New area - create it
+        areasToCreate.push({
+          area: newArea.area,
+          responsable: newArea.responsable,
+          entity: entityId,
+        });
+      }
+    });
+
     try {
-      await updateEntity(entityId, values);
-      message.success("Entidad actualizada exitosamente");
-      router.push("/entities");
+      // Update entity basic info
+      const updatedEntity = await updateEntity(entityId, rest);
+      if (!updatedEntity) {
+        throw new Error("Error al actualizar la entidad");
+      }
+
+      // Handle areas
+      if (areasToDelete.length > 0) {
+        await Promise.all(areasToDelete.map((id) => deleteEntityArea(id)));
+      }
+
+      if (areasToCreate.length > 0) {
+        await Promise.all(areasToCreate.map((area) => createEntityArea(area)));
+      }
+
+      if (areasToUpdate.length > 0) {
+        await Promise.all(
+          areasToUpdate.map((area) => updateEntityArea(area.id, area))
+        );
+      }
     } catch (error) {
       console.error("Error al actualizar la entidad:", error);
       message.error("Error al actualizar la entidad");
+      setLoading(false);
+    } finally {
+      setLoading(false);
+      message.success("Entidad actualizada exitosamente");
+      router.push("/entities");
     }
   };
 
-  if (!entity) {
+  if (entitiesLoading || entitiesAreasLoading || loading) {
+    return <Skeleton active rows={10} />;
+  }
+
+  if (
+    (!entity || !entityAreas) &&
+    !loading &&
+    !entitiesLoading &&
+    !entitiesAreasLoading
+  ) {
     return (
       <NotFoundContent
         title="Entidad no encontrada"
@@ -68,14 +141,15 @@ export default function EditEntityPage() {
         <EntityForm
           mode="edit"
           initialValues={{
+            entity_id: entity.id,
             entity_name: entity.entity_name,
             is_active: entity.is_active,
             description: entity.description,
-            entity_areas: entity.entity_areas || [],
+            entity_areas: entityAreas,
           }}
           onSubmit={handleSubmit}
           form={form}
-          loading={loading || entityLoading}
+          loading={loading}
         />
       </div>
     </div>

@@ -9,27 +9,34 @@ export default function useEntitiesRequirements() {
   const [error, setError] = useState(null);
   const [groupedByEntity, setGroupedByEntity] = useState([]);
 
-  // Fetch all entities requirements
-  const fetchEntitiesRequirements = async () => {
+  // Fetch all entities requirements (optionally filtered)
+  const fetchEntitiesRequirements = async (params = {}) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await fetch("/api/entities-requirements");
+      // Build query string from params
+      const query = new URLSearchParams(params).toString();
+      const url = query
+        ? `/api/entities-requirements?${query}`
+        : "/api/entities-requirements";
+      const response = await fetch(url);
       const result = await response.json();
 
       if (result.success) {
         setEntitiesRequirements(result.data || []);
         // Group will be done when both entities and requirements are loaded
+        return result.data || [];
       } else {
         setError(result.message || "Failed to fetch entities requirements");
         setEntitiesRequirements([]);
         setGroupedByEntity([]);
+        return [];
       }
     } catch (err) {
       setError("An error occurred while fetching entities requirements");
-      console.error(err);
       setEntitiesRequirements([]);
       setGroupedByEntity([]);
+      return [];
     } finally {
       setLoading(false);
     }

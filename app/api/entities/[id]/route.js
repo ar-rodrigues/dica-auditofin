@@ -23,6 +23,8 @@ export async function PUT(request, { params }) {
   const { id } = await params;
   const data = await request.json();
 
+  console.log("data", data);
+
   try {
     const updatedEntity = await updateEntity(id, data);
     return NextResponse.json(updatedEntity);

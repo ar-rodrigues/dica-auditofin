@@ -43,6 +43,7 @@ export async function createEntityArea(entityArea) {
     throw new Error("Entity area data is required");
   }
 
+  console.log("entityArea route", entityArea);
   const supabase = await createClient();
 
   const { data, error } = await supabase
@@ -51,6 +52,7 @@ export async function createEntityArea(entityArea) {
     .select();
 
   if (error) {
+    console.log("error", error);
     console.error("Database error creating entity area:", error);
     throw new Error(`Failed to create entity area: ${error.message}`);
   }
