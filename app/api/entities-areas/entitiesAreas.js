@@ -1,10 +1,13 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 
-export async function getEntitiesAreas() {
+export async function getEntitiesAreas(filters = {}) {
   const supabase = await createClient();
 
-  const { data, error } = await supabase.from("entities_areas").select("*");
+  const { data, error } = await supabase
+    .from("entities_areas")
+    .select("*")
+    .match(filters);
 
   if (error) {
     console.error("Database error fetching entities areas:", error);

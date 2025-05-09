@@ -5,7 +5,7 @@ import { Input, Select, Space, Typography, Button, Spin, message } from "antd";
 import { SearchOutlined, PlusOutlined } from "@ant-design/icons";
 import RequirementsTable from "@/components/Requirements/RequirementsTable";
 import { useRouter } from "next/navigation";
-import useRequirements from "@/hooks/useRequirements";
+import { useRequirements } from "@/hooks/useRequirements";
 import useDocumentTypes from "@/hooks/useDocumentTypes";
 
 const { Option } = Select;

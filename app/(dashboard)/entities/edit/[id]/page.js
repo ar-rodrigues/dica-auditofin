@@ -7,7 +7,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import NotFoundContent from "@/components/NotFoundContent";
 import { useEntities } from "@/hooks/useEntities";
-import useEntitiesAreas from "@/hooks/useEntitiesAreas";
+import { useEntitiesAreas } from "@/hooks/useEntitiesAreas";
 const { Title } = Typography;
 
 export default function EditEntityPage() {

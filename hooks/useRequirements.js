@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 
-export default function useRequirements() {
+export const useRequirements = () => {
   const [requirements, setRequirements] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -22,15 +22,16 @@ export default function useRequirements() {
       }
 
       if (result.success) {
-        setRequirements(result.data);
-        return result;
+        const data = result.data || [];
+        setRequirements(data);
+        return data;
       } else {
         throw new Error(result.error || "Failed to fetch requirements");
       }
     } catch (err) {
       setError(err.message);
       console.error("Error fetching requirements:", err);
-      return { success: false, error: err.message };
+      return [];
     } finally {
       setIsLoading(false);
     }
@@ -226,4 +227,4 @@ export default function useRequirements() {
     deleteRequirement,
     setCurrentRequirement,
   };
-}
+};

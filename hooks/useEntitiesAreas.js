@@ -2,14 +2,15 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-export default function useEntitiesAreas() {
+export const useEntitiesAreas = () => {
   const [entitiesAreas, setEntitiesAreas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchEntitiesAreas = useCallback(async (params = {}) => {
+  const fetchEntitiesAreas = async (params = {}) => {
     setLoading(true);
     setError(null);
+
     try {
       const query = new URLSearchParams(params).toString();
       const url = query
@@ -22,14 +23,17 @@ export default function useEntitiesAreas() {
         throw new Error(result.error || "Failed to fetch entities areas");
       }
 
-      setEntitiesAreas(result.data || []);
+      const data = result.data || [];
+      setEntitiesAreas(data);
+      return data;
     } catch (err) {
       setError(err.message || "Error fetching entities areas");
       console.error("Error fetching entities areas:", err);
+      return [];
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
   const getEntityAreaById = useCallback(async (id) => {
     if (!id) {
@@ -170,7 +174,7 @@ export default function useEntitiesAreas() {
   // Fetch entities areas on component mount
   useEffect(() => {
     fetchEntitiesAreas();
-  }, [fetchEntitiesAreas]);
+  }, []);
 
   return {
     entitiesAreas,
@@ -182,4 +186,4 @@ export default function useEntitiesAreas() {
     updateEntityArea,
     deleteEntityArea,
   };
-}
+};

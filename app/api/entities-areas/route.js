@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server";
 import { getEntitiesAreas, createEntityArea } from "./entitiesAreas";
 
-export async function GET() {
+export async function GET(request) {
+  const { searchParams } = new URL(request.url);
+  const filters = Object.fromEntries(searchParams);
+
   try {
-    const entitiesAreas = await getEntitiesAreas();
+    const entitiesAreas = await getEntitiesAreas(filters);
     return NextResponse.json({ data: entitiesAreas, success: true });
   } catch (error) {
     console.error("Error fetching entities areas:", error);

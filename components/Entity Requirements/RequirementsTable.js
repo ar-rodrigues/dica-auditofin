@@ -19,6 +19,7 @@ import {
   FileTextOutlined,
   CheckCircleOutlined,
   StopOutlined,
+  InboxOutlined,
 } from "@ant-design/icons";
 import StatCard from "../common/StatCard";
 import RequirementDetails from "./RequirementDetails";
@@ -343,6 +344,22 @@ const RequirementsTable = ({
             },
             style: { cursor: "pointer" },
           })}
+          locale={{
+            emptyText: (
+              <div className="text-center py-8">
+                <InboxOutlined style={{ fontSize: 48, color: "#bfbfbf" }} />
+                <Paragraph
+                  style={{ fontSize: 16, color: "#bfbfbf" }}
+                  className="mt-4"
+                >
+                  No hay requerimientos disponibles.
+                </Paragraph>
+                <Button type="primary" onClick={onAddRequirements}>
+                  Asigne un nuevo
+                </Button>
+              </div>
+            ),
+          }}
         />
       </div>
 

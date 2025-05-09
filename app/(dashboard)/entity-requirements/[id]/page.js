@@ -23,7 +23,7 @@ export default function EntityRequirementsDetailPage() {
     fetchEntitiesRequirements,
   } = useEntitiesRequirements();
 
-  console.log("requirements", requirements);
+  //console.log("requirements", requirements);
 
   useEffect(() => {
     const loadData = async () => {
@@ -78,7 +78,7 @@ export default function EntityRequirementsDetailPage() {
 
   const handleAddRequirements = () => {
     if (entity) {
-      router.push(`/requirements-assignment?entity=${entity.id}&edit=true`);
+      router.push(`/entity-requirements/${entity.id}/assign`);
     }
   };
 
