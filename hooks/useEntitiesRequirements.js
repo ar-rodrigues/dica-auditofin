@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useEntities } from "./useEntities";
 
-export default function useEntitiesRequirements() {
+export const useEntitiesRequirements = () => {
   const { entities, loading: entitiesLoading } = useEntities();
   const [entitiesRequirements, setEntitiesRequirements] = useState([]);
   const [entityRequirement, setEntityRequirement] = useState(null);
@@ -257,4 +257,4 @@ export default function useEntitiesRequirements() {
     deleteEntityRequirement,
     regroupEntities,
   };
-}
+};

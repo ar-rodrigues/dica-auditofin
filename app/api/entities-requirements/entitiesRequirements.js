@@ -1,14 +1,15 @@
 "use server";
 import { createClient } from "@/utils/supabase/server";
 
-export async function getEntitiesRequirements() {
+export async function getEntitiesRequirements(filters = {}) {
   const supabase = await createClient();
   try {
     const { data, error } = await supabase
       .from("entities_requirements")
       .select(
         "*, entity:entities(*), requirement:requirements(*), area:entities_areas(*)"
-      );
+      )
+      .match(filters);
 
     if (error) {
       throw new Error(

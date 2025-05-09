@@ -8,6 +8,7 @@ import {
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
+    console.log("id", id);
     const response = await getEntityRequirementById(id);
 
     if (!response.success) {

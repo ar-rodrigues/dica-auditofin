@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Empty } from "antd";
-import EntityCard from "./EntityCard";
-import EntityHeader from "./EntityHeader";
+import EntityCard from "../common/EntityCard";
+import EntityHeader from "../common/EntityHeader";
 
 const EntityCardList = ({ entities, onEntitySelect }) => {
   const [searchText, setSearchText] = useState("");

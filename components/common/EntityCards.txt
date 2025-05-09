@@ -70,7 +70,6 @@ const EntityCard = ({ entity, onClick }) => {
         flexDirection: "column",
         padding: "16px",
       }}
-      bodyStyle={{ padding: "0", height: "100%" }}
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <Avatar

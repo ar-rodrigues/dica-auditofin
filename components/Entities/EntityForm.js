@@ -13,7 +13,7 @@ const { TextArea } = Input;
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
-import useEntitiesRequirements from "@/hooks/useEntitiesRequirements";
+import { useEntitiesRequirements } from "@/hooks/useEntitiesRequirements";
 export default function EntityForm({
   mode = "create",
   onSubmit,

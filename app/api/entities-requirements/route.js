@@ -4,9 +4,12 @@ import {
   createEntityRequirement,
 } from "./entitiesRequirements";
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const response = await getEntitiesRequirements();
+    const { searchParams } = new URL(request.url);
+    const filters = Object.fromEntries(searchParams);
+    //console.log("filters", filters);
+    const response = await getEntitiesRequirements(filters);
     return NextResponse.json(response, { status: 200 });
   } catch (error) {
     console.error("Failed to get entities requirements:", error);

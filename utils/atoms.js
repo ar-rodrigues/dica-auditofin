@@ -333,12 +333,6 @@ export const sidebarItems = [
     children: [
       {
         key: "6.1",
-        label: "Asignar Requerimientos",
-        url: "/requirements-assignment",
-        permissions: ["admin", "super admin"],
-      },
-      {
-        key: "6.2",
         label: "Requerimientos por Entidad",
         url: "/entity-requirements",
         permissions: ["admin", "super admin"],

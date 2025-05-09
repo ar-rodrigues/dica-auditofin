@@ -24,6 +24,12 @@ export const useEntities = () => {
     fetchEntities();
   }, []);
 
+  const getEntityById = async (id) => {
+    const response = await fetch(`/api/entities/${id}`);
+    const data = await response.json();
+    return data;
+  };
+
   const createEntity = async (entityData) => {
     try {
       setLoading(true);
@@ -102,6 +108,7 @@ export const useEntities = () => {
     createEntity,
     updateEntity,
     deleteEntity,
+    getEntityById,
     refreshEntities: fetchEntities,
   };
 };
