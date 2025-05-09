@@ -14,6 +14,7 @@ import {
 import { useAtom, useAtomValue } from "jotai";
 import { useRouter, usePathname } from "next/navigation";
 import { useUserRole } from "@/hooks/useUserRole";
+import { getCurrentMenuKey } from "@/utils/getCurrentMenuKey";
 const { Sider } = Layout;
 
 export default function Sidebar() {
@@ -24,39 +25,13 @@ export default function Sidebar() {
   const pathname = usePathname();
   const { userRole, loading: loadingUserRole } = useUserRole();
 
-  // Find the current key based on the pathname
-  const getCurrentKey = () => {
-    // First check for exact matches
-    for (const item of sidebarItems) {
-      if (item.url === pathname) {
-        return item.key;
-      }
-
-      // Check children for exact matches
-      if (item.children) {
-        const childMatch = item.children.find(
-          (child) => child.url === pathname
-        );
-        if (childMatch) return childMatch.key;
-      }
-    }
-
-    // If no exact match, try partial matches (for dynamic routes)
-    const pathSegments = pathname.split("/").filter(Boolean);
-    if (pathSegments.length >= 1) {
-      const basePath = `/${pathSegments[0]}`;
-      const item = sidebarItems.find((item) => item.url === basePath);
-      return item ? item.key : "1";
-    }
-
-    return "1"; // Default to dashboard
-  };
-
-  const [current, setCurrent] = useState(getCurrentKey());
+  const [current, setCurrent] = useState(() =>
+    getCurrentMenuKey(pathname, sidebarItems)
+  );
 
   // Update selected key when path changes
   useEffect(() => {
-    setCurrent(getCurrentKey());
+    setCurrent(getCurrentMenuKey(pathname, sidebarItems));
   }, [pathname]);
 
   const handleClick = async ({ key }) => {

@@ -36,15 +36,15 @@ export const logoAtoms = {
   white: atom(LogoWhite),
 };
 
-// Content images atoms
-export const imageAtoms = {
-  hero: {
-    office: atom(Office),
-    team: atom(Team),
-    teamConsulting: atom(Team2),
-    teamSupport: atom(Team3),
-  },
-};
+// Content images atoms - Not used
+// export const imageAtoms = {
+//   hero: {
+//     office: atom(Office),
+//     team: atom(Team),
+//     teamConsulting: atom(Team2),
+//     teamSupport: atom(Team3),
+//   },
+// };
 
 // Carousel content atom
 export const carouselContentAtom = atom([
@@ -397,8 +397,8 @@ export const dashboardsAtom = atom([
   },
 ]);
 
-// Users atom
-export const usersAtom = atom();
+// Users atom - Not used
+// export const usersAtom = atom();
 
 // Admin only pages atom
 export const adminOnlyPagesAtom = atom([
@@ -543,29 +543,29 @@ export const entitiesAtom = atom({
   ],
 });
 
-// Mock file types data
-export const mockFileTypesAtom = atom([
-  { id: 1, type: "PDF", extension: ".pdf" },
-  { id: 2, type: "Excel", extension: ".xlsx" },
-  { id: 3, type: "Word", extension: ".docx" },
-  { id: 4, type: "Imagen", extension: ".jpg,.png" },
-]);
+// Mock file types data - Not used (replaced by API)
+// export const mockFileTypesAtom = atom([
+//   { id: 1, type: "PDF", extension: ".pdf" },
+//   { id: 2, type: "Excel", extension: ".xlsx" },
+//   { id: 3, type: "Word", extension: ".docx" },
+//   { id: 4, type: "Imagen", extension: ".jpg,.png" },
+// ]);
 
-// Mock required formats data
-export const mockRequiredFormatsAtom = atom([
-  {
-    id: "simple",
-    format: "Copia Simple",
-    description: "Documento en copia simple",
-  },
-  {
-    id: "authenticated",
-    format: "Copia Autenticada",
-    description: "Documento autenticado por notario",
-  },
-  {
-    id: "original",
-    format: "Original",
-    description: "Documento original",
-  },
-]);
+// Mock required formats data - Not used (replaced by API)
+// export const mockRequiredFormatsAtom = atom([
+//   {
+//     id: "simple",
+//     format: "Copia Simple",
+//     description: "Documento en copia simple",
+//   },
+//   {
+//     id: "authenticated",
+//     format: "Copia Autenticada",
+//     description: "Documento autenticado por notario",
+//   },
+//   {
+//     id: "original",
+//     format: "Original",
+//     description: "Documento original",
+//   },
+// ]);
