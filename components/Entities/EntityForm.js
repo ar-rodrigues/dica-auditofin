@@ -7,19 +7,23 @@ import {
   Col,
   Card,
   Switch,
+  Select,
   message,
+  Skeleton,
 } from "antd";
 const { TextArea } = Input;
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 import { PlusOutlined, MinusCircleOutlined } from "@ant-design/icons";
 import { useEntitiesRequirements } from "@/hooks/useEntitiesRequirements";
+
 export default function EntityForm({
   mode = "create",
   onSubmit,
   form,
   loading,
   initialValues,
+  users,
 }) {
   const router = useRouter();
   const [formValues, setFormValues] = useState(initialValues || null);
@@ -29,23 +33,14 @@ export default function EntityForm({
     setFormValues(initialValues || null);
   }, [initialValues]);
 
-  useEffect(() => {
-    if (formValues) {
-      form.setFieldsValue(formValues);
-    }
-  }, [formValues, form]);
-
   const handleRemoveArea = (areaToRemove, removeFunction) => {
-    // Get the area ID from the form values
     const areaId = formValues?.entity_areas?.[areaToRemove]?.id;
 
     if (!areaId) {
-      // If no ID exists, it's a new area that hasn't been saved yet
       removeFunction(areaToRemove);
       return;
     }
 
-    // Check if the area is being used in any requirements
     const areasInUse = entitiesRequirements.filter(
       (requirement) => requirement?.area?.id === areaId
     );
@@ -57,6 +52,12 @@ export default function EntityForm({
     }
   };
 
+  //console.log(users);
+
+  if (loading) {
+    return <Skeleton active rows={10} />;
+  }
+
   return (
     <Card className="w-full max-w-5xl mx-auto">
       <Form
@@ -67,6 +68,7 @@ export default function EntityForm({
           ...formValues,
           is_active: formValues?.is_active ?? true,
           entity_areas: formValues?.entity_areas || [],
+          auditors: formValues?.auditors || [],
         }}
         className="w-full"
       >
@@ -110,7 +112,6 @@ export default function EntityForm({
             </Form.Item>
           </Col>
 
-          {/* Entity Areas */}
           <Col xs={24}>
             <div className="mb-2">
               <h3 className="text-base font-medium">Áreas de la Entidad</h3>
@@ -170,6 +171,18 @@ export default function EntityForm({
                 </>
               )}
             </Form.List>
+          </Col>
+
+          <Col xs={24}>
+            <Form.Item name="auditors" label="Auditores Asignados">
+              <Select
+                mode="multiple"
+                placeholder="Seleccione los auditores"
+                options={users || []}
+                loading={loading}
+                allowClear
+              />
+            </Form.Item>
           </Col>
 
           <Col xs={24} className="mt-6 flex justify-end">
