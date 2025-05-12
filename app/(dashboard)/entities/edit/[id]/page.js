@@ -81,14 +81,13 @@ export default function EditEntityPage() {
     const areasToUpdate = [];
     const auditorsToDelete = [];
     const auditorsToCreate = [];
-    const auditorsToUpdate = [];
 
     // Get existing data
     const existingAreas = entitiesAreas.filter(
       (area) => area.entity === entityId
     );
     const existingAuditors = auditorsForEntities.filter(
-      (auditor) => auditor.entity === entityId
+      (auditor) => auditor.entity.id === entityId
     );
 
     // Identify areas to delete
@@ -129,18 +128,12 @@ export default function EditEntityPage() {
       }
     });
 
-    // Process new auditors
+    // Process new auditors - only create entries for auditors that don't already exist
     formValues.auditors.forEach((newAuditorId) => {
       const existingAuditor = existingAuditors.find(
         (auditor) => auditor.auditor.id === newAuditorId
       );
-      if (existingAuditor) {
-        auditorsToUpdate.push({
-          id: existingAuditor.id,
-          entity: entityId,
-          auditor: newAuditorId,
-        });
-      } else {
+      if (!existingAuditor) {
         auditorsToCreate.push({
           entity: entityId,
           auditor: newAuditorId,
@@ -179,13 +172,6 @@ export default function EditEntityPage() {
           auditorsToCreate.map((auditor) => createAuditorForEntity(auditor))
         );
       }
-      if (auditorsToUpdate.length > 0) {
-        await Promise.all(
-          auditorsToUpdate.map((auditor) =>
-            updateAuditorForEntity(auditor.id, auditor)
-          )
-        );
-      }
 
       message.success("Entidad actualizada exitosamente");
       router.push("/entities");
@@ -211,10 +197,11 @@ export default function EditEntityPage() {
 
   // Show not found state
   if (
-    (!currentEntity || !entityAreas || !entityAuditors) &&
     !isSubmitting &&
     !isEntitiesLoading &&
-    !isEntitiesAreasLoading
+    !isEntitiesAreasLoading &&
+    !isAuditorLoading &&
+    !currentEntity
   ) {
     return (
       <NotFoundContent
