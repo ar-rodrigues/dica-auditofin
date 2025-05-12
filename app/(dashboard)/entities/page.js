@@ -29,9 +29,13 @@ export default function EntitiesPage() {
 
   const handleDelete = async (entity) => {
     try {
-      await deleteEntity(entity.id);
+      const result = await deleteEntity(entity.id);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
     } catch (error) {
-      console.error("Error deleting entity:", error);
+      // Error is now handled in the EntitiesTable component
+      throw error;
     }
   };
 

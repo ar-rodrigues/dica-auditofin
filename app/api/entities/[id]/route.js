@@ -42,17 +42,19 @@ export async function DELETE(request, { params }) {
 
   try {
     const result = await deleteEntity(id);
-    if (!result) {
+
+    if (!result.success) {
       return NextResponse.json(
-        { error: "Error deleting entity" },
-        { status: 500 }
+        { success: false, error: result.error },
+        { status: 400 }
       );
     }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Error deleting entity:", error);
     return NextResponse.json(
-      { error: "Error deleting entity" },
+      { success: false, error: error.message || "Error deleting entity" },
       { status: 500 }
     );
   }

@@ -89,10 +89,15 @@ export const useEntities = () => {
         method: "DELETE",
       });
 
-      if (!response.ok) throw new Error("Failed to delete entity");
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || "Failed to delete entity");
+      }
 
       setEntities((prev) => prev.filter((entity) => entity.id !== id));
       setError(null);
+      return { success: true };
     } catch (err) {
       setError(err.message);
       throw err;

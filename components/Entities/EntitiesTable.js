@@ -1,11 +1,30 @@
-import { Table, Button, Space, Typography, Avatar } from "antd";
+import { Table, Button, Space, Typography, Avatar, Modal, message } from "antd";
 import { EditOutlined, DeleteOutlined, BankOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 
 const { Paragraph } = Typography;
+const { confirm } = Modal;
 
 export default function EntitiesTable({ data, onDelete }) {
   const router = useRouter();
+
+  const handleDelete = (record) => {
+    confirm({
+      title: "¿Estás seguro de eliminar esta entidad?",
+      content: `¿Deseas eliminar la entidad "${record.entity_name}"? Esta acción no se puede deshacer.`,
+      okText: "Sí, eliminar",
+      okType: "danger",
+      cancelText: "No, cancelar",
+      onOk: async () => {
+        try {
+          await onDelete?.(record);
+          message.success("Entidad eliminada exitosamente");
+        } catch (error) {
+          message.error(error.message || "Error al eliminar la entidad");
+        }
+      },
+    });
+  };
 
   const columns = [
     {
@@ -59,7 +78,7 @@ export default function EntitiesTable({ data, onDelete }) {
             type="primary"
             danger
             icon={<DeleteOutlined />}
-            onClick={() => onDelete?.(record)}
+            onClick={() => handleDelete(record)}
           />
         </Space>
       ),
