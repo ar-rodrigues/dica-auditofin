@@ -80,16 +80,7 @@ export async function updateReport(id, updateData) {
     return [];
   }
 
-  const {
-    name,
-    entity_id,
-    workspaceId,
-    reportId,
-    clientId,
-    clientSecret,
-    tenantId,
-    iframeUrl,
-  } = updateData;
+  const { name, entity_id, iframeUrlDesktop, iframeUrlMobile } = updateData;
 
   try {
     const { data, error } = await supabase
@@ -97,12 +88,8 @@ export async function updateReport(id, updateData) {
       .update({
         name,
         entity_id,
-        workspaceId,
-        reportId,
-        clientId,
-        clientSecret,
-        tenantId,
-        iframeUrl,
+        iframeUrlDesktop,
+        iframeUrlMobile,
       })
       .eq("id", id)
       .select()
@@ -140,16 +127,7 @@ export async function deleteReport(id) {
 export async function createReport(reportData) {
   const supabase = await createClient();
   console.log("reportData", reportData);
-  const {
-    name,
-    entity_id,
-    workspaceId,
-    reportId,
-    clientId,
-    clientSecret,
-    tenantId,
-    iframeUrl,
-  } = reportData;
+  const { name, entity_id, iframeUrlDesktop, iframeUrlMobile } = reportData;
 
   try {
     const { data, error } = await supabase
@@ -157,12 +135,8 @@ export async function createReport(reportData) {
       .insert({
         name,
         entity_id,
-        workspaceId,
-        reportId,
-        clientId,
-        clientSecret,
-        tenantId,
-        iframeUrl,
+        iframeUrlDesktop,
+        iframeUrlMobile,
       })
       .select()
       .single();

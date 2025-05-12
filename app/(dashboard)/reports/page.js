@@ -17,19 +17,27 @@ export default function ReportsPage() {
       key: "name",
     },
     {
-      title: "Workspace ID",
-      dataIndex: "workspaceId",
-      key: "workspaceId",
+      title: "Entidad",
+      dataIndex: "entity_name",
+      key: "entity_name",
     },
     {
-      title: "Report ID",
-      dataIndex: "reportId",
-      key: "reportId",
+      title: "Iframe URL Desktop",
+      dataIndex: "iframeUrlDesktop",
+      key: "iframeUrlDesktop",
+      render: (text) =>
+        text ? (
+          <Tooltip title={text}>
+            {text.length > 30 ? `${text.slice(0, 30)}...` : text}
+          </Tooltip>
+        ) : (
+          ""
+        ),
     },
     {
-      title: "Iframe URL",
-      dataIndex: "iframeUrl",
-      key: "iframeUrl",
+      title: "Iframe URL Mobile",
+      dataIndex: "iframeUrlMobile",
+      key: "iframeUrlMobile",
       render: (text) =>
         text ? (
           <Tooltip title={text}>

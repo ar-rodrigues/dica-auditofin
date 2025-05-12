@@ -24,10 +24,21 @@ const PowerBIReport = dynamic(
 export default function PowerBIContent({ reports }) {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedReport, setSelectedReport] = useState(reports[0]?.id);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 1024);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
   const handleReportChange = (value) => {
@@ -117,9 +128,13 @@ export default function PowerBIContent({ reports }) {
               </div>
             ) : (
               <div className="w-full h-full min-h-[calc(100vh-200px)] overflow-hidden">
-                {currentReport?.iframeUrl ? (
+                {currentReport ? (
                   <iframe
-                    src={currentReport.iframeUrl}
+                    src={
+                      isMobile
+                        ? currentReport.iframeUrlMobile
+                        : currentReport.iframeUrlDesktop
+                    }
                     title={currentReport.name || "Reporte"}
                     width="100%"
                     height="100%"
@@ -131,7 +146,11 @@ export default function PowerBIContent({ reports }) {
                   <PowerBIReport
                     id={currentReport?.id}
                     reportId={currentReport?.reportId}
-                    iframeUrl={currentReport?.iframeUrl}
+                    iframeUrl={
+                      isMobile
+                        ? currentReport?.iframeUrlMobile
+                        : currentReport?.iframeUrlDesktop
+                    }
                   />
                 )}
               </div>

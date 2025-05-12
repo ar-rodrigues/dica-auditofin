@@ -38,6 +38,7 @@ export default function ReportForm({
         />
       </Form.Item>
 
+      {/* Commented out unused fields
       <Form.Item name="workspaceId" label="Workspace ID" rules={[]}>
         <Input />
       </Form.Item>
@@ -57,10 +58,19 @@ export default function ReportForm({
       <Form.Item name="tenantId" label="Tenant ID" rules={[]}>
         <Input />
       </Form.Item>
+      */}
 
       <Form.Item
-        name="iframeUrl"
-        label="Iframe URL"
+        name="iframeUrlDesktop"
+        label="Iframe URL Desktop"
+        rules={[{ type: "url", message: "Debe ser una URL válida" }]}
+      >
+        <Input placeholder="https://..." />
+      </Form.Item>
+
+      <Form.Item
+        name="iframeUrlMobile"
+        label="Iframe URL Mobile"
         rules={[{ type: "url", message: "Debe ser una URL válida" }]}
       >
         <Input placeholder="https://..." />
