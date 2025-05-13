@@ -93,6 +93,53 @@ const RequirementDetails = ({ requirement, onStatusChange, loading }) => {
         </div>
       </div>
 
+      <div>
+        <Text type="secondary" className="text-xs">
+          Auditor asignado
+        </Text>
+        <div className="mt-1">
+          {requirement.auditor && requirement.auditor.first_name ? (
+            <Space>
+              {requirement.auditor.photo ? (
+                <img
+                  src={requirement.auditor.photo}
+                  alt={requirement.auditor.first_name}
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                  }}
+                />
+              ) : (
+                <span
+                  style={{
+                    width: 28,
+                    height: 28,
+                    borderRadius: "50%",
+                    background: "#eee",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontWeight: 600,
+                  }}
+                >
+                  {requirement.auditor.first_name[0]}
+                </span>
+              )}
+              <span>
+                {requirement.auditor.first_name} {requirement.auditor.last_name}
+              </span>
+              <span style={{ color: "#888", fontSize: 13 }}>
+                ({requirement.auditor.email})
+              </span>
+            </Space>
+          ) : (
+            <span>-</span>
+          )}
+        </div>
+      </div>
+
       <Divider className="my-3" />
 
       <Button

@@ -7,7 +7,7 @@ export async function getEntitiesRequirements(filters = {}) {
     const { data, error } = await supabase
       .from("entities_requirements")
       .select(
-        "*, entity:entities(*), requirement:requirements(*), area:entities_areas(*)"
+        "*, entity:entities(*), requirement:requirements(*), area:entities_areas(*), auditor:auditors_for_entities(*)"
       )
       .match(filters);
 

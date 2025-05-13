@@ -153,6 +153,35 @@ const RequirementsTable = ({
       ),
     },
     {
+      title: "Auditor",
+      key: "auditor",
+      width: 200,
+      render: (_, record) => {
+        const auditor =
+          record.auditor && record.auditor.auditor_details
+            ? record.auditor.auditor_details
+            : record.auditor;
+        if (auditor && auditor.first_name) {
+          return (
+            <Space>
+              {auditor.photo ? (
+                <Avatar size={24} src={auditor.photo} />
+              ) : (
+                <Avatar size={24}>{auditor.first_name[0]}</Avatar>
+              )}
+              <span>
+                {auditor.first_name} {auditor.last_name}
+              </span>
+              <span style={{ color: "#888", fontSize: 12 }}>
+                ({auditor.email})
+              </span>
+            </Space>
+          );
+        }
+        return "-";
+      },
+    },
+    {
       title: "Acciones",
       key: "actions",
       width: 110,

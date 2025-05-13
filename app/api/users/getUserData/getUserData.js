@@ -9,36 +9,37 @@ export async function getUserData() {
       error,
     } = await supabase.auth.getUser();
 
-    if (user) {
-      const { data: userData, error: userError } = await supabase
-        .from("profiles")
-        .select(
-          `
-          *,
-          entity:entity (
-            id,
-            entity_name
-          ),
-          role:role (
-            id,
-            role
-          )
-        `
-        )
-        .eq("id", user.id);
-
-      if (userData) {
-        return userData;
-      }
-
+    if (error || !user) {
+      console.error("Error getting user:", error);
       return null;
     }
 
-    if (error || !user) return null;
+    const { data: userData, error: userError } = await supabase
+      .from("profiles")
+      .select(
+        `
+        *,
+        entity:entities (
+          id,
+          entity_name
+        ),
+        role:roles (
+          id,
+          role
+        )
+      `
+      )
+      .eq("id", user.id)
+      .single();
 
-    return user;
+    if (userError) {
+      console.error("Error fetching user profile:", userError);
+      return null;
+    }
+
+    return userData;
   } catch (error) {
-    console.error("Error fetching user session:", error);
+    console.error("Error in getUserData:", error);
     return null;
   }
 }

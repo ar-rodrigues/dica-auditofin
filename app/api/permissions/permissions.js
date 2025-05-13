@@ -25,12 +25,14 @@ export const fetchPermissions = async (
   try {
     let query = supabase.from("permissions");
 
-    if (userRole.role === "admin" || userRole.role === "super admin") {
+    // Always select all fields for internal permission checks
+    if (!shouldSanitize) {
+      query = query.select("*");
+    } else if (userRole.role === "admin" || userRole.role === "super admin") {
       query = query.select("*");
     } else {
-      query = query.select(
-        "id, created_at, table_asset, asset_id, users, roles, entities"
-      );
+      // For regular users, still select all fields but we'll sanitize the response
+      query = query.select("*");
     }
 
     const { data, error } = await query.match(filter || { [key]: value });
@@ -46,7 +48,35 @@ export const fetchPermissions = async (
       userRole.role !== "admin" &&
       userRole.role !== "super admin"
     ) {
-      return data.map(sanitizePermissionData);
+      // For regular users, only return permissions they have access to
+      const userData = await getUserData();
+      const userId = userData?.id;
+      const userRoleId = userData?.role?.id;
+      const userEntityId = userData?.entity?.id;
+
+      if (!userId || !userRoleId || !userEntityId) {
+        console.error("Incomplete user data for permission check");
+        return [];
+      }
+
+      // Filter permissions to only those the user has access to
+      const accessiblePermissions = data.filter((permission) => {
+        const users = Array.isArray(permission.users) ? permission.users : [];
+        const roles = Array.isArray(permission.roles) ? permission.roles : [];
+        const entities = Array.isArray(permission.entities)
+          ? permission.entities
+          : [];
+
+        const hasUserAccess = users.length > 0 && users.includes(userId);
+        const hasRoleAccess = roles.length > 0 && roles.includes(userRoleId);
+        const hasEntityAccess =
+          entities.length > 0 && entities.includes(userEntityId);
+
+        return hasUserAccess || hasRoleAccess || hasEntityAccess;
+      });
+
+      // Then sanitize the filtered permissions
+      return accessiblePermissions.map(sanitizePermissionData);
     }
 
     return data;
@@ -216,8 +246,11 @@ export const checkResourcePermission = async (tableAsset, assetId) => {
   const supabase = await createClient();
   const userData = await getUserData();
 
+  // Log user data for debugging
+  console.log("User data in checkResourcePermission:", userData);
+
   // Super admins have access to everything
-  if (userData?.[0]?.role.role === "super admin") {
+  if (userData?.role?.role === "super admin") {
     return true;
   }
 
@@ -233,35 +266,59 @@ export const checkResourcePermission = async (tableAsset, assetId) => {
       false
     ); // Pass false to prevent sanitization
 
+    // Log permissions for debugging
+    console.log("Permissions in checkResourcePermission:", permissions);
+
     if (!permissions || permissions.length === 0) {
+      console.log("No permissions found for resource");
+      return false;
+    }
+
+    const userId = userData?.id;
+    const userRoleId = userData?.role?.id;
+    const userEntityId = userData?.entity?.id;
+
+    // Log user identifiers for debugging
+    console.log("User identifiers:", { userId, userRoleId, userEntityId });
+
+    // If user data is incomplete, deny access
+    if (!userId || !userRoleId || !userEntityId) {
+      console.error("Incomplete user data for permission check:", {
+        userId,
+        userRoleId,
+        userEntityId,
+      });
       return false;
     }
 
     // Check if user has access through any permission
-    return permissions.some((permission) => {
-      // Check if user's entity matches
-      if (
-        permission.entities?.length > 0 &&
-        permission.entities.includes(userData?.[0]?.entity.id)
-      ) {
-        return true;
-      }
-      // Check if user's role matches
-      if (
-        permission.roles?.length > 0 &&
-        permission.roles.includes(userData?.[0]?.role.id)
-      ) {
-        return true;
-      }
-      // Check if user's id matches
-      if (
-        permission.users?.length > 0 &&
-        permission.users.includes(userData?.[0]?.id)
-      ) {
-        return true;
-      }
-      return false;
+    const hasAccess = permissions.some((permission) => {
+      // Ensure arrays exist and are not null
+      const users = Array.isArray(permission.users) ? permission.users : [];
+      const roles = Array.isArray(permission.roles) ? permission.roles : [];
+      const entities = Array.isArray(permission.entities)
+        ? permission.entities
+        : [];
+
+      // Check if user has access through any permission type
+      const hasUserAccess = users.length > 0 && users.includes(userId);
+      const hasRoleAccess = roles.length > 0 && roles.includes(userRoleId);
+      const hasEntityAccess =
+        entities.length > 0 && entities.includes(userEntityId);
+
+      // Log permission check results for debugging
+      console.log("Permission check results:", {
+        permissionId: permission.id,
+        hasUserAccess,
+        hasRoleAccess,
+        hasEntityAccess,
+      });
+
+      return hasUserAccess || hasRoleAccess || hasEntityAccess;
     });
+
+    console.log("Final access result:", hasAccess);
+    return hasAccess;
   } catch (error) {
     console.error("Error checking resource permission:", error);
     return false;
