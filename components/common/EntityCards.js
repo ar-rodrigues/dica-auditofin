@@ -72,6 +72,11 @@ const EntityCard = ({ entity, onClick }) => {
       }}
     >
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+        <div>
+          <h1 className="text-xs text-gray-500">
+            REMEMBER TO REMOVE THIS COMPONENT FROM DASHBOARD/AUDITOR PAGE
+          </h1>
+        </div>
         <Avatar
           size={{ xs: 64, sm: 64, md: 72 }}
           icon={!entity.logo && <BankOutlined />}
