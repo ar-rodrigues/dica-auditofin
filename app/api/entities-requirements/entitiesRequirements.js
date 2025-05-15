@@ -7,7 +7,7 @@ export async function getEntitiesRequirements(filters = {}) {
     const { data, error } = await supabase
       .from("entities_requirements")
       .select(
-        "*, entity:entities(*), requirement:requirements(*), area:entities_areas(*), auditor:auditors_for_entities(*)"
+        "*, entity:entities(*), requirement:requirements(*), area:entities_areas(*), auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, last_name, email))"
       )
       .match(filters);
 
@@ -29,7 +29,9 @@ export async function getEntityRequirementById(id) {
   try {
     const { data, error } = await supabase
       .from("entities_requirements")
-      .select("*, entity:entities(*), requirement:requirements(*)")
+      .select(
+        "*, entity:entities(*), requirement:requirements(*), area:entities_areas(*), auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, last_name, email))"
+      )
       .eq("id", id);
 
     if (error) {

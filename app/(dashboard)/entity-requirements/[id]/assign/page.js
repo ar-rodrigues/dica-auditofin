@@ -498,103 +498,39 @@ export default function AssignRequirementsPage() {
                                     req.requirement.id === requirement.id &&
                                     req.area.id === selectedArea.id
                                 );
-                                return assignment?.auditor?.id ?? undefined;
+                                if (!assignment?.auditor) return undefined;
+                                return assignment.auditor.id;
                               })()}
-                              onChange={(auditorForEntityId) =>
+                              onChange={(auditorId) =>
                                 handleAssignAuditor(
                                   requirement,
-                                  auditorForEntityId ?? null
+                                  auditorId ?? null
                                 )
                               }
                               loading={auditorLoading[requirement.id]}
                               disabled={auditorLoading[requirement.id]}
                               allowClear
                               dropdownStyle={{ minWidth: 300 }}
-                              optionLabelProp="label"
+                              optionLabelProp="children"
                             >
                               {auditorsForEntities
                                 .filter((item) => item.entity.id === entityId)
                                 .map((item) => (
-                                  <Select.Option
-                                    key={item.id}
-                                    value={item.id}
-                                    label={
-                                      <>
-                                        {item.auditor.photo ? (
-                                          <img
-                                            src={item.auditor.photo}
-                                            alt={item.auditor.first_name}
-                                            style={{
-                                              width: 22,
-                                              height: 22,
-                                              borderRadius: "50%",
-                                              objectFit: "cover",
-                                              marginRight: 6,
-                                            }}
-                                          />
-                                        ) : (
-                                          <UserOutlined
-                                            style={{
-                                              fontSize: 18,
-                                              color: "#bfbfbf",
-                                              marginRight: 6,
-                                            }}
-                                          />
-                                        )}
-                                        <span style={{ fontWeight: 500 }}>
-                                          {item.auditor.first_name}{" "}
-                                          {item.auditor.last_name}
-                                        </span>
-                                        <span
-                                          style={{
-                                            color: "#888",
-                                            fontSize: 13,
-                                            marginLeft: 6,
-                                          }}
-                                        >
-                                          {item.auditor.email}
-                                        </span>
-                                      </>
-                                    }
-                                  >
+                                  <Select.Option key={item.id} value={item.id}>
                                     <div
                                       style={{
                                         display: "flex",
-                                        alignItems: "center",
-                                        gap: 8,
+                                        flexDirection: "column",
+                                        alignItems: "flex-start",
+                                        lineHeight: 1.2,
                                       }}
                                     >
-                                      {item.auditor.photo ? (
-                                        <img
-                                          src={item.auditor.photo}
-                                          alt={item.auditor.first_name}
-                                          style={{
-                                            width: 28,
-                                            height: 28,
-                                            borderRadius: "50%",
-                                            objectFit: "cover",
-                                            marginRight: 6,
-                                          }}
-                                        />
-                                      ) : (
-                                        <UserOutlined
-                                          style={{
-                                            fontSize: 22,
-                                            color: "#bfbfbf",
-                                            marginRight: 6,
-                                          }}
-                                        />
-                                      )}
                                       <span style={{ fontWeight: 500 }}>
                                         {item.auditor.first_name}{" "}
                                         {item.auditor.last_name}
                                       </span>
                                       <span
-                                        style={{
-                                          color: "#888",
-                                          fontSize: 13,
-                                          marginLeft: 6,
-                                        }}
+                                        style={{ color: "#888", fontSize: 13 }}
                                       >
                                         {item.auditor.email}
                                       </span>

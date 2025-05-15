@@ -157,25 +157,24 @@ const RequirementsTable = ({
       key: "auditor",
       width: 200,
       render: (_, record) => {
-        const auditor =
-          record.auditor && record.auditor.auditor_details
-            ? record.auditor.auditor_details
-            : record.auditor;
+        const auditor = record.auditor?.auditor;
         if (auditor && auditor.first_name) {
           return (
-            <Space>
-              {auditor.photo ? (
-                <Avatar size={24} src={auditor.photo} />
-              ) : (
-                <Avatar size={24}>{auditor.first_name[0]}</Avatar>
-              )}
-              <span>
+            <div
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                lineHeight: 1.2,
+              }}
+            >
+              <span style={{ fontWeight: 500 }}>
                 {auditor.first_name} {auditor.last_name}
               </span>
-              <span style={{ color: "#888", fontSize: 12 }}>
-                ({auditor.email})
+              <span style={{ color: "#888", fontSize: 13 }}>
+                {auditor.email}
               </span>
-            </Space>
+            </div>
           );
         }
         return "-";
