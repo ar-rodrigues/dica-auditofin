@@ -18,6 +18,8 @@ import {
   Divider,
   Tag,
   Select,
+  Skeleton,
+  Modal,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -288,6 +290,24 @@ export default function AssignRequirementsPage() {
     }
   };
 
+  const highlightText = (text, search) => {
+    if (!search) return text;
+    const regex = new RegExp(`(${search})`, "gi");
+    return (
+      <span>
+        {text.split(regex).map((part, i) =>
+          regex.test(part) ? (
+            <span key={i} style={{ background: "#ffe58f", fontWeight: 600 }}>
+              {part}
+            </span>
+          ) : (
+            part
+          )
+        )}
+      </span>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-100">
@@ -303,7 +323,7 @@ export default function AssignRequirementsPage() {
   return (
     <div className="min-h-screen bg-gray-100">
       <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6">
-        <div className="mb-6">
+        <div className="mb-8">
           <Button
             icon={<ArrowLeftOutlined />}
             onClick={handleGoBack}
@@ -311,92 +331,119 @@ export default function AssignRequirementsPage() {
           >
             Volver
           </Button>
-          <Title level={2}>
+          <Title level={1} style={{ fontWeight: 800, fontSize: 32 }}>
             Asignar Requerimientos - {entity?.name || "Entidad"}
           </Title>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Areas Column */}
-          <Card title="Áreas" className="h-full">
-            <List
-              dataSource={areas || []}
-              renderItem={(area) => (
-                <List.Item
-                  key={area?.id}
-                  className={`cursor-pointer hover:bg-gray-50 p-4 rounded-lg ${
-                    selectedArea?.id === area?.id ? "bg-blue-50" : ""
-                  }`}
-                  onClick={() => handleAreaSelect(area)}
-                >
-                  <div className="w-full">
-                    <div className="flex justify-between items-center">
-                      <Text strong>{area?.area || "Área sin nombre"}</Text>
-                      <Tag color="blue">
-                        {getAssignedRequirementsForArea(area?.id).length}{" "}
-                        requerimientos
-                      </Tag>
-                    </div>
-                    {selectedArea?.id === area?.id && (
-                      <div className="mt-2">
-                        <Text type="secondary">
-                          {getAssignedRequirementsForArea(area?.id).map(
-                            (req) => (
-                              <Tag key={req?.id} className="mr-1 mb-1">
-                                {req?.requirement?.ref_code || "Sin código"}
-                              </Tag>
-                            )
-                          )}
+          <Card
+            title={<span style={{ fontWeight: 700, fontSize: 22 }}>Áreas</span>}
+            className="h-full"
+          >
+            {loading ? (
+              <Skeleton active paragraph={{ rows: 6 }} />
+            ) : (
+              <List
+                dataSource={areas || []}
+                renderItem={(area) => (
+                  <List.Item
+                    key={area?.id}
+                    className={`cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-all duration-200 ${
+                      selectedArea?.id === area?.id
+                        ? "bg-blue-50 border-2 border-blue-400"
+                        : "border border-transparent"
+                    }`}
+                    style={{ marginBottom: 10 }}
+                    onClick={() => handleAreaSelect(area)}
+                  >
+                    <div className="w-full">
+                      <div className="flex justify-between items-center">
+                        <Text strong style={{ fontSize: 18 }}>
+                          {area?.area || "Área sin nombre"}
                         </Text>
+                        <Tag color="blue" style={{ fontSize: 15 }}>
+                          {getAssignedRequirementsForArea(area?.id).length}{" "}
+                          requerimientos
+                        </Tag>
                       </div>
-                    )}
-                  </div>
-                </List.Item>
-              )}
-            />
+                      {selectedArea?.id === area?.id && (
+                        <div className="mt-2">
+                          <Text type="secondary">
+                            {getAssignedRequirementsForArea(area?.id).map(
+                              (req) => (
+                                <Tag key={req?.id} className="mr-1 mb-1">
+                                  {req?.requirement?.ref_code || "Sin código"}
+                                </Tag>
+                              )
+                            )}
+                          </Text>
+                        </div>
+                      )}
+                    </div>
+                  </List.Item>
+                )}
+              />
+            )}
           </Card>
-
           {/* Requirements Column */}
           <Card
             title={
-              <div className="flex justify-between items-center">
-                <span>Requerimientos</span>
-                <Search
-                  placeholder="Buscar requerimientos..."
-                  allowClear
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ width: 250 }}
-                />
-              </div>
+              <span style={{ fontWeight: 700, fontSize: 22 }}>
+                Requerimientos
+              </span>
             }
             className="h-full"
           >
-            {selectedArea ? (
+            <div className="mb-4 flex justify-end">
+              <Search
+                placeholder="Buscar requerimientos..."
+                allowClear
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{ width: 300 }}
+              />
+            </div>
+            {loading ? (
+              <Skeleton active paragraph={{ rows: 8 }} />
+            ) : selectedArea ? (
               <List
                 dataSource={filteredRequirements}
                 renderItem={(requirement) => (
-                  <List.Item key={requirement?.id}>
+                  <List.Item key={requirement?.id} style={{ marginBottom: 18 }}>
                     <div
                       style={{
                         width: "100%",
                         display: "flex",
                         flexDirection: "column",
-                        gap: 4,
+                        gap: 8,
+                        padding: 8,
+                        borderRadius: 8,
+                        background: isRequirementAssigned(requirement?.id)
+                          ? "#f6ffed"
+                          : "#fff",
+                        border: isRequirementAssigned(requirement?.id)
+                          ? "1.5px solid #b7eb8f"
+                          : "1px solid #f0f0f0",
                       }}
                     >
                       <div
                         style={{
                           display: "flex",
                           alignItems: "center",
-                          gap: 8,
+                          gap: 12,
                           flexWrap: "wrap",
                         }}
                       >
-                        <Text strong>
-                          {requirement?.ref_code || "Sin código"}
+                        <Text strong style={{ fontSize: 17 }}>
+                          {highlightText(
+                            requirement?.ref_code || "Sin código",
+                            searchTerm
+                          )}
                         </Text>
                         {isRequirementAssigned(requirement?.id) && (
-                          <Tag color="success">Asignado</Tag>
+                          <Tag color="success" style={{ fontSize: 15 }}>
+                            Asignado
+                          </Tag>
                         )}
                       </div>
                       <div
@@ -407,7 +454,11 @@ export default function AssignRequirementsPage() {
                           maxWidth: 600,
                         }}
                       >
-                        {requirement?.required_information || "Sin descripción"}
+                        {highlightText(
+                          requirement?.required_information ||
+                            "Sin descripción",
+                          searchTerm
+                        )}
                       </div>
                       {isRequirementAssigned(requirement?.id) ? (
                         <>
@@ -415,7 +466,7 @@ export default function AssignRequirementsPage() {
                             style={{
                               display: "flex",
                               alignItems: "center",
-                              gap: 12,
+                              gap: 16,
                               marginTop: 4,
                             }}
                           >
@@ -468,12 +519,42 @@ export default function AssignRequirementsPage() {
                                     key={item.id}
                                     value={item.id}
                                     label={
-                                      item.auditor.first_name +
-                                      " " +
-                                      item.auditor.last_name +
-                                      " (" +
-                                      item.auditor.email +
-                                      ")"
+                                      <>
+                                        {item.auditor.photo ? (
+                                          <img
+                                            src={item.auditor.photo}
+                                            alt={item.auditor.first_name}
+                                            style={{
+                                              width: 22,
+                                              height: 22,
+                                              borderRadius: "50%",
+                                              objectFit: "cover",
+                                              marginRight: 6,
+                                            }}
+                                          />
+                                        ) : (
+                                          <UserOutlined
+                                            style={{
+                                              fontSize: 18,
+                                              color: "#bfbfbf",
+                                              marginRight: 6,
+                                            }}
+                                          />
+                                        )}
+                                        <span style={{ fontWeight: 500 }}>
+                                          {item.auditor.first_name}{" "}
+                                          {item.auditor.last_name}
+                                        </span>
+                                        <span
+                                          style={{
+                                            color: "#888",
+                                            fontSize: 13,
+                                            marginLeft: 6,
+                                          }}
+                                        >
+                                          {item.auditor.email}
+                                        </span>
+                                      </>
                                     }
                                   >
                                     <div
@@ -533,9 +614,18 @@ export default function AssignRequirementsPage() {
                                   <CloseOutlined />
                                 )
                               }
-                              onClick={() =>
-                                handleUnassignRequirement(requirement)
-                              }
+                              onClick={() => {
+                                Modal.confirm({
+                                  title: "¿Desasignar requerimiento?",
+                                  content:
+                                    "¿Está seguro que desea desasignar este requerimiento?",
+                                  okText: "Sí, desasignar",
+                                  okType: "danger",
+                                  cancelText: "Cancelar",
+                                  onOk: () =>
+                                    handleUnassignRequirement(requirement),
+                                });
+                              }}
                               loading={buttonLoading[requirement?.id]}
                               style={{ minWidth: 110 }}
                             >
@@ -567,7 +657,7 @@ export default function AssignRequirementsPage() {
               />
             ) : (
               <div className="text-center py-8">
-                <Text type="secondary">
+                <Text type="secondary" style={{ fontSize: 17 }}>
                   Seleccione un área para ver y asignar requerimientos
                 </Text>
               </div>

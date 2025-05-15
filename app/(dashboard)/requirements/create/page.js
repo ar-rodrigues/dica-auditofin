@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Typography, message } from "antd";
 import RequirementForm from "@/components/Requirements/RequirementForm";
-import useRequirements from "@/hooks/useRequirements";
+import { useRequirements } from "@/hooks/useRequirements";
 
 const { Title } = Typography;
 
