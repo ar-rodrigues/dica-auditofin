@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { Typography, Spin, message } from "antd";
 import RequirementForm from "@/components/Requirements/RequirementForm";
-import useRequirements from "@/hooks/useRequirements";
+import { useRequirements } from "@/hooks/useRequirements";
 import NotFoundContent from "@/components/NotFoundContent";
 
 const { Title } = Typography;
