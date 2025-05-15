@@ -343,55 +343,81 @@ export default function AssignRequirementsPage() {
           >
             {loading ? (
               <Skeleton active paragraph={{ rows: 6 }} />
+            ) : areas.length === 0 ? (
+              <div className="flex flex-col  gap-4">
+                <Text type="secondary" style={{ fontSize: 17 }}>
+                  No hay áreas disponibles, por favor asigne áreas a la entidad.
+                </Text>
+                <Button
+                  type="primary"
+                  onClick={() => router.push(`/entities/edit/${entityId}`)}
+                >
+                  Editar Entidad
+                </Button>
+              </div>
             ) : (
-              <List
-                dataSource={areas || []}
-                renderItem={(area) => (
-                  <List.Item
-                    key={area?.id}
-                    className={`cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-all duration-200 ${
-                      selectedArea?.id === area?.id
-                        ? "bg-blue-50 border-2 border-blue-400"
-                        : "border border-transparent"
-                    }`}
-                    style={{ marginBottom: 10 }}
-                    onClick={() => handleAreaSelect(area)}
-                  >
-                    <div className="w-full">
-                      <div className="flex justify-between items-center">
-                        <Text strong style={{ fontSize: 18 }}>
-                          {area?.area || "Área sin nombre"}
-                        </Text>
-                        <Tag color="blue" style={{ fontSize: 15 }}>
-                          {getAssignedRequirementsForArea(area?.id).length}{" "}
-                          requerimientos
-                        </Tag>
-                      </div>
-                      {selectedArea?.id === area?.id && (
-                        <div className="mt-2">
-                          <Text type="secondary">
-                            {getAssignedRequirementsForArea(area?.id).map(
-                              (req) => (
-                                <Tag key={req?.id} className="mr-1 mb-1">
-                                  {req?.requirement?.ref_code || "Sin código"}
-                                </Tag>
-                              )
-                            )}
+              areas.length > 0 && (
+                <List
+                  dataSource={areas || []}
+                  renderItem={(area) => (
+                    <List.Item
+                      key={area?.id}
+                      className={`cursor-pointer hover:bg-gray-50 p-4 rounded-lg transition-all duration-200 ${
+                        selectedArea?.id === area?.id
+                          ? "bg-blue-50 border-2 border-blue-400"
+                          : "border border-transparent"
+                      }`}
+                      style={{ marginBottom: 10 }}
+                      onClick={() => handleAreaSelect(area)}
+                    >
+                      <div className="w-full">
+                        <div className="flex justify-between items-center">
+                          <Text strong style={{ fontSize: 18 }}>
+                            {area?.area || "Área sin nombre"}
                           </Text>
+                          <Tag color="blue" style={{ fontSize: 15 }}>
+                            {getAssignedRequirementsForArea(area?.id).length}{" "}
+                            requerimientos
+                          </Tag>
                         </div>
-                      )}
-                    </div>
-                  </List.Item>
-                )}
-              />
+                        {selectedArea?.id === area?.id && (
+                          <div className="mt-2">
+                            <Text type="secondary">
+                              {getAssignedRequirementsForArea(area?.id).map(
+                                (req) => (
+                                  <Tag key={req?.id} className="mr-1 mb-1">
+                                    {req?.requirement?.ref_code || "Sin código"}
+                                  </Tag>
+                                )
+                              )}
+                            </Text>
+                          </div>
+                        )}
+                      </div>
+                    </List.Item>
+                  )}
+                />
+              )
             )}
           </Card>
           {/* Requirements Column */}
           <Card
             title={
-              <span style={{ fontWeight: 700, fontSize: 22 }}>
-                Requerimientos
-              </span>
+              <div className="flex flex-col gap-2">
+                <span style={{ fontWeight: 700, fontSize: 22 }}>
+                  Listado de Requerimientos
+                </span>
+                <span style={{ fontSize: 14, color: "#666" }}>
+                  Disponibles para asignación
+                </span>
+              </div>
+            }
+            extra={
+              <Button
+                type="primary"
+                icon={<PlusOutlined />}
+                onClick={() => router.push("/requirements/create")}
+              />
             }
             className="h-full"
           >
@@ -482,62 +508,85 @@ export default function AssignRequirementsPage() {
                               />{" "}
                               Auditor:
                             </span>
-                            <Select
-                              key="auditor-select"
-                              style={{
-                                minWidth: 220,
-                                maxWidth: 320,
-                                marginRight: 12,
-                              }}
-                              placeholder="Seleccionar auditor"
-                              showSearch
-                              optionFilterProp="children"
-                              value={(() => {
-                                const assignment = assignedRequirements.find(
-                                  (req) =>
-                                    req.requirement.id === requirement.id &&
-                                    req.area.id === selectedArea.id
-                                );
-                                if (!assignment?.auditor) return undefined;
-                                return assignment.auditor.id;
-                              })()}
-                              onChange={(auditorId) =>
-                                handleAssignAuditor(
-                                  requirement,
-                                  auditorId ?? null
-                                )
-                              }
-                              loading={auditorLoading[requirement.id]}
-                              disabled={auditorLoading[requirement.id]}
-                              allowClear
-                              dropdownStyle={{ minWidth: 300 }}
-                              optionLabelProp="children"
-                            >
-                              {auditorsForEntities
-                                .filter((item) => item.entity.id === entityId)
-                                .map((item) => (
-                                  <Select.Option key={item.id} value={item.id}>
-                                    <div
-                                      style={{
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        alignItems: "flex-start",
-                                        lineHeight: 1.2,
-                                      }}
+                            {entityAuditors.length > 0 ? (
+                              <Select
+                                key="auditor-select"
+                                style={{
+                                  minWidth: 220,
+                                  maxWidth: 320,
+                                  marginRight: 12,
+                                }}
+                                placeholder="Seleccionar auditor"
+                                showSearch
+                                optionFilterProp="children"
+                                value={(() => {
+                                  const assignment = assignedRequirements.find(
+                                    (req) =>
+                                      req.requirement.id === requirement.id &&
+                                      req.area.id === selectedArea.id
+                                  );
+                                  if (!assignment?.auditor) return undefined;
+                                  return assignment.auditor.id;
+                                })()}
+                                onChange={(auditorId) =>
+                                  handleAssignAuditor(
+                                    requirement,
+                                    auditorId ?? null
+                                  )
+                                }
+                                loading={auditorLoading[requirement.id]}
+                                disabled={auditorLoading[requirement.id]}
+                                allowClear
+                                dropdownStyle={{ minWidth: 300 }}
+                                optionLabelProp="children"
+                              >
+                                {auditorsForEntities
+                                  .filter((item) => item.entity.id === entityId)
+                                  .map((item) => (
+                                    <Select.Option
+                                      key={item.id}
+                                      value={item.id}
                                     >
-                                      <span style={{ fontWeight: 500 }}>
-                                        {item.auditor.first_name}{" "}
-                                        {item.auditor.last_name}
-                                      </span>
-                                      <span
-                                        style={{ color: "#888", fontSize: 13 }}
+                                      <div
+                                        style={{
+                                          display: "flex",
+                                          flexDirection: "column",
+                                          alignItems: "flex-start",
+                                          lineHeight: 1.2,
+                                        }}
                                       >
-                                        {item.auditor.email}
-                                      </span>
-                                    </div>
-                                  </Select.Option>
-                                ))}
-                            </Select>
+                                        <span style={{ fontWeight: 500 }}>
+                                          {item.auditor.first_name}{" "}
+                                          {item.auditor.last_name}
+                                        </span>
+                                        <span
+                                          style={{
+                                            color: "#888",
+                                            fontSize: 13,
+                                          }}
+                                        >
+                                          {item.auditor.email}
+                                        </span>
+                                      </div>
+                                    </Select.Option>
+                                  ))}
+                              </Select>
+                            ) : (
+                              <>
+                                <Text type="secondary" style={{ fontSize: 15 }}>
+                                  No hay auditores asignados
+                                </Text>
+                                <Button
+                                  type="primary"
+                                  icon={<PlusOutlined />}
+                                  onClick={() =>
+                                    router.push(`/entities/edit/${entityId}`)
+                                  }
+                                >
+                                  Asignar
+                                </Button>
+                              </>
+                            )}
                           </div>
                           <div style={{ marginTop: 8 }}>
                             <Button

@@ -280,7 +280,7 @@ const RequirementsTable = ({
           onClick={onAddRequirements}
           className={isMobile ? "w-full" : "w-auto"}
         >
-          Agregar
+          Editar Asignación
         </Button>
       )}
     </div>
