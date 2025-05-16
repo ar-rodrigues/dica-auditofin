@@ -13,6 +13,7 @@ const ImportHeadersModal = ({ open, onOk, onCancel }) => {
   const [activeTab, setActiveTab] = useState("archivo");
   const [headers, setHeaders] = useState([]);
   const [copiedText, setCopiedText] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const [caseMode, , cycleCaseMode] = useStringCase(
     headers,
@@ -21,18 +22,33 @@ const ImportHeadersModal = ({ open, onOk, onCancel }) => {
   );
 
   const handleFile = (file) => {
+    setLoading(true);
     const reader = new FileReader();
     reader.onload = (e) => {
       const data = new Uint8Array(e.target.result);
       const workbook = XLSX.read(data, { type: "array" });
       const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
       const headerRow = XLSX.utils.sheet_to_json(firstSheet, { header: 1 })[0];
+      //console.log("RAW HEADER ROW:", headerRow);
       if (headerRow && headerRow.length > 0) {
-        setHeaders(headerRow.map((h) => ({ name: h, type: "string" })));
-        message.success("Encabezados importados correctamente");
+        const filteredHeaders = headerRow
+          .filter((h) => h && typeof h === "string" && h.trim() !== "")
+          .map((h) => ({ name: h, type: "string" }));
+        //console.log("FILTERED HEADERS:", filteredHeaders);
+        setHeaders(filteredHeaders);
+        if (filteredHeaders.length > 0) {
+          message.success("Encabezados importados correctamente");
+        } else {
+          message.error("No se encontraron encabezados válidos en el archivo");
+        }
       } else {
         message.error("No se encontraron encabezados en el archivo");
       }
+      setLoading(false);
+    };
+    reader.onerror = () => {
+      message.error("Error al leer el archivo");
+      setLoading(false);
     };
     reader.readAsArrayBuffer(file);
     return false;
@@ -42,8 +58,19 @@ const ImportHeadersModal = ({ open, onOk, onCancel }) => {
     const lines = copiedText.split(/\r?\n/).filter(Boolean);
     if (lines.length > 0) {
       const headerLine = lines[0].split(/,|\t|;/).map((h) => h.trim());
-      setHeaders(headerLine.map((h) => ({ name: h, type: "string" })));
-      message.success("Encabezados importados correctamente");
+      console.log("RAW HEADER LINE (PASTE):", headerLine);
+      const filteredHeaders = headerLine
+        .filter((h) => h && typeof h === "string" && h.trim() !== "")
+        .map((h) => ({ name: h, type: "string" }));
+      console.log("FILTERED HEADERS (PASTE):", filteredHeaders);
+      setHeaders(filteredHeaders);
+      if (filteredHeaders.length > 0) {
+        message.success("Encabezados importados correctamente");
+      } else {
+        message.error(
+          "No se encontraron encabezados válidos en el texto pegado"
+        );
+      }
     } else {
       message.error("No se encontraron encabezados en el texto pegado");
     }
@@ -69,6 +96,11 @@ const ImportHeadersModal = ({ open, onOk, onCancel }) => {
     setHeaders((prev) => prev.filter((_, i) => i !== index));
   };
 
+  const handleClearHeaders = () => {
+    setHeaders([]);
+    setCopiedText("");
+  };
+
   const caseModeLabel = {
     lower: "minúsculas",
     upper: "MAYÚSCULAS",
@@ -86,20 +118,28 @@ const ImportHeadersModal = ({ open, onOk, onCancel }) => {
       key: "archivo",
       label: "Subir archivo",
       children: (
-        <Dragger
-          accept=".csv,.xls,.xlsx"
-          beforeUpload={handleFile}
-          showUploadList={false}
-          multiple={false}
-        >
-          <p className="ant-upload-drag-icon">
-            <InboxOutlined />
-          </p>
-          <p>
-            Arrastra y suelta un archivo CSV, XLS o XLSX aquí, o haz clic para
-            seleccionar
-          </p>
-        </Dragger>
+        <>
+          {loading ? (
+            <div style={{ textAlign: "center", padding: 40 }}>
+              <span>Cargando archivo...</span>
+            </div>
+          ) : headers.length === 0 ? (
+            <Dragger
+              accept=".csv,.xls,.xlsx"
+              beforeUpload={handleFile}
+              showUploadList={false}
+              multiple={false}
+            >
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p>
+                Arrastra y suelta un archivo CSV, XLS o XLSX aquí, o haz clic
+                para seleccionar
+              </p>
+            </Dragger>
+          ) : null}
+        </>
       ),
     },
     {
@@ -134,11 +174,19 @@ const ImportHeadersModal = ({ open, onOk, onCancel }) => {
       {headers.length > 0 && (
         <div style={{ marginTop: 16 }}>
           <Button
-            style={{ marginBottom: 12 }}
+            style={{ marginBottom: 12, marginRight: 8 }}
             onClick={handleCycleCase}
             type="default"
           >
             Formato del texto: {caseModeLabel[caseMode]}
+          </Button>
+          <Button
+            style={{ marginBottom: 12 }}
+            onClick={handleClearHeaders}
+            type="default"
+            danger
+          >
+            Limpiar encabezados
           </Button>
           <br />
           <strong>Encabezados importados:</strong>

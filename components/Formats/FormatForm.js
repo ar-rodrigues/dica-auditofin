@@ -76,6 +76,7 @@ const FormatForm = ({
               >
                 Importar desde Excel/CSV o copiar y pegar
               </Button>
+
               <HeaderFields
                 headers={headers}
                 onChange={handleHeaderChange}
