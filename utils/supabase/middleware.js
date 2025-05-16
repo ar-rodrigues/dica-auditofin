@@ -55,7 +55,8 @@ export async function updateSession(request) {
     request.nextUrl.pathname.startsWith("/images") ||
     request.nextUrl.pathname.endsWith(".png") ||
     request.nextUrl.pathname.endsWith(".svg") ||
-    request.nextUrl.pathname.endsWith(".ico")
+    request.nextUrl.pathname.endsWith(".ico") ||
+    request.nextUrl.pathname.endsWith(".sw.js")
   ) {
     return supabaseResponse;
   }
