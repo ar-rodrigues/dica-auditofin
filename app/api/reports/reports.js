@@ -34,7 +34,7 @@ export async function getReports() {
   const userData = await getUserData();
 
   // Log user data for debugging
-  console.log("User data in getReports:", userData);
+  //console.log("User data in getReports:", userData);
 
   // if user is super admin, return all reports
   if (userData?.role?.role === "super admin") {
@@ -96,16 +96,16 @@ export async function getReports() {
       const hasEntityAccess =
         entities.length > 0 && entities.includes(userEntityId);
 
-      // Log permission check results for debugging
-      console.log("Permission check results in getReports:", {
-        permissionId: permission.id,
-        users,
-        roles,
-        entities,
-        hasUserAccess,
-        hasRoleAccess,
-        hasEntityAccess,
-      });
+      // // Log permission check results for debugging
+      // console.log("Permission check results in getReports:", {
+      //   permissionId: permission.id,
+      //   users,
+      //   roles,
+      //   entities,
+      //   hasUserAccess,
+      //   hasRoleAccess,
+      //   hasEntityAccess,
+      // });
 
       return hasUserAccess || hasRoleAccess || hasEntityAccess;
     });
@@ -135,7 +135,7 @@ export async function getReports() {
     }
 
     // Log final reports for debugging
-    console.log("Final reports:", reports);
+    //console.log("Final reports:", reports);
 
     return reports || [];
   } catch (error) {
@@ -146,7 +146,7 @@ export async function getReports() {
 
 export async function updateReport(id, updateData) {
   const supabase = await createClient();
-  console.log("updateData", updateData);
+  //console.log("updateData", updateData);
   // Check if user has permission to update this report
   const hasPermission = await checkResourcePermission("reports", id);
 
@@ -233,7 +233,7 @@ export async function deleteReport(id) {
 
 export async function createReport(reportData) {
   const supabase = await createClient();
-  console.log("reportData", reportData);
+  //console.log("reportData", reportData);
   const { name, entity_id, iframeUrlDesktop, iframeUrlMobile, permissions } =
     reportData;
 
@@ -255,7 +255,7 @@ export async function createReport(reportData) {
       throw permissionError;
     }
 
-    console.log("Created permission:", permission);
+    //console.log("Created permission:", permission);
 
     // Create the report with the permission ID
     const { data: report, error: reportError } = await supabase
@@ -290,7 +290,7 @@ export async function createReport(reportData) {
       throw updateError;
     }
 
-    console.log("Created report:", report);
+    //console.log("Created report:", report);
     return report;
   } catch (error) {
     console.error("Error creating report:", error);
