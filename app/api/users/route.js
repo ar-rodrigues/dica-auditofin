@@ -8,13 +8,21 @@ import {
 } from "./users";
 import { sendWelcomeEmail } from "../../../utils/mailer/mailer";
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const users = await getUsers();
-    return NextResponse.json(users);
+    const { searchParams } = new URL(request.url);
+    const filters = Object.fromEntries(searchParams);
+    const response = await getUsers(filters);
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
     console.error("Error in GET /api/users:", error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message || "Error al obtener usuarios",
+      },
+      { status: 500 }
+    );
   }
 }
 
@@ -87,8 +95,9 @@ export async function POST(request) {
 
     return NextResponse.json(
       {
+        success: true,
         message: "Usuario y perfil creados exitosamente",
-        profile: newProfile,
+        data: newProfile,
       },
       { status: 201 }
     );
@@ -111,8 +120,9 @@ export async function POST(request) {
 
     return NextResponse.json(
       {
-        error: `Error en el proceso de creación: ${error.message}`,
-        details: error.stack,
+        success: false,
+        message: `Error en el proceso de creación: ${error.message}`,
+        error: error.stack,
       },
       { status: 500 }
     );

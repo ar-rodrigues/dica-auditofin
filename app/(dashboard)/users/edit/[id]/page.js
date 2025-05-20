@@ -23,8 +23,8 @@ export default function EditUserPage() {
   useEffect(() => {
     const fetchUser = async () => {
       const userData = await getUserById(id);
-      if (userData) {
-        setUser(userData[0]);
+      if (userData && userData.success && userData.data) {
+        setUser(userData.data);
       }
     };
     fetchUser();

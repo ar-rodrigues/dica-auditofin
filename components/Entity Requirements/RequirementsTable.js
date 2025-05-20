@@ -1,32 +1,19 @@
 import React, { useState, useEffect } from "react";
+import { Tag, Button, Input, Select, Space, Typography, Paragraph } from "antd";
 import {
-  Table,
-  Tag,
-  Button,
-  Input,
-  Select,
-  Space,
-  Typography,
-  Avatar,
-  Drawer,
-  Divider,
-} from "antd";
-import {
-  ArrowLeftOutlined,
-  BankOutlined,
-  SearchOutlined,
-  PlusOutlined,
   FileTextOutlined,
   CheckCircleOutlined,
   StopOutlined,
-  InboxOutlined,
+  SearchOutlined,
+  PlusOutlined,
 } from "@ant-design/icons";
 import StatCard from "../common/StatCard";
-import RequirementDetails from "./RequirementDetails";
+import EntityAssignmentTable from "../common/EntityAssignmentTable";
+import EntityAssignmentDetails from "../common/EntityAssignmentDetails";
 
 const { Search } = Input;
 const { Option } = Select;
-const { Title, Text, Paragraph } = Typography;
+const { Title, Text } = Typography;
 
 const RequirementsTable = ({
   entity,
@@ -40,10 +27,8 @@ const RequirementsTable = ({
     status: "all",
     area: "all",
   });
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-  const [selectedRequirement, setSelectedRequirement] = useState(null);
-  const [isMobile, setIsMobile] = useState(false);
   const [loadingStatus, setLoadingStatus] = useState({});
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkIfMobile = () => setIsMobile(window.innerWidth < 768);
@@ -68,17 +53,12 @@ const RequirementsTable = ({
     setLoadingStatus((prev) => ({ ...prev, [requirement.id]: true }));
     try {
       await onStatusChange?.(requirement);
-      // Update selectedRequirement if it's the one being changed
-      setSelectedRequirement((prev) =>
-        prev && prev.id === requirement.id
-          ? { ...prev, is_active: !prev.is_active }
-          : prev
-      );
     } finally {
       setLoadingStatus((prev) => ({ ...prev, [requirement.id]: false }));
     }
   };
 
+  // Columns for requirements
   const columns = [
     {
       title: "Código",
@@ -100,10 +80,6 @@ const RequirementsTable = ({
             tooltip: true,
           }}
           className="mb-0 whitespace-normal cursor-pointer"
-          onClick={() => {
-            setSelectedRequirement(record);
-            setIsDrawerVisible(true);
-          }}
         >
           {text}
         </Paragraph>
@@ -122,6 +98,13 @@ const RequirementsTable = ({
       key: "days_to_deliver",
       width: 90,
       render: (days) => `${days || 0} días`,
+    },
+    {
+      title: "Fecha de entrega",
+      dataIndex: "due_date",
+      key: "due_date",
+      width: 140,
+      render: (date) => (date ? new Date(date).toLocaleDateString() : "-"),
     },
     {
       title: "Archivo",
@@ -207,7 +190,6 @@ const RequirementsTable = ({
   // Filter requirements based on search and filters
   const filteredRequirements = React.useMemo(() => {
     if (!requirements?.length) return [];
-
     return requirements.filter((item) => {
       const matchesSearch =
         !filters.search ||
@@ -217,25 +199,45 @@ const RequirementsTable = ({
         item.requirement?.ref_code
           ?.toLowerCase()
           .includes(filters.search.toLowerCase());
-
       const matchesStatus =
         filters.status === "all" ||
         item.is_active === (filters.status === "active");
-
       const matchesArea =
         filters.area === "all" || item.area?.id === filters.area;
-
       return matchesSearch && matchesStatus && matchesArea;
     });
   }, [requirements, filters]);
 
-  // Calculate stats for requirements
+  // Stats
   const totalRequirements = requirements?.length || 0;
   const activeRequirements =
     requirements?.filter((req) => req.is_active)?.length || 0;
   const inactiveRequirements = totalRequirements - activeRequirements;
+  const stats = (
+    <div className={`flex ${isMobile ? "gap-2 mb-4 justify-center" : "gap-4"}`}>
+      <StatCard
+        title="Total"
+        value={totalRequirements}
+        icon={<FileTextOutlined />}
+        iconColor="#1890ff"
+      />
+      <StatCard
+        title="Activos"
+        value={activeRequirements}
+        icon={<CheckCircleOutlined />}
+        iconColor="#52c41a"
+      />
+      <StatCard
+        title="Inactivos"
+        value={inactiveRequirements}
+        icon={<StopOutlined />}
+        iconColor="#f5222d"
+      />
+    </div>
+  );
 
-  const renderFilters = () => (
+  // Filters
+  const renderFilters = (
     <div className="flex flex-col md:flex-row md:items-center md:gap-4 gap-2 mb-2">
       <div className="flex-1 flex flex-col md:flex-row md:items-center md:gap-4 gap-2 w-full">
         <Search
@@ -286,127 +288,120 @@ const RequirementsTable = ({
     </div>
   );
 
-  return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-      <div className="p-4 sm:p-6 border-b border-gray-100">
-        {/* Header: Entity info and stats */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-          <div className="flex items-center min-w-0">
-            <Button
-              type="primary"
-              icon={<ArrowLeftOutlined />}
-              onClick={onBack}
-              className="mr-4 flex-shrink-0"
-              ghost
-            >
-              Volver
-            </Button>
-            <Avatar
-              size={48}
-              icon={<BankOutlined />}
-              src={entity?.entity_logo || null}
-              className="mr-3 flex-shrink-0 bg-blue-600"
-            />
-            <div className="min-w-0">
-              <Title level={4} className="!m-0 !text-lg truncate">
-                {entity?.entity_name || ""}
-              </Title>
-              <Text type="secondary" className="text-sm truncate">
-                {entity?.description || ""}
-              </Text>
-            </div>
-            {!isMobile && (
-              <Divider
-                type="vertical"
-                className="h-12 ml-4"
-                style={{ borderLeft: "2px solid #f0f0f0", height: 48 }}
-              />
-            )}
-          </div>
+  // Details fields for drawer
+  const detailsFields = [
+    {
+      label: "Código",
+      value: (item) => item.requirement?.ref_code || "",
+    },
+    {
+      label: "Información",
+      value: (item) => item.requirement?.required_information || "",
+    },
+    {
+      label: "Área",
+      value: (item) => item.area?.area || "-",
+    },
+    {
+      label: "Responsable del Área",
+      value: (item) => item.area?.responsable || "-",
+    },
+    {
+      label: "Tiempo de entrega",
+      value: (item) => `${item.requirement?.days_to_deliver || 0} días`,
+    },
+    {
+      label: "Frecuencia por día",
+      value: (item) => `${item.requirement?.frequency_by_day || 0} veces`,
+    },
+    {
+      label: "Tipo de archivo",
+      render: (item) =>
+        item.requirement?.file_type?.length > 0 ? (
+          <Space size={[0, 4]} wrap>
+            {item.requirement.file_type.map((type, index) => (
+              <Tag key={index} color="blue">
+                {type.type}
+              </Tag>
+            ))}
+          </Space>
+        ) : (
+          "-"
+        ),
+    },
+    {
+      label: "Auditor asignado",
+      render: (item) =>
+        item.auditor &&
+        item.auditor.auditor &&
+        item.auditor.auditor.first_name ? (
           <div
-            className={`flex ${
-              isMobile ? "gap-2 mb-4 justify-center" : "gap-4"
-            }`}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "flex-start",
+              lineHeight: 1.2,
+            }}
           >
-            <StatCard
-              title="Total"
-              value={totalRequirements}
-              icon={<FileTextOutlined />}
-              iconColor="#1890ff"
-            />
-            <StatCard
-              title="Activos"
-              value={activeRequirements}
-              icon={<CheckCircleOutlined />}
-              iconColor="#52c41a"
-            />
-            <StatCard
-              title="Inactivos"
-              value={inactiveRequirements}
-              icon={<StopOutlined />}
-              iconColor="#f5222d"
-            />
+            <span style={{ fontWeight: 500 }}>
+              {item.auditor.auditor.first_name} {item.auditor.auditor.last_name}
+            </span>
+            <span style={{ color: "#888", fontSize: 13 }}>
+              {item.auditor.auditor.email}
+            </span>
           </div>
-        </div>
+        ) : (
+          <span>-</span>
+        ),
+    },
+  ];
 
-        {renderFilters()}
-      </div>
+  // Status config for details
+  const detailsStatus = {
+    value: (item) => item.is_active,
+    activeText: "Desactivar requerimiento",
+    inactiveText: "Activar requerimiento",
+  };
 
-      <div className="p-4 sm:p-8">
-        <Table
-          columns={columns}
-          dataSource={filteredRequirements}
-          rowKey="id"
-          pagination={{
-            pageSize: 10,
-            hideOnSinglePage: filteredRequirements.length <= 10,
-          }}
-          className="entity-requirements-table"
-          bordered={false}
-          scroll={{ x: false }}
-          size={isMobile ? "small" : "middle"}
-          onRow={(record) => ({
-            onClick: () => {
-              setSelectedRequirement(record);
-              setIsDrawerVisible(true);
-            },
-            style: { cursor: "pointer" },
-          })}
-          locale={{
-            emptyText: (
-              <div className="text-center py-8">
-                <InboxOutlined style={{ fontSize: 48, color: "#bfbfbf" }} />
-                <Paragraph
-                  style={{ fontSize: 16, color: "#bfbfbf" }}
-                  className="mt-4"
-                >
-                  No hay requerimientos disponibles.
-                </Paragraph>
-                <Button type="primary" onClick={onAddRequirements}>
-                  Asigne un nuevo
-                </Button>
-              </div>
-            ),
-          }}
-        />
-      </div>
+  // Status icons
+  const statusButtonIcons = {
+    active: <CheckCircleOutlined />,
+    inactive: <StopOutlined />,
+  };
 
-      <Drawer
-        title="Detalles del requerimiento"
-        placement="right"
-        onClose={() => setIsDrawerVisible(false)}
-        open={isDrawerVisible}
-        width={isMobile ? 320 : 450}
-      >
-        {isDrawerVisible && selectedRequirement && (
-          <RequirementDetails
-            requirement={selectedRequirement}
-            onStatusChange={handleStatusChange}
-            loading={loadingStatus[selectedRequirement.id]}
-          />
-        )}
-      </Drawer>
-    </div>
+  // Details component for drawer
+  const DetailsComponent = ({ item }) => (
+    <EntityAssignmentDetails
+      item={item}
+      fields={detailsFields.map((f) => ({
+        label: f.label,
+        value: typeof f.value === "function" ? f.value(item) : undefined,
+        render: f.render ? (i) => f.render(i) : undefined,
+      }))}
+      status={{
+        value: item.is_active,
+        activeText: "Desactivar requerimiento",
+        inactiveText: "Activar requerimiento",
+      }}
+      onStatusChange={handleStatusChange}
+      loading={loadingStatus[item.id]}
+      statusButtonIcons={statusButtonIcons}
+    />
+  );
+
+  return (
+    <EntityAssignmentTable
+      entity={entity}
+      data={filteredRequirements}
+      columns={columns}
+      filters={renderFilters}
+      stats={stats}
+      onBack={onBack}
+      onAdd={onAddRequirements}
+      detailsComponent={DetailsComponent}
+      detailsTitle="Detalles del requerimiento"
+      addButtonText="Editar Asignación"
+    />
   );
 };
 

@@ -14,24 +14,35 @@ export default function LoginPage() {
   const supabase = createClient();
   const router = useRouter();
   const [isResetPassword, setIsResetPassword] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
 
   //const viewportWidth = window.innerWidth;
   //console.log(viewportWidth);
 
   useEffect(() => {
+    const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+    updateOnlineStatus();
+    return () => {
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!isOnline) return;
     const fetchUser = async () => {
       const {
         data: { user },
         error,
       } = await supabase.auth.getUser();
-
       if (user) {
         router.push("/dashboard");
       }
     };
-
     fetchUser();
-  }, []);
+  }, [isOnline]);
 
   return (
     <div

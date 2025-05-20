@@ -7,7 +7,7 @@ import {
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const response = await getEntityFormatById(id);
 
     if (!response.success) {
@@ -29,7 +29,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const entityFormatData = await request.json();
     const response = await updateEntityFormat(id, entityFormatData);
 
@@ -52,7 +52,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     const response = await deleteEntityFormat(id);
 
     if (!response.success) {

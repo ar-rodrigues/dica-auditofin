@@ -35,10 +35,10 @@ export default function UsersPage() {
   const handleDelete = async (id) => {
     try {
       const result = await deleteUser(id);
-      if (result) {
+      if (result && result.success) {
         message.success("Usuario eliminado correctamente");
       } else {
-        message.error("Error al eliminar el usuario");
+        message.error(result?.error || "Error al eliminar el usuario");
       }
     } catch (error) {
       message.error("Error al eliminar el usuario");

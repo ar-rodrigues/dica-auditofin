@@ -16,12 +16,16 @@ export const useUserRole = () => {
             throw new Error("Failed to fetch user role");
           }
 
-          const data = await response.json();
-
-          setUserRole(data[0].role.role);
+          const result = await response.json();
+          if (result && result.success && result.data && result.data.role) {
+            setUserRole(result.data.role.role);
+          } else {
+            setUserRole(null);
+          }
         }
       } catch (error) {
         console.error("Error fetching user role:", error);
+        setUserRole(null);
       } finally {
         setLoading(false);
       }

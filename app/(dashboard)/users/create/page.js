@@ -22,11 +22,11 @@ export default function CreateUserPage() {
   const handleSubmit = async (values) => {
     try {
       const result = await createUser(values);
-      if (result) {
+      if (result && result.success) {
         message.success("Usuario creado correctamente");
         router.push("/users");
       } else {
-        message.error("Error al crear el usuario");
+        message.error(result?.error || "Error al crear el usuario");
       }
     } catch (error) {
       message.error("Error al crear el usuario");

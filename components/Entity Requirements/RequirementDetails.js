@@ -123,6 +123,17 @@ const RequirementDetails = ({ requirement, onStatusChange, loading }) => {
         </div>
       </div>
 
+      <div>
+        <Text type="secondary" className="text-xs">
+          Fecha de entrega
+        </Text>
+        <Paragraph className="mt-1">
+          {requirement.due_date
+            ? new Date(requirement.due_date).toLocaleDateString()
+            : "-"}
+        </Paragraph>
+      </div>
+
       <Divider className="my-3" />
 
       <Button

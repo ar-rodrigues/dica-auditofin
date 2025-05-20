@@ -2,139 +2,148 @@ import { useState, useEffect } from "react";
 
 export const useUsers = () => {
   const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  // Fetch all users
-  const fetchUsers = async () => {
+  // Obtener todos los usuarios (opcionalmente filtrados)
+  const fetchUsers = async (params = {}) => {
     setLoading(true);
+    setError(null);
     try {
-      const response = await fetch("/api/users");
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error fetching users");
+      const query = new URLSearchParams(params).toString();
+      const url = query ? `/api/users?${query}` : "/api/users";
+      const response = await fetch(url);
+      const result = await response.json();
+      if (result.success) {
+        setUsers(result.data || []);
+        return result.data || [];
+      } else {
+        setError(result.message || "Error al obtener los usuarios");
+        setUsers([]);
+        return [];
       }
-      const data = await response.json();
-      setUsers(data);
-      return data;
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      setError(error.message);
-      return null;
+    } catch (err) {
+      setError("Ocurrió un error al obtener los usuarios");
+      setUsers([]);
+      return [];
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch a single user by ID
+  // Obtener un usuario por ID
   const getUserById = async (id) => {
+    if (!id) return;
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`/api/users/${id}`);
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error fetching user");
+      const result = await response.json();
+      if (result.success) {
+        return result;
+      } else {
+        setError(result.message || "Error al obtener el usuario");
+        return result;
       }
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error(`Error fetching user ${id}:`, error);
-      setError(error.message);
-      return null;
+    } catch (err) {
+      setError("Ocurrió un error al obtener el usuario");
+      return {
+        success: false,
+        error: "Ocurrió un error al obtener el usuario",
+      };
     } finally {
       setLoading(false);
     }
   };
 
-  // Create a new user
-  const createUser = async (userData) => {
+  // Crear un nuevo usuario
+  const createUser = async (data) => {
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch("/api/users", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error creating user");
+      const result = await response.json();
+      if (result.success) {
+        await fetchUsers();
+        return { success: true, data: result.data };
+      } else {
+        setError(result.message || "Error al crear el usuario");
+        return { success: false, error: result.message };
       }
-
-      const data = await response.json();
-      // Refresh users list after creating a new user
-      await fetchUsers();
-      return data;
-    } catch (error) {
-      console.error("Error creating user:", error);
-      setError(error.message);
-      return null;
+    } catch (err) {
+      setError("Ocurrió un error al crear el usuario");
+      return {
+        success: false,
+        error: "Ocurrió un error al crear el usuario",
+      };
     } finally {
       setLoading(false);
     }
   };
 
-  // Update a user
-  const updateUser = async (id, userData) => {
+  // Actualizar un usuario
+  const updateUser = async (id, data) => {
+    if (!id) return { success: false, error: "ID requerido" };
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`/api/users/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(userData),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error updating user");
+      const result = await response.json();
+      if (result.success) {
+        await fetchUsers();
+        return { success: true, data: result.data };
+      } else {
+        setError(result.message || "Error al actualizar el usuario");
+        return { success: false, error: result.message };
       }
-
-      const data = await response.json();
-      // Update the local users state with the updated user
-      setUsers(
-        users.map((user) => (user.id === id ? { ...user, ...userData } : user))
-      );
-      return data;
-    } catch (error) {
-      console.error(`Error updating user ${id}:`, error);
-      setError(error.message);
-      return null;
+    } catch (err) {
+      setError("Ocurrió un error al actualizar el usuario");
+      return {
+        success: false,
+        error: "Ocurrió un error al actualizar el usuario",
+      };
     } finally {
       setLoading(false);
     }
   };
 
-  // Delete a user
+  // Eliminar un usuario
   const deleteUser = async (id) => {
+    if (!id) return { success: false, error: "ID requerido" };
     setLoading(true);
+    setError(null);
     try {
       const response = await fetch(`/api/users/${id}`, {
         method: "DELETE",
       });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Error deleting user");
+      const result = await response.json();
+      if (result.success) {
+        await fetchUsers();
+        return { success: true };
+      } else {
+        setError(result.message || "Error al eliminar el usuario");
+        return { success: false, error: result.message };
       }
-
-      const data = await response.json();
-      // Remove the deleted user from the local state
-      setUsers(users.filter((user) => user.id !== id));
-      return data;
-    } catch (error) {
-      console.error(`Error deleting user ${id}:`, error);
-      setError(error.message);
-      return null;
+    } catch (err) {
+      setError("Ocurrió un error al eliminar el usuario");
+      return {
+        success: false,
+        error: "Ocurrió un error al eliminar el usuario",
+      };
     } finally {
       setLoading(false);
     }
   };
 
-  // Load users on component mount
+  // Cargar los usuarios al montar el componente
   useEffect(() => {
     fetchUsers();
   }, []);

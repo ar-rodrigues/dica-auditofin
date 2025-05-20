@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 
 import LoadingOverlay from "@/components/LoadingOverlay";
 import DashboardClientLayout from "@/components/layouts/DashboardClientLayout";
+import OfflineBanner from "@/components/common/OfflineBanner";
 
 function isMobileDevice(userAgent) {
   return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
@@ -22,6 +23,7 @@ export default async function DashboardLayout({ children }) {
   return (
     <html lang="es-MX">
       <body className="h-screen">
+        <OfflineBanner />
         <AntdRegistry>
           <LoadingOverlay />
           <DashboardClientLayout isMobile={isMobile}>

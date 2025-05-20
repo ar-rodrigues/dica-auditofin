@@ -10,10 +10,8 @@ export async function getEntitiesFormats(filters = {}) {
         `*, 
         entity:entities(*), 
         format:formats(*), 
-        area:entities_areas(*), 
-        auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email)),
-        predecessor:profiles!predecessor(id, first_name, last_name, email),
-        successor:profiles!successor(id, first_name, last_name, email)`
+        area:entities_areas(*, predecessor:predecessor(id, first_name, last_name, email), successor:successor(id, first_name, last_name, email)), 
+        auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email))`
       )
       .match(filters);
 
@@ -34,7 +32,7 @@ export async function getEntityFormatById(id) {
     const { data, error } = await supabase
       .from("entities_formats")
       .select(
-        "*, entity:entities(*), format:formats(*), area:entities_areas(*), auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email)), predecessor: profiles(id, first_name, last_name, email), successor: profiles(id, first_name, last_name, email)"
+        "*, entity:entities(*), format:formats(*), area:entities_areas(*, predecessor:predecessor(id, first_name, last_name, email), successor:successor(id, first_name, last_name, email)), auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email))"
       )
       .eq("id", id);
 

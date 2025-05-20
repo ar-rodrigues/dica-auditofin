@@ -6,6 +6,7 @@ import { Layout } from "antd";
 
 import { Content, Footer } from "antd/es/layout/layout";
 import Navbar from "@/components/Navbar";
+import OfflineBanner from "@/components/common/OfflineBanner";
 
 const APP_NAME = "Dica México";
 const APP_DEFAULT_TITLE = "Dica México";
@@ -41,6 +42,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="es-MX">
       <body>
+        <OfflineBanner />
         <Provider>
           <AntdRegistry>
             <Layout style={{ maxWidth: "100%", margin: 0 }}>

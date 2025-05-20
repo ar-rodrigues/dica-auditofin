@@ -4,9 +4,15 @@ import { createClient } from "@/utils/supabase/server";
 export async function getEntitiesAreas(filters = {}) {
   const supabase = await createClient();
 
+  // Join profiles for predecessor and successor, aliasing to avoid ambiguity
   const { data, error } = await supabase
     .from("entities_areas")
-    .select("*")
+    .select(
+      `*,
+      predecessor:predecessor(id, first_name, last_name, email),
+      successor:successor(id, first_name, last_name, email)
+    `
+    )
     .match(filters);
 
   if (error) {
@@ -14,7 +20,7 @@ export async function getEntitiesAreas(filters = {}) {
     throw new Error(`Failed to fetch entities areas: ${error.message}`);
   }
 
-  return data || [];
+  return data;
 }
 
 export async function getEntityAreaById(id) {
@@ -26,7 +32,12 @@ export async function getEntityAreaById(id) {
 
   const { data, error } = await supabase
     .from("entities_areas")
-    .select("*")
+    .select(
+      `*,
+      predecessor:predecessor(id, first_name, last_name, email),
+      successor:successor(id, first_name, last_name, email)
+    `
+    )
     .eq("id", id)
     .single();
 

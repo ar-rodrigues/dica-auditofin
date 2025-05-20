@@ -11,3 +11,23 @@ export function createClient() {
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
   );
 }
+
+// Wrapper para manejar errores de red en llamadas a Supabase desde el cliente
+export async function withSupabaseClientErrorHandling(callback) {
+  try {
+    return await callback();
+  } catch (error) {
+    if (error.message && error.message.includes("Failed to fetch")) {
+      return {
+        data: null,
+        error: {
+          message: "Sin conexión a internet. Por favor, verifica tu conexión.",
+        },
+      };
+    }
+    return {
+      data: null,
+      error: { message: error.message || "Error desconocido." },
+    };
+  }
+}
