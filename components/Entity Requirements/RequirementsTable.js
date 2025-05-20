@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Tag, Button, Input, Select, Space, Typography, Paragraph } from "antd";
+import { Tag, Button, Input, Select, Space, Typography } from "antd";
 import {
   FileTextOutlined,
   CheckCircleOutlined,
@@ -13,7 +13,7 @@ import EntityAssignmentDetails from "../common/EntityAssignmentDetails";
 
 const { Search } = Input;
 const { Option } = Select;
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 
 const RequirementsTable = ({
   entity,
