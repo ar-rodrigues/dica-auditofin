@@ -2,9 +2,7 @@ import { resetPassword } from "./resetPassword";
 import { NextResponse } from "next/server";
 export async function POST(request) {
   try {
-    const url = new URL(request.url);
-    const baseUrl = `${url.protocol}//${url.host}`;
-    const { email } = await request.json();
+    const { email, baseUrl } = await request.json();
 
     const { success, error } = await resetPassword(email, baseUrl);
 
