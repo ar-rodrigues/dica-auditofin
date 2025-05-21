@@ -56,6 +56,28 @@ export const useUsers = () => {
     }
   };
 
+  // Obtener los datos del usuario
+  const getUserData = async (id) => {
+    if (!id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`/api/users/getUserData`);
+      const result = await response.json();
+      if (result.success) {
+        return result;
+      }
+    } catch (err) {
+      setError("Ocurrió un error al obtener los datos del usuario");
+      return {
+        success: false,
+        error: "Ocurrió un error al obtener los datos del usuario",
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Crear un nuevo usuario
   const createUser = async (data) => {
     setLoading(true);
@@ -153,6 +175,7 @@ export const useUsers = () => {
     loading,
     error,
     fetchUsers,
+    getUserData,
     getUserById,
     createUser,
     updateUser,

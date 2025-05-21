@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import AuditHeader from "@/components/AuditHeader";
+import AuditHeader from "@/components/common/AuditHeader";
 //remove the EntityCards component
 import EntityCards from "@/components/common/EntityCards";
 import { useAtom } from "jotai";

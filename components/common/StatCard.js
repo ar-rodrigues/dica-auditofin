@@ -24,19 +24,23 @@ const StatCard = ({
     <Card
       hoverable={!!onClick}
       onClick={onClick}
-      className={`${className} overflow-hidden`}
+      className={`${className} overflow-hidden w-full`}
       variant="outlined"
       style={{
         boxShadow: `0 2px 8px ${iconColor}10`,
         transition: "all 0.3s ease",
-        padding: isMobile ? "2px" : "2px",
+        padding: isMobile ? "8px 4px" : "10px 12px",
         borderRadius: "8px",
         background: `linear-gradient(135deg, white 30%, ${iconColor}10)`,
         border: `1px solid ${iconColor}20`,
         position: "relative",
         overflow: "hidden",
-        minWidth: isMobile ? "5rem" : "10rem",
-        maxWidth: isMobile ? "5rem" : "10rem",
+        height: isMobile ? "auto" : "100%",
+        padding: isMobile ? "4px" : "8px",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "center",
       }}
     >
       {/* Efecto decorativo de fondo */}
@@ -44,10 +48,10 @@ const StatCard = ({
         className="absolute top-0 right-0 rounded-full opacity-10"
         style={{
           background: iconColor,
-          width: "28px",
-          height: "28px",
+          width: isMobile ? "16px" : "28px",
+          height: isMobile ? "16px" : "28px",
           transform: "translate(50%, -50%)",
-          filter: "blur(10px)",
+          filter: "blur(8px)",
         }}
       ></div>
 
@@ -55,48 +59,34 @@ const StatCard = ({
         <div className="flex flex-col items-center justify-center text-center w-full">
           <Title
             level={5}
-            className="!m-0 !text-base !font-bold"
-            style={{ color: iconColor, fontSize: 18, lineHeight: 1.1 }}
+            className="!m-0 !font-bold"
+            style={{ color: iconColor, fontSize: 24, lineHeight: 1.2 }}
           >
             {value}
           </Title>
           <Text
-            className="text-[11px] font-medium block truncate"
-            style={{ color: `${iconColor}99`, marginTop: 2 }}
+            className="font-medium block"
+            style={{ color: iconColor, marginTop: 2, fontSize: 14 }}
           >
             {title}
           </Text>
         </div>
       ) : (
-        <div className="flex items-center gap-2">
-          <div
-            className="flex items-center justify-center rounded-full min-w-8 h-8"
-            style={{
-              backgroundColor: `${iconColor}15`,
-              boxShadow: `0 0 0 2px ${iconColor}10`,
-            }}
-          >
-            {React.cloneElement(icon, {
-              style: {
-                fontSize: "18px",
-                color: iconColor,
-              },
-            })}
-          </div>
-          <div className="flex-grow min-w-0">
-            <Text
-              className="text-[12px] font-medium block truncate"
-              style={{ color: `${iconColor}99` }}
-            >
-              {title}
-            </Text>
+        <div className="flex items-center justify-center gap-2 h-full">
+          <div className="flex flex-col items-center justify-center text-center w-full">
             <Title
               level={5}
-              className="!m-0 !text-base !font-bold truncate"
-              style={{ color: iconColor }}
+              className="!m-0 !font-bold"
+              style={{ color: iconColor, fontSize: 22, lineHeight: 1.2 }}
             >
               {value}
             </Title>
+            <Text
+              className="font-medium block text-center"
+              style={{ color: iconColor, marginTop: 2, fontSize: 14 }}
+            >
+              {title}
+            </Text>
           </div>
         </div>
       )}

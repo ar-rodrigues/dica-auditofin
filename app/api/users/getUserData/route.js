@@ -2,10 +2,17 @@ import { getUserData } from "./getUserData";
 import { NextResponse } from "next/server";
 
 export async function GET(request) {
-  const userData = await getUserData();
   try {
-    return NextResponse.json(userData);
+    const userData = await getUserData();
+    return NextResponse.json(userData, { status: 200 });
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Error al obtener datos del usuario:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message || "Error al obtener datos del usuario",
+      },
+      { status: 500 }
+    );
   }
 }

@@ -10,8 +10,11 @@ export async function getUserData() {
     } = await supabase.auth.getUser();
 
     if (error || !user) {
-      console.error("Error getting user:", error);
-      return null;
+      return {
+        data: null,
+        success: false,
+        message: "Error al obtener el usuario autenticado",
+      };
     }
 
     const { data: userData, error: userError } = await supabase
@@ -20,8 +23,7 @@ export async function getUserData() {
         `
         *,
         entity:entities (
-          id,
-          entity_name
+          *
         ),
         role:roles (
           id,
@@ -33,13 +35,24 @@ export async function getUserData() {
       .single();
 
     if (userError) {
-      console.error("Error fetching user profile:", userError);
-      return null;
+      return {
+        data: null,
+        success: false,
+        message: "Error al obtener el perfil del usuario",
+      };
     }
 
-    return userData;
+    return {
+      data: userData,
+      success: true,
+      message: "Datos del usuario obtenidos exitosamente",
+    };
   } catch (error) {
-    console.error("Error in getUserData:", error);
-    return null;
+    console.error("Error en getUserData:", error);
+    return {
+      data: null,
+      success: false,
+      message: "Error al obtener los datos del usuario",
+    };
   }
 }

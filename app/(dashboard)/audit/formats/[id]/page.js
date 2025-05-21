@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button, Typography, Space, Card, Skeleton } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import AuditHeader from "@/components/AuditHeader";
+import AuditHeader from "@/components/common/AuditHeader";
 import RequirementDetails from "@/components/common/RequirementDetails";
 import { useAtom } from "jotai";
 import { mockRequirementsAtom } from "@/utils/atoms";

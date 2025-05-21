@@ -8,83 +8,77 @@ import {
 import StatCard from "./StatCard";
 
 const AuditStats = ({ stats, customIcons }) => {
-  // Default icons and colors if not provided
-  const defaultIcons = {
-    total: {
-      icon: <FileTextOutlined />,
-      color: "#1890ff", // Blue
-      title: "Total de Requerimientos",
-    },
-    pending: {
-      icon: <ClockCircleOutlined />,
-      color: "#faad14", // Yellow/Amber
-      title: "Pendientes",
-    },
-    approved: {
-      icon: <CheckCircleOutlined />,
-      color: "#52c41a", // Green
-      title: "Aprobados",
-    },
-    missing: {
-      icon: <ExclamationCircleOutlined />,
-      color: "#f5222d", // Red
-      title: "Faltantes/Vencidos",
-    },
-    // Añadir soporte para los nombres en español
-    pendiente: {
-      icon: <ClockCircleOutlined />,
-      color: "#faad14", // Yellow/Amber
-      title: "Pendientes",
-    },
-    aprobado: {
-      icon: <CheckCircleOutlined />,
-      color: "#52c41a", // Green
-      title: "Aprobados",
-    },
-    faltante: {
-      icon: <ExclamationCircleOutlined />,
-      color: "#f5222d", // Red
-      title: "Faltantes/Vencidos",
-    },
-  };
+  // Merge custom icons with fallback defaults
+  const icons = { ...customIcons };
 
-  // Merge default icons with custom icons if provided
-  const icons = { ...defaultIcons, ...customIcons };
-
-  // Normalizar las estadísticas (aceptar tanto en inglés como en español)
-  const normalizedStats = {
-    total: stats.total || 0,
-    pending: stats.pending || stats.pendiente || 0,
-    approved: stats.approved || stats.aprobado || 0,
-    missing: stats.missing || stats.faltante || 0,
-  };
+  // Get all stat keys in the order they appear in the stats prop
+  const statKeys = Object.keys(stats);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <StatCard
-        title={icons.total.title}
-        value={normalizedStats.total}
-        icon={icons.total.icon}
-        iconColor={icons.total.color}
-      />
-      <StatCard
-        title={icons.pending.title}
-        value={normalizedStats.pending}
-        icon={icons.pending.icon}
-        iconColor={icons.pending.color}
-      />
-      <StatCard
-        title={icons.approved.title}
-        value={normalizedStats.approved}
-        icon={icons.approved.icon}
-        iconColor={icons.approved.color}
-      />
-      <StatCard
-        title={icons.missing.title}
-        value={normalizedStats.missing}
-        icon={icons.missing.icon}
-        iconColor={icons.missing.color}
-      />
+    <div className="audit-stats-grid mb-8">
+      {statKeys.map((key, idx) => (
+        <div
+          key={key}
+          className={idx === 0 ? "audit-stats-total" : "audit-stats-regular"}
+        >
+          <StatCard
+            title={icons[key]?.title || key}
+            value={stats[key]}
+            icon={icons[key]?.icon}
+            iconColor={icons[key]?.color || "#1890ff"}
+          />
+        </div>
+      ))}
+      <style jsx global>{`
+        @media (max-width: 767px) {
+          .audit-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: auto auto auto;
+            gap: 16px;
+            padding: 0 0 16px 0;
+          }
+          .audit-stats-total {
+            grid-column: 1 / span 2;
+            grid-row: 1;
+            margin-bottom: 4px;
+          }
+          .audit-stats-regular:nth-child(2) {
+            grid-column: 1;
+            grid-row: 2;
+          }
+          .audit-stats-regular:nth-child(3) {
+            grid-column: 2;
+            grid-row: 2;
+          }
+          .audit-stats-regular:nth-child(4) {
+            grid-column: 1;
+            grid-row: 3;
+          }
+          .audit-stats-regular:nth-child(5) {
+            grid-column: 2;
+            grid-row: 3;
+          }
+        }
+        @media (min-width: 768px) {
+          .audit-stats-grid {
+            display: grid;
+            grid-template-columns: repeat(${statKeys.length}, 1fr);
+            gap: 12px;
+            max-width: 900px;
+            margin: 0 auto;
+          }
+          .audit-stats-total,
+          .audit-stats-regular {
+            grid-column: unset;
+            grid-row: unset;
+            min-width: 0;
+            max-width: 160px;
+            width: 100%;
+            margin: 0 auto;
+          }
+        }
+      `}</style>
     </div>
   );
 };

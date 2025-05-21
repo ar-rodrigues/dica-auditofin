@@ -2,7 +2,7 @@
 
 import React from "react";
 import { useRouter } from "next/navigation";
-import AuditHeader from "@/components/AuditHeader";
+import AuditHeader from "@/components/common/AuditHeader";
 import RequirementDetails from "@/components/common/RequirementDetails";
 import { useAtom } from "jotai";
 import { mockRequirementsAtom, entitiesAtom } from "@/utils/atoms";

@@ -11,7 +11,7 @@ import {
 import { useAtom, useAtomValue } from "jotai";
 import { loadingAtom, colorsAtoms, findingsAtom } from "@/utils/atoms";
 import FindingsTable from "@/components/FindingsTable";
-import AuditHeader from "@/components/AuditHeader";
+import AuditHeader from "@/components/common/AuditHeader";
 
 const { Option } = Select;
 const { Title } = Typography;

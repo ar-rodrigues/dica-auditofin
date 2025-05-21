@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
-import AuditHeader from "@/components/AuditHeader";
+import AuditHeader from "@/components/common/AuditHeader";
 import AuditStats from "@/components/common/AuditStats";
 import AuditRequirementsTable from "@/components/common/AuditRequirementsTable";
 import SearchAndFilters from "@/components/common/SearchAndFilters";
