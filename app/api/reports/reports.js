@@ -31,7 +31,8 @@ export async function getReportsById(id) {
 
 export async function getReports() {
   const supabase = await createClient();
-  const userData = await getUserData();
+  const user = await getUserData();
+  const userData = user?.data;
 
   // Log user data for debugging
   //console.log("User data in getReports:", userData);
