@@ -288,25 +288,35 @@ export default function EntityFormatsDetailPage() {
   const activeFormats = formats?.filter((f) => f.is_active)?.length || 0;
   const inactiveFormats = totalFormats - activeFormats;
   const stats = (
-    <div className={`flex ${isMobile ? "gap-2 mb-4 justify-center" : "gap-4"}`}>
-      <StatCard
-        title="Total"
-        value={totalFormats}
-        icon={<FileTextOutlined />}
-        iconColor="#1890ff"
-      />
-      <StatCard
-        title="Activos"
-        value={activeFormats}
-        icon={<CheckCircleOutlined />}
-        iconColor="#52c41a"
-      />
-      <StatCard
-        title="Inactivos"
-        value={inactiveFormats}
-        icon={<StopOutlined />}
-        iconColor="#f5222d"
-      />
+    <div
+      className={`flex ${
+        isMobile ? "gap-2 mb-4 justify-center" : "gap-4"
+      } w-full`}
+    >
+      <div className={`flex-1 ${isMobile ? "max-w-[32%]" : "max-w-[33%]"}`}>
+        <StatCard
+          title="Total"
+          value={totalFormats}
+          icon={<FileTextOutlined />}
+          iconColor="#1890ff"
+        />
+      </div>
+      <div className={`flex-1 ${isMobile ? "max-w-[32%]" : "max-w-[33%]"}`}>
+        <StatCard
+          title="Activos"
+          value={activeFormats}
+          icon={<CheckCircleOutlined />}
+          iconColor="#52c41a"
+        />
+      </div>
+      <div className={`flex-1 ${isMobile ? "max-w-[32%]" : "max-w-[33%]"}`}>
+        <StatCard
+          title="Inactivos"
+          value={inactiveFormats}
+          icon={<StopOutlined />}
+          iconColor="#f5222d"
+        />
+      </div>
     </div>
   );
 

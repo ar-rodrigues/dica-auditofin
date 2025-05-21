@@ -24,7 +24,7 @@ const StatCard = ({
     <Card
       hoverable={!!onClick}
       onClick={onClick}
-      className={`${className} overflow-hidden w-full`}
+      className={`${className} overflow-hidden`}
       variant="outlined"
       style={{
         boxShadow: `0 2px 8px ${iconColor}10`,
@@ -35,9 +35,9 @@ const StatCard = ({
         border: `1px solid ${iconColor}20`,
         position: "relative",
         overflow: "hidden",
-        height: isMobile ? "auto" : "100%",
-        padding: isMobile ? "4px" : "8px",
         height: "100%",
+        minWidth: isMobile ? "90px" : "120px",
+        width: "100%",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
