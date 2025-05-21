@@ -49,7 +49,6 @@ export default function UserForm({
   const handleResetPassword = async () => {
     try {
       setResetPasswordLoading(true);
-      const baseUrl = window.location.origin;
       const response = await fetch("/api/reset-password", {
         method: "POST",
         headers: {
@@ -57,7 +56,6 @@ export default function UserForm({
         },
         body: JSON.stringify({
           email: form.getFieldValue("email"),
-          baseUrl,
         }),
       });
 
