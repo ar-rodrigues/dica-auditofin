@@ -195,6 +195,39 @@ export const useFormatValues = () => {
     }
   };
 
+  // Bulk delete values
+  const bulkDeleteFormatValues = async (idArray) => {
+    if (!idArray || !Array.isArray(idArray) || idArray.length === 0) {
+      return { success: false, error: "Se requiere un array de IDs válido" };
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/format-values?bulkdelete=1", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: idArray }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        await fetchFormatValues();
+        return { success: true, data: result.data };
+      } else {
+        setError(result.message || "Error al eliminar valores masivamente");
+        return { success: false, error: result.message };
+      }
+    } catch (err) {
+      setError("Ocurrió un error al eliminar valores masivamente");
+      return {
+        success: false,
+        error: "Ocurrió un error al eliminar valores masivamente",
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     values,
     value,
@@ -207,5 +240,6 @@ export const useFormatValues = () => {
     deleteFormatValue,
     bulkInsertFormatValues,
     bulkUpdateFormatValues,
+    bulkDeleteFormatValues,
   };
 };

@@ -145,16 +145,7 @@ export default function AuditorFormatDetailPage() {
           setFormatHeaders(data.format?.headers || []);
           setFormatEntries(data?.format_entries?.[0] || null);
 
-          // Asegurar que todos los valores tengan la propiedad is_valid inicializada
-          const processedValues = (data.values || []).map((value) => {
-            // Si is_valid no está definido, inicializarlo como false
-            return {
-              ...value,
-              is_valid: value.is_valid === undefined ? false : value.is_valid,
-            };
-          });
-
-          setFormatValues(processedValues);
+          setFormatValues(data.values || []);
           setFormatStatus(data.status || "");
           setDueDate(data.due_date || null);
         } else {
@@ -280,7 +271,7 @@ export default function AuditorFormatDetailPage() {
       // Actualizar el estado del formato a "faltante"
       const result = await updateEntityFormat(id, {
         status: "faltante",
-        reject_reason: rejectReason,
+        auditor_comments: rejectReason,
       });
 
       if (result.success) {
@@ -540,6 +531,7 @@ export default function AuditorFormatDetailPage() {
               Descargar Excel
             </Button>
           </div>
+
           <Table
             columns={getTableColumns()}
             dataSource={formattedData}

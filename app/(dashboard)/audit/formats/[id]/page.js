@@ -19,6 +19,7 @@ import {
   Row,
   Col,
   Tooltip,
+  Input,
 } from "antd";
 import {
   ArrowLeftOutlined,
@@ -33,6 +34,7 @@ import {
   CalendarOutlined,
   FileOutlined,
   BankOutlined,
+  ExclamationCircleOutlined,
 } from "@ant-design/icons";
 import AuditHeader from "@/components/common/AuditHeader";
 import { useEntitiesFormats } from "@/hooks/useEntitiesFormats";
@@ -104,6 +106,7 @@ export default function FormatFillPage() {
   const [savingData, setSavingData] = useState(false);
   const [submitModalVisible, setSubmitModalVisible] = useState(false);
   const [validationErrors, setValidationErrors] = useState([]);
+  const [auditeeComments, setAuditeeComments] = useState("");
 
   // Estados para almacenar los datos de la respuesta de la API
   const [entityInfo, setEntityInfo] = useState(null);
@@ -132,7 +135,11 @@ export default function FormatFillPage() {
   const { createFormatEntry } = useFormatEntries();
 
   // Hook para manejar los valores de formato
-  const { bulkInsertFormatValues, bulkUpdateFormatValues } = useFormatValues();
+  const {
+    bulkInsertFormatValues,
+    bulkUpdateFormatValues,
+    bulkDeleteFormatValues,
+  } = useFormatValues();
 
   useEffect(() => {
     const loadFormData = async () => {
@@ -175,6 +182,47 @@ export default function FormatFillPage() {
   // Usar el hook para obtener las columnas y datos de la tabla
   const { columns: tableColumnsFromHook, dataSource: formattedDataFromHook } =
     useFormatTable(formatValues, formatHeaders);
+
+  // Función para añadir estilos de validación a las columnas de la tabla
+  const getStyledColumns = (baseColumns) => {
+    return baseColumns.map((column) => {
+      return {
+        ...column,
+        render: (text, record) => {
+          // Encontrar el valor correspondiente a esta celda
+          const rowNumber = record.key + 2; // Ajuste basado en la estructura de los datos
+          const columnName = column.title;
+
+          // Buscar el valor por cell_ref y header
+          const cellValue = formatValues.find((value) => {
+            if (!value.cell_ref || !value.header_id) return false;
+            const cellRowNumber = parseInt(
+              value.cell_ref.match(/\d+/)?.[0] || "0"
+            );
+            return (
+              cellRowNumber === rowNumber &&
+              value.header_id.header === columnName
+            );
+          });
+
+          // Si no hay valor, mostrar el texto normal
+          if (!cellValue) return text;
+
+          // Estilo basado en la validez (solo si ha sido marcado como inválido)
+          const style =
+            cellValue.is_valid === false
+              ? {
+                  backgroundColor: "#ffccc7", // Rojo claro para inválidos
+                  padding: "4px 8px",
+                  borderRadius: "4px",
+                }
+              : {};
+
+          return <div style={style}>{text}</div>;
+        },
+      };
+    });
+  };
 
   // Preparar columnas para la tabla cuando cambian los headers o los datos cargados
   // Generar columnas para la vista previa del archivo cargado
@@ -583,7 +631,7 @@ export default function FormatFillPage() {
 
       // Normalizar los encabezados de Excel que tenemos en los datos
       const excelHeaders = Object.keys(tableData[0]).filter(
-        (key) => !key.endsWith("_cell_ref")
+        (key) => !key.endsWith("_cell_ref") && key !== "__hasError"
       );
       console.log(
         `Encabezados detectados en archivo: ${excelHeaders.join(", ")}`
@@ -619,32 +667,41 @@ export default function FormatFillPage() {
         );
       }
 
-      // Preparar valores para inserción o actualización
-      const valuesForInsert = [];
+      // Crear un mapa de todos los valores existentes por cell_ref
+      // Este mapa se usará para seguimiento y posteriormente para eliminar valores
       const existingValuesMap = new Map();
 
-      // Si hay valores existentes, crear un mapa para facilitar la actualización
+      // Preparar conjuntos para seguimiento
+      const cellRefsInNewUpload = new Set(); // Para seguimiento de cell_refs que se mantienen
+
+      // Poblar el mapa con valores existentes
       if (formatValues && formatValues.length > 0) {
         formatValues.forEach((value) => {
-          // Si existe cell_ref, usarlo como clave para mapear
           if (value.cell_ref) {
             existingValuesMap.set(value.cell_ref, value);
-          } else {
-            // De lo contrario, usar el header_id como antes
-            const key = `${value.header_id.id}`;
-            existingValuesMap.set(key, value);
           }
         });
       }
 
+      console.log(
+        `Mapa de valores existentes creado con ${existingValuesMap.size} entradas`
+      );
+
       // Preparar los valores para insertar o actualizar
+      const valuesForInsert = [];
+      const valuesToUpdate = [];
+
+      // Procesar todos los valores de la nueva carga
       tableData.forEach((row, rowIndex) => {
         excelHeaders.forEach((header) => {
           const headerId = headerMap.get(header);
           if (headerId && row[header] !== undefined) {
             const cellRef = row[`${header}_cell_ref`];
-            const valueKey = cellRef || `${headerId}`;
-            const existingValue = existingValuesMap.get(valueKey);
+
+            // Marcar este cell_ref como presente en la nueva carga
+            if (cellRef) {
+              cellRefsInNewUpload.add(cellRef);
+            }
 
             // Asegurarse de que el valor se guarde con el formato adecuado
             let valueToSave = row[header];
@@ -654,15 +711,21 @@ export default function FormatFillPage() {
               valueToSave = valueToSave.toLocaleDateString("es-ES");
             }
 
+            // Verificar si este cell_ref ya existe en la base de datos
+            const existingValue = cellRef
+              ? existingValuesMap.get(cellRef)
+              : null;
+
             if (existingValue) {
               // Actualizar valor existente
-              valuesForInsert.push({
+              valuesToUpdate.push({
                 id: existingValue.id,
                 entry_id: entryId,
                 header_id: headerId,
                 value: String(valueToSave),
                 cell_ref: cellRef,
                 entities_formats_id: entityFormatId,
+                is_valid: null, // Resetear el estado de validación
               });
             } else {
               // Crear nuevo valor
@@ -672,28 +735,37 @@ export default function FormatFillPage() {
                 value: String(valueToSave),
                 cell_ref: cellRef,
                 entities_formats_id: entityFormatId,
+                is_valid: null, // Indicar que no ha sido validado
               });
             }
           }
         });
       });
 
-      console.log(`Preparados ${valuesForInsert.length} valores para guardar`);
+      // Identificar valores a eliminar (los que existían pero ya no están en la nueva carga)
+      const valuesToDelete = [];
+      existingValuesMap.forEach((value, cellRef) => {
+        if (!cellRefsInNewUpload.has(cellRef)) {
+          valuesToDelete.push(value.id);
+        }
+      });
 
-      // Separar valores a insertar y a actualizar
-      const valuesToInsert = valuesForInsert.filter((v) => !v.id);
-      const valuesToUpdate = valuesForInsert.filter((v) => v.id);
+      console.log(`Preparados ${valuesForInsert.length} valores para insertar`);
+      console.log(
+        `Preparados ${valuesToUpdate.length} valores para actualizar`
+      );
+      console.log(`Preparados ${valuesToDelete.length} valores para eliminar`);
 
       // Insertar nuevos valores si los hay
-      if (valuesToInsert.length > 0) {
-        const insertResult = await bulkInsertFormatValues(valuesToInsert);
+      if (valuesForInsert.length > 0) {
+        const insertResult = await bulkInsertFormatValues(valuesForInsert);
         if (!insertResult.success) {
           throw new Error(
             "Error al insertar nuevos valores: " + insertResult.error
           );
         }
         console.log(
-          `${valuesToInsert.length} nuevos valores insertados correctamente`
+          `${valuesForInsert.length} nuevos valores insertados correctamente`
         );
       }
 
@@ -708,6 +780,28 @@ export default function FormatFillPage() {
         console.log(
           `${valuesToUpdate.length} valores actualizados correctamente`
         );
+      }
+
+      // Eliminar valores que ya no están presentes
+      if (valuesToDelete.length > 0) {
+        try {
+          // Usar el mismo hook o crear una nueva función para eliminar valores en lote
+          const deleteResult = await bulkDeleteFormatValues(valuesToDelete);
+          if (!deleteResult.success) {
+            console.warn(
+              `Advertencia: No se pudieron eliminar algunos valores obsoletos: ${deleteResult.error}`
+            );
+          } else {
+            console.log(
+              `${valuesToDelete.length} valores eliminados correctamente`
+            );
+          }
+        } catch (error) {
+          // No interrumpir el proceso si la eliminación falla
+          console.warn(
+            `Advertencia: Error al eliminar valores obsoletos: ${error.message}`
+          );
+        }
       }
 
       message.success("Datos guardados correctamente");
@@ -752,20 +846,66 @@ export default function FormatFillPage() {
         return;
       }
 
-      // Actualizar el estado del formato a "pendiente"
-      const updateResult = await updateEntityFormat(id, {
+      // Para formatos con estado "faltante", verificar que haya comentarios del auditado
+      if (
+        formatStatus === "faltante" &&
+        (!auditeeComments || auditeeComments.trim() === "")
+      ) {
+        message.warning(
+          "Por favor, describa las correcciones realizadas antes de reenviar."
+        );
+        return;
+      }
+
+      // Preparar datos para actualizar
+      const updateData = {
         status: "pendiente",
-      });
+        auditee_comments: auditeeComments,
+      };
+
+      // Si el formato estaba marcado como faltante, limpiamos los comentarios del auditor
+      if (formatStatus === "faltante") {
+        updateData.auditor_comments = null;
+      }
+
+      // Actualizar el estado del formato en entities_formats
+      const updateResult = await updateEntityFormat(id, updateData);
 
       if (!updateResult.success) {
         throw new Error("Error al actualizar el estado del formato");
       }
 
+      // Para formatos con estado "faltante", actualizar la entrada del formato
+      // incrementando la versión
+      if (formatStatus === "faltante" && formatEntries) {
+        // Actualizar formato_entries - incrementar versión y actualizar metadatos
+        const updateEntryResult = await createFormatEntry({
+          id: formatEntries.id, // ID existente para actualizar, no crear nuevo
+          entities_formats_id: id,
+          version: formatEntries.version + 1, // Incrementar versión
+          modified_by: user?.id,
+          modified_at: dayjs().tz("America/Mexico_City").toISOString(),
+        });
+
+        if (!updateEntryResult.success) {
+          console.warn(
+            "Advertencia: No se pudo actualizar la versión del formato"
+          );
+        }
+      }
+
       // Actualizar estado local
       setFormatStatus("pendiente");
 
-      message.success("Formato enviado correctamente para revisión");
+      // Mostrar mensaje según el contexto
+      const successMessage =
+        formatStatus === "faltante"
+          ? "Formato reenviado correctamente para revisión"
+          : "Formato enviado correctamente para revisión";
+
+      message.success(successMessage);
       setSubmitModalVisible(false);
+      setAuditeeComments("");
 
       // Redireccionar a la página de formatos
       router.push("/audit/formats");
@@ -948,6 +1088,67 @@ export default function FormatFillPage() {
                     className="mb-4"
                   />
                 )}
+
+                {/* Mostrar comentarios del auditor cuando el formato está marcado como faltante */}
+                {formatStatus === "faltante" &&
+                  entityFormat?.auditor_comments && (
+                    <Card
+                      className="mb-6 border-red-500 border-2"
+                      title={
+                        <div className="flex items-center">
+                          <ExclamationCircleOutlined
+                            style={{
+                              color: "#f5222d",
+                              fontSize: "20px",
+                              marginRight: "8px",
+                            }}
+                          />
+                          <span className="text-red-500 font-bold">
+                            Comentarios del Auditor - Acción Requerida
+                          </span>
+                        </div>
+                      }
+                    >
+                      <div className="bg-red-50 p-4 rounded-md">
+                        <Paragraph
+                          style={{ fontSize: "16px", marginBottom: "12px" }}
+                        >
+                          <strong>
+                            El auditor ha rechazado este formato con los
+                            siguientes comentarios:
+                          </strong>
+                        </Paragraph>
+                        <div className="pl-4 border-l-4 border-red-500">
+                          <Paragraph
+                            style={{
+                              fontSize: "16px",
+                              fontStyle: "italic",
+                              color: "#cf1322",
+                              whiteSpace: "pre-line",
+                            }}
+                          >
+                            {entityFormat.auditor_comments}
+                          </Paragraph>
+                        </div>
+                        <Divider />
+                        <Paragraph type="secondary">
+                          <InfoCircleOutlined className="mr-2" />
+                          Corrija los problemas señalados y vuelva a enviar el
+                          formato. Las celdas con problemas están marcadas en{" "}
+                          <span
+                            style={{
+                              backgroundColor: "#ffccc7",
+                              padding: "2px 6px",
+                              borderRadius: "4px",
+                            }}
+                          >
+                            rojo
+                          </span>{" "}
+                          en la tabla de datos.
+                        </Paragraph>
+                      </div>
+                    </Card>
+                  )}
 
                 {validationErrors.length > 0 && (
                   <Alert
@@ -1316,9 +1517,38 @@ export default function FormatFillPage() {
                     </Tag>
                   }
                 >
+                  {formatStatus === "faltante" &&
+                    !entityFormat?.auditor_comments && (
+                      <Alert
+                        message="Correcciones requeridas"
+                        description={
+                          <div>
+                            <p>
+                              El auditor ha marcado este formato como{" "}
+                              <strong>faltante</strong>. Por favor revise los
+                              datos y corrija las celdas marcadas en{" "}
+                              <span
+                                style={{
+                                  backgroundColor: "#ffccc7",
+                                  padding: "2px 6px",
+                                  borderRadius: "4px",
+                                }}
+                              >
+                                rojo
+                              </span>
+                              .
+                            </p>
+                          </div>
+                        }
+                        type="error"
+                        showIcon
+                        className="mb-4"
+                      />
+                    )}
+
                   {formattedDataFromHook && formattedDataFromHook.length > 0 ? (
                     <Table
-                      columns={tableColumnsFromHook}
+                      columns={getStyledColumns(tableColumnsFromHook)}
                       dataSource={formattedDataFromHook}
                       scroll={{ x: "max-content", y: 400 }}
                       pagination={{ pageSize: 10 }}
@@ -1335,16 +1565,20 @@ export default function FormatFillPage() {
 
                 {/* Botón de enviar para revisión destacado */}
                 {formatEntries &&
-                  formatStatus === "asignado" &&
+                  (formatStatus === "asignado" ||
+                    formatStatus === "faltante") &&
                   !isEditingDisabled && (
                     <Card className="mt-8 mb-4 bg-gray-50 border-dashed">
                       <div className="text-center">
                         <Title level={5} className="mb-4">
-                          ¿Has completado todos los datos?
+                          {formatStatus === "faltante"
+                            ? "¿Has realizado todas las correcciones?"
+                            : "¿Has completado todos los datos?"}
                         </Title>
                         <Paragraph>
-                          Una vez que hayas verificado que todos los datos están
-                          correctos, puedes enviar este formato para revisión.
+                          {formatStatus === "faltante"
+                            ? "Una vez que hayas corregido todos los problemas señalados por el auditor, puedes reenviar este formato para revisión."
+                            : "Una vez que hayas verificado que todos los datos están correctos, puedes enviar este formato para revisión."}
                         </Paragraph>
                         <Button
                           type="primary"
@@ -1359,7 +1593,9 @@ export default function FormatFillPage() {
                             fontSize: "16px",
                           }}
                         >
-                          Enviar para revisión
+                          {formatStatus === "faltante"
+                            ? "Reenviar para revisión"
+                            : "Enviar para revisión"}
                         </Button>
                       </div>
                     </Card>
@@ -1372,11 +1608,13 @@ export default function FormatFillPage() {
 
       {/* Modal de confirmación para enviar */}
       <Modal
-        title="Confirmar envío"
+        title={
+          formatStatus === "faltante" ? "Confirmar reenvío" : "Confirmar envío"
+        }
         open={submitModalVisible}
         onOk={handleSubmitFormat}
         onCancel={() => setSubmitModalVisible(false)}
-        okText="Sí, enviar"
+        okText={formatStatus === "faltante" ? "Sí, reenviar" : "Sí, enviar"}
         cancelText="Cancelar"
       >
         <div className="py-2">
@@ -1387,7 +1625,29 @@ export default function FormatFillPage() {
             showIcon
             className="mb-4"
           />
-          <p>¿Estás seguro de que deseas enviar este formato para revisión?</p>
+          <div className="mb-4">
+            <Text strong>
+              {formatStatus === "faltante"
+                ? "Describe las correcciones realizadas:"
+                : "Comentarios adicionales (opcional):"}
+            </Text>
+            <Input.TextArea
+              rows={4}
+              value={auditeeComments}
+              onChange={(e) => setAuditeeComments(e.target.value)}
+              placeholder={
+                formatStatus === "faltante"
+                  ? "Describa las correcciones que ha realizado en respuesta a los comentarios del auditor."
+                  : "Agregue comentarios o notas adicionales para el auditor."
+              }
+              className="mt-2"
+            />
+          </div>
+          <p>
+            {formatStatus === "faltante"
+              ? "¿Estás seguro de que deseas reenviar este formato para revisión?"
+              : "¿Estás seguro de que deseas enviar este formato para revisión?"}
+          </p>
         </div>
       </Modal>
     </div>

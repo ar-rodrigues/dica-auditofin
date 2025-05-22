@@ -4,6 +4,7 @@ import {
   createFormatValue,
   bulkInsertFormatValues,
   bulkUpdateFormatValues,
+  bulkDeleteFormatValues,
 } from "./formatValues";
 
 export async function GET(request) {
@@ -73,6 +74,48 @@ export async function PUT(request) {
       {
         success: false,
         message: error.message || "Error al actualizar valores",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    if (searchParams.has("bulkdelete")) {
+      const { ids } = await request.json();
+
+      if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Se requiere un array de IDs válido",
+          },
+          { status: 400 }
+        );
+      }
+
+      const response = await bulkDeleteFormatValues(ids);
+      return NextResponse.json(response, {
+        status: response.success ? 200 : 400,
+      });
+    }
+
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          "Operación no soportada. Use el endpoint específico para eliminar un valor individual.",
+      },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error("Error al eliminar valores:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message || "Error al eliminar valores",
       },
       { status: 500 }
     );

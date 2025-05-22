@@ -17,7 +17,7 @@ export async function getEntitiesFormats(filters = {}) {
         area:entities_areas(*, predecessor:predecessor(id, first_name, last_name, email), successor:successor(id, first_name, last_name, email)), 
         auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email)),
         format_entries:format_entries(*),
-        values:format_values(id, cell_ref, value, header_id(id, header, type, order))`
+        values:format_values(id, cell_ref, value, is_valid, header_id(id, header, type, order))`
       )
       .match(matchFilters);
 
@@ -54,7 +54,8 @@ export async function getEntityFormatById(id) {
         area:entities_areas(*, predecessor:predecessor(id, first_name, last_name, email), successor:successor(id, first_name, last_name, email)), 
         auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email)),
         format_entries:format_entries(*, modified_by(id, role, first_name, last_name, email), reviewed_by(auditor(id, first_name, last_name, email))),
-        values:format_values(id,cell_ref, value, header_id(id, header, type, order))`
+        values:format_values(id, cell_ref, value, is_valid, header_id(id, header, type, order))
+        `
       )
       .eq("id", id);
 
