@@ -9,7 +9,6 @@ import { useMemo } from "react";
  * @returns {Object} { columns, dataSource } - Columnas y datos listos para usar en Table
  */
 export function useFormatTable(values, headers) {
-  console.log(values);
   return useMemo(() => {
     if (!values || !headers || values.length === 0 || headers.length === 0) {
       return { columns: [], dataSource: [] };

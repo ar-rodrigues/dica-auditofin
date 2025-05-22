@@ -4,6 +4,10 @@ import { createClient } from "@/utils/supabase/server";
 export async function getEntitiesFormats(filters = {}) {
   const supabase = await createClient();
   try {
+    // Extract auditor_user_id from filters, keep the rest for match()
+    const { auditor_user_id, ...matchFilters } = filters;
+
+    // Execute the Supabase query with the remaining filters
     const { data, error } = await supabase
       .from("entities_formats")
       .select(
@@ -15,7 +19,7 @@ export async function getEntitiesFormats(filters = {}) {
         format_entries:format_entries(*),
         values:format_values(id, cell_ref, value, header_id(id, header, type, order))`
       )
-      .match(filters);
+      .match(matchFilters);
 
     if (error) {
       throw new Error(
@@ -23,7 +27,15 @@ export async function getEntitiesFormats(filters = {}) {
       );
     }
 
-    return { data, success: true };
+    // If auditor_user_id is provided, filter the results
+    let filteredData = data;
+    if (auditor_user_id) {
+      filteredData = data.filter(
+        (format) => format.auditor?.auditor?.id === auditor_user_id
+      );
+    }
+
+    return { data: filteredData, success: true };
   } catch (error) {
     console.error("Error al obtener los formatos de entidades:", error);
     return { data: [], success: false };

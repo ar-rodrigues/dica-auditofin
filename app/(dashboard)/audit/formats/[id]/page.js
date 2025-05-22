@@ -286,8 +286,13 @@ export default function FormatFillPage() {
     reader.onload = (e) => {
       try {
         const data = new Uint8Array(e.target.result);
-        // Leer el archivo Excel
-        const workbook = XLSX.read(data, { type: "array" });
+        // Leer el archivo Excel con opciones para preservar el formato de fechas
+        const workbook = XLSX.read(data, {
+          type: "array",
+          cellDates: true,
+          cellText: true,
+          cellStyles: true,
+        });
 
         // Obtener la primera hoja
         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
@@ -327,7 +332,19 @@ export default function FormatFillPage() {
               const headerName = excelHeaders[C];
 
               if (cell && cell.v !== undefined && cell.v !== null) {
-                row[headerName] = cell.v;
+                // Obtener el valor formateado para las fechas en lugar del valor numérico interno
+                if (
+                  cell.t === "d" ||
+                  (cell.w &&
+                    !isNaN(cell.v) &&
+                    typeof cell.v === "number" &&
+                    cell.v > 1000)
+                ) {
+                  // Si es una fecha o parece un número que podría ser una fecha en Excel
+                  row[headerName] = cell.w || cell.v;
+                } else {
+                  row[headerName] = cell.v;
+                }
                 // Almacenar la referencia de celda (por ejemplo A3, B2, etc.)
                 row[`${headerName}_cell_ref`] = cellAddress;
                 isEmpty = false;
@@ -407,7 +424,28 @@ export default function FormatFillPage() {
                     }
                     break;
                   case "date":
-                    if (isNaN(new Date(value).getTime())) {
+                    // Si es una cadena que parece una fecha o un objeto Date
+                    if (typeof value === "object" && value instanceof Date) {
+                      // Ya es un objeto Date, es válido
+                    } else if (
+                      typeof value === "string" &&
+                      value.trim() !== ""
+                    ) {
+                      // Intentar convertir la cadena a fecha
+                      const dateObj = new Date(value);
+                      if (isNaN(dateObj.getTime())) {
+                        errors.push({
+                          row: rowIndex + 1,
+                          column: matchingExcelHeader,
+                          message: "Formato de fecha inválido",
+                          value: value,
+                        });
+                        rowHasError = true;
+                      }
+                    } else if (typeof value === "number" && value > 1000) {
+                      // Probablemente es una fecha en formato Excel (días desde 1900/1904)
+                      // La consideramos válida ya que se mostrará formateada
+                    } else {
                       errors.push({
                         row: rowIndex + 1,
                         column: matchingExcelHeader,
@@ -608,13 +646,21 @@ export default function FormatFillPage() {
             const valueKey = cellRef || `${headerId}`;
             const existingValue = existingValuesMap.get(valueKey);
 
+            // Asegurarse de que el valor se guarde con el formato adecuado
+            let valueToSave = row[header];
+
+            // Si es un objeto Date, convertirlo a formato de cadena adecuado
+            if (valueToSave instanceof Date) {
+              valueToSave = valueToSave.toLocaleDateString("es-ES");
+            }
+
             if (existingValue) {
               // Actualizar valor existente
               valuesForInsert.push({
                 id: existingValue.id,
                 entry_id: entryId,
                 header_id: headerId,
-                value: String(row[header]),
+                value: String(valueToSave),
                 cell_ref: cellRef,
                 entities_formats_id: entityFormatId,
               });
@@ -623,7 +669,7 @@ export default function FormatFillPage() {
               valuesForInsert.push({
                 entry_id: entryId,
                 header_id: headerId,
-                value: String(row[header]),
+                value: String(valueToSave),
                 cell_ref: cellRef,
                 entities_formats_id: entityFormatId,
               });
