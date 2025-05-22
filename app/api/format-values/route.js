@@ -3,6 +3,7 @@ import {
   getFormatValues,
   createFormatValue,
   bulkInsertFormatValues,
+  bulkUpdateFormatValues,
 } from "./formatValues";
 
 export async function GET(request) {
@@ -42,6 +43,36 @@ export async function POST(request) {
       {
         success: false,
         message: error.message || "Error al crear el valor",
+      },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    if (searchParams.has("bulkupdate")) {
+      const valuesArray = await request.json();
+      const response = await bulkUpdateFormatValues(valuesArray);
+      return NextResponse.json(response, {
+        status: response.success ? 200 : 400,
+      });
+    }
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          "Operación no soportada. Use el endpoint específico para actualizar un valor.",
+      },
+      { status: 400 }
+    );
+  } catch (error) {
+    console.error("Error al actualizar valores:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: error.message || "Error al actualizar valores",
       },
       { status: 500 }
     );

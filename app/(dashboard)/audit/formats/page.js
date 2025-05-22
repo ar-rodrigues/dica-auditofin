@@ -1,11 +1,15 @@
 "use client";
 
 import React, { useEffect, useState, useMemo } from "react";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 import { Spin, Result, Tag, Button, Input, Select } from "antd";
 import { useRouter } from "next/navigation";
 import { useFetchUser } from "@/hooks/useFetchUser";
 import { useUsers } from "@/hooks/useUsers";
 import { useEntitiesFormats } from "@/hooks/useEntitiesFormats";
+import { useFormatEntries } from "@/hooks/useFormatEntries";
 import AuditHeader from "@/components/common/AuditHeader";
 import AuditAssignmentTable from "@/components/Audit/AuditAssignmentTable";
 import AuditAssignmentDetails from "@/components/Audit/AuditAssignmentDetails";
@@ -16,7 +20,13 @@ import {
   ExclamationCircleOutlined,
   EyeOutlined,
   SearchOutlined,
+  FormOutlined,
+  LoadingOutlined,
 } from "@ant-design/icons";
+
+// Extend dayjs with plugins
+dayjs.extend(utc);
+dayjs.extend(timezone);
 
 const { Option } = Select;
 
@@ -29,6 +39,11 @@ export default function AuditFormatsPage() {
     entitiesFormats,
     loading: formatsLoading,
   } = useEntitiesFormats();
+  const {
+    fetchFormatEntries,
+    createFormatEntry,
+    loading: entriesLoading,
+  } = useFormatEntries();
   const [entity, setEntity] = useState(null);
   const [formats, setFormats] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -36,6 +51,7 @@ export default function AuditFormatsPage() {
   const [search, setSearch] = useState("");
   const [areaFilter, setAreaFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [processingId, setProcessingId] = useState(null);
 
   useEffect(() => {
     const load = async () => {
@@ -64,7 +80,18 @@ export default function AuditFormatsPage() {
     if (!userLoading) load();
   }, [user, userLoading]);
 
-  console.log(entity);
+  // Handle format navigation
+  const handleFormatAction = async (record) => {
+    setProcessingId(record.id);
+    try {
+      // Simply navigate to the format page - we'll check for entries there
+      router.push(`/audit/formats/${record.id}`);
+    } catch (err) {
+      console.error("Error handling format action:", err);
+    } finally {
+      setProcessingId(null);
+    }
+  };
 
   // Filtered formats
   const filteredFormats = useMemo(() => {
@@ -120,6 +147,47 @@ export default function AuditFormatsPage() {
     pendiente: "Pendiente",
     faltante: "Faltante",
     aprobado: "Aprobado",
+  };
+
+  // Button text and icon based on status
+  const getButtonProps = (status) => {
+    switch (status) {
+      case "asignado":
+        return {
+          text: "Llenar",
+          icon: <FormOutlined />,
+          disabled: false,
+          type: "primary",
+        };
+      case "pendiente":
+        return {
+          text: "En revisión",
+          icon: <LoadingOutlined />,
+          disabled: true,
+          type: "default",
+        };
+      case "faltante":
+        return {
+          text: "Revisar",
+          icon: <ExclamationCircleOutlined />,
+          disabled: false,
+          type: "primary",
+        };
+      case "aprobado":
+        return {
+          text: "Ver",
+          icon: <EyeOutlined />,
+          disabled: false,
+          type: "primary",
+        };
+      default:
+        return {
+          text: "Ver",
+          icon: <EyeOutlined />,
+          disabled: false,
+          type: "primary",
+        };
+    }
   };
 
   // Table columns (read-only, no actions except Acciones)
@@ -213,18 +281,24 @@ export default function AuditFormatsPage() {
       title: "Acciones",
       key: "acciones",
       width: 120,
-      render: (_, record) => (
-        <Button
-          type="primary"
-          icon={<EyeOutlined />}
-          onClick={(e) => {
-            e.stopPropagation();
-            router.push(`/audit/formats/${record.id}`);
-          }}
-        >
-          Ver
-        </Button>
-      ),
+      render: (_, record) => {
+        const buttonProps = getButtonProps(record.status);
+        const isProcessing = processingId === record.id;
+
+        return (
+          <Button
+            type={buttonProps.type}
+            icon={isProcessing ? <LoadingOutlined /> : buttonProps.icon}
+            disabled={buttonProps.disabled || isProcessing}
+            onClick={(e) => {
+              e.stopPropagation();
+              handleFormatAction(record);
+            }}
+          >
+            {isProcessing ? "Procesando..." : buttonProps.text}
+          </Button>
+        );
+      },
     },
   ];
 

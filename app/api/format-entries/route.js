@@ -31,6 +31,7 @@ export async function GET(request) {
 export async function POST(request) {
   try {
     const entryData = await request.json();
+    //console.log("entryData", entryData);
     const response = await createFormatEntry(entryData);
     return NextResponse.json(response, { status: 201 });
   } catch (error) {

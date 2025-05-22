@@ -6,11 +6,45 @@ export async function getFormatEntries(filters = {}) {
   try {
     const { data, error } = await supabase
       .from("format_entries")
-      .select("*, values:format_values(*)")
+      .select(
+        `*,
+        entities_formats_id:entities_formats(
+          auditor(auditor(id, first_name, last_name, email)), 
+          format(
+            *,
+            created_by(id, role, first_name, last_name, email),
+            headers:format_headers(id, header, type, order)
+          )
+        ),
+        reviewed_by(*),
+        modified_by(id, first_name, last_name, email)
+        `
+      )
       .match(filters);
     if (error) {
       throw new Error(`Error al obtener las entradas: ${error.message}`);
     }
+
+    // Si hay entradas, obtener también sus valores
+    if (data && data.length > 0) {
+      const entryIds = data.map((entry) => entry.id);
+      const { data: valuesData, error: valuesError } = await supabase
+        .from("format_values")
+        .select("*")
+        .in("entry_id", entryIds);
+
+      if (valuesError) {
+        throw new Error(`Error al obtener valores: ${valuesError.message}`);
+      }
+
+      // Agregar valores a cada entrada
+      data.forEach((entry) => {
+        entry.values = valuesData.filter(
+          (value) => value.entry_id === entry.id
+        );
+      });
+    }
+
     return { data, success: true };
   } catch (error) {
     console.error("Error al obtener las entradas:", error);
@@ -23,7 +57,25 @@ export async function getFormatEntryById(id) {
   try {
     const { data, error } = await supabase
       .from("format_entries")
-      .select("*, values:format_values(*)")
+      .select(
+        `*,
+        entities_formats_id:entities_formats(
+        entity(*),
+          auditor(auditor(id, first_name, last_name, email)), 
+          format(
+            *,
+            created_by(id, role, first_name, last_name, email),
+            headers:format_headers(id, header, type, order)
+          ),
+          due_date,
+          area(*, entity(*), predecessor(id, first_name, last_name, email), successor(id, first_name, last_name, email)),
+          status,
+          is_active
+        ),
+        reviewed_by(*),
+        modified_by(id, first_name, last_name, email)
+        `
+      )
       .eq("id", id);
     if (error) {
       throw new Error(
@@ -37,6 +89,20 @@ export async function getFormatEntryById(id) {
         message: `Entrada con id ${id} no encontrada`,
       };
     }
+
+    // Obtener los valores asociados a esta entrada
+    const { data: valuesData, error: valuesError } = await supabase
+      .from("format_values")
+      .select("*")
+      .eq("entry_id", id);
+
+    if (valuesError) {
+      throw new Error(`Error al obtener valores: ${valuesError.message}`);
+    }
+
+    // Agregar valores a la entrada
+    data[0].values = valuesData;
+
     return { data: data[0], success: true };
   } catch (error) {
     console.error("Error al obtener la entrada por id:", error);
@@ -137,23 +203,57 @@ export async function deleteFormatEntry(id) {
 export async function getFormatEntriesExcel(format_id) {
   const supabase = await createClient();
   try {
+    // Primero, obtenemos el formato_id desde la tabla entities_formats
+    const { data: entityFormatData, error: entityFormatError } = await supabase
+      .from("entities_formats")
+      .select("format")
+      .eq("id", format_id)
+      .single();
+
+    if (entityFormatError) {
+      throw new Error(
+        `Error al obtener el formato: ${entityFormatError.message}`
+      );
+    }
+
+    if (!entityFormatData || !entityFormatData.format) {
+      throw new Error(
+        `No se encontró el formato para la entidad con ID ${format_id}`
+      );
+    }
+
+    const realFormatId = entityFormatData.format;
+
     // Obtener headers del formato
     const { data: headers, error: headersError } = await supabase
       .from("format_headers")
       .select("id, header, type, order")
-      .eq("format_id", format_id)
+      .eq("format_id", realFormatId)
       .order("order", { ascending: true });
+
     if (headersError)
       throw new Error(
         `Error al obtener los encabezados: ${headersError.message}`
       );
+
+    if (!headers || headers.length === 0) {
+      return {
+        data: [],
+        headers: [],
+        success: true,
+        message: "No hay encabezados definidos para este formato",
+      };
+    }
+
     // Obtener todas las entradas para el formato
     const { data: entries, error: entriesError } = await supabase
       .from("format_entries")
-      .select("id, filled_by, created_at")
-      .eq("format_id", format_id);
+      .select("id, version, created_at, modified_at, modified_by")
+      .eq("entities_formats_id", format_id);
+
     if (entriesError)
       throw new Error(`Error al obtener las entradas: ${entriesError.message}`);
+
     // Obtener todos los valores para las entradas
     const entryIds = entries.map((e) => e.id);
     let values = [];
@@ -166,13 +266,15 @@ export async function getFormatEntriesExcel(format_id) {
         throw new Error(`Error al obtener los valores: ${valuesError.message}`);
       values = valuesData;
     }
+
     // Construir estructura tipo Excel
     const headerMap = Object.fromEntries(headers.map((h) => [h.id, h.header]));
     const rows = entries.map((entry) => {
       const row = {
         id: entry.id,
-        filled_by: entry.filled_by,
+        version: entry.version,
         created_at: entry.created_at,
+        modified_at: entry.modified_at,
       };
       headers.forEach((h) => {
         const val = values.find(
@@ -182,6 +284,7 @@ export async function getFormatEntriesExcel(format_id) {
       });
       return row;
     });
+
     return { data: rows, headers, success: true };
   } catch (error) {
     console.error("Error al obtener datos tipo Excel:", error);

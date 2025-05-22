@@ -159,3 +159,29 @@ export async function bulkInsertFormatValues(valuesArray) {
     return { data: null, success: false, message: error.message };
   }
 }
+
+export async function bulkUpdateFormatValues(valuesArray) {
+  const supabase = await createClient();
+  try {
+    if (!Array.isArray(valuesArray) || valuesArray.length === 0) {
+      throw new Error("El array de valores está vacío o no es válido");
+    }
+    const { data, error } = await supabase
+      .from("format_values")
+      .upsert(valuesArray)
+      .select("*");
+    if (error) {
+      throw new Error(
+        `Error al actualizar valores masivamente: ${error.message}`
+      );
+    }
+    return {
+      data,
+      success: true,
+      message: "Valores actualizados exitosamente",
+    };
+  } catch (error) {
+    console.error("Error en actualización masiva de valores:", error);
+    return { data: null, success: false, message: error.message };
+  }
+}

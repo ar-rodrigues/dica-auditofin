@@ -19,6 +19,8 @@ export default function TabMenu() {
   const pathname = usePathname();
   const { userRole, loading: loadingUserRole } = useUserRole();
 
+  //console.log(userRole);
+
   const [current, setCurrent] = useState(() =>
     getCurrentMenuKey(pathname, sidebarItems)
   );

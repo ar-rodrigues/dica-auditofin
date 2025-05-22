@@ -166,6 +166,35 @@ export const useFormatValues = () => {
     }
   };
 
+  // Bulk update values
+  const bulkUpdateFormatValues = async (valuesArray) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("/api/format-values?bulkupdate=1", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(valuesArray),
+      });
+      const result = await response.json();
+      if (result.success) {
+        await fetchFormatValues();
+        return { success: true, data: result.data };
+      } else {
+        setError(result.message || "Error al actualizar valores masivamente");
+        return { success: false, error: result.message };
+      }
+    } catch (err) {
+      setError("Ocurrió un error al actualizar valores masivamente");
+      return {
+        success: false,
+        error: "Ocurrió un error al actualizar valores masivamente",
+      };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     values,
     value,
@@ -177,5 +206,6 @@ export const useFormatValues = () => {
     updateFormatValue,
     deleteFormatValue,
     bulkInsertFormatValues,
+    bulkUpdateFormatValues,
   };
 };

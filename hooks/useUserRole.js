@@ -6,6 +6,8 @@ export const useUserRole = () => {
   const [loading, setLoading] = useState(true);
   const { user } = useFetchUser();
 
+  //console.log("hook", userRole);
+
   useEffect(() => {
     const fetchUserRole = async () => {
       try {

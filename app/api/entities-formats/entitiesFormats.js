@@ -9,19 +9,23 @@ export async function getEntitiesFormats(filters = {}) {
       .select(
         `*, 
         entity:entities(*), 
-        format:formats(*), 
+        format:formats(*, created_by(id, role, first_name, last_name, email), headers:format_headers(id, header, type, order)), 
         area:entities_areas(*, predecessor:predecessor(id, first_name, last_name, email), successor:successor(id, first_name, last_name, email)), 
-        auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email))`
+        auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email)),
+        format_entries:format_entries(*),
+        values:format_values(id, cell_ref, value, header_id(id, header, type, order))`
       )
       .match(filters);
 
     if (error) {
-      throw new Error(`Failed to fetch entities formats: ${error.message}`);
+      throw new Error(
+        `Error al obtener los formatos de entidades: ${error.message}`
+      );
     }
 
     return { data, success: true };
   } catch (error) {
-    console.error("Error fetching entities formats:", error);
+    console.error("Error al obtener los formatos de entidades:", error);
     return { data: [], success: false };
   }
 }
@@ -32,13 +36,19 @@ export async function getEntityFormatById(id) {
     const { data, error } = await supabase
       .from("entities_formats")
       .select(
-        "*, entity:entities(*), format:formats(*), area:entities_areas(*, predecessor:predecessor(id, first_name, last_name, email), successor:successor(id, first_name, last_name, email)), auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email))"
+        `*, 
+        entity:entities(*), 
+        format:formats(*, created_by(id, role, first_name, last_name, email), headers:format_headers(id, header, type, order)), 
+        area:entities_areas(*, predecessor:predecessor(id, first_name, last_name, email), successor:successor(id, first_name, last_name, email)), 
+        auditor:auditors_for_entities(*, auditor: profiles(id, first_name, last_name, email)),
+        format_entries:format_entries(*, modified_by(id, role, first_name, last_name, email), reviewed_by(auditor(id, first_name, last_name, email))),
+        values:format_values(id,cell_ref, value, header_id(id, header, type, order))`
       )
       .eq("id", id);
 
     if (error) {
       throw new Error(
-        `Failed to fetch entity format with id ${id}: ${error.message}`
+        `Error al obtener el formato de entidad con id ${id}: ${error.message}`
       );
     }
 
@@ -46,13 +56,13 @@ export async function getEntityFormatById(id) {
       return {
         data: null,
         success: false,
-        message: `Entity format with id ${id} not found`,
+        message: `Formato de entidad con id ${id} no encontrado`,
       };
     }
 
     return { data: data[0], success: true };
   } catch (error) {
-    console.error("Error fetching entity format by id:", error);
+    console.error("Error al obtener el formato de entidad por id:", error);
     return { data: null, success: false };
   }
 }
@@ -66,16 +76,16 @@ export async function createEntityFormat(entityFormat) {
       .select("*");
 
     if (error) {
-      throw new Error(`Failed to create entity format: ${error.message}`);
+      throw new Error(`Error al crear el formato de entidad: ${error.message}`);
     }
 
     return {
       data: data[0],
       success: true,
-      message: "Entity format created successfully",
+      message: "Formato de entidad creado exitosamente",
     };
   } catch (error) {
-    console.error("Error creating entity format:", error);
+    console.error("Error al crear el formato de entidad:", error);
     return { data: null, success: false };
   }
 }
@@ -91,7 +101,7 @@ export async function updateEntityFormat(id, entityFormat) {
 
     if (error) {
       throw new Error(
-        `Failed to update entity format with id ${id}: ${error.message}`
+        `Error al actualizar el formato de entidad con id ${id}: ${error.message}`
       );
     }
 
@@ -99,17 +109,17 @@ export async function updateEntityFormat(id, entityFormat) {
       return {
         data: null,
         success: false,
-        message: `Entity format with id ${id} not found`,
+        message: `Formato de entidad con id ${id} no encontrado`,
       };
     }
 
     return {
       data: data[0],
       success: true,
-      message: "Entity format updated successfully",
+      message: "Formato de entidad actualizado exitosamente",
     };
   } catch (error) {
-    console.error("Error updating entity format:", error);
+    console.error("Error al actualizar el formato de entidad:", error);
     return { data: null, success: false };
   }
 }
@@ -126,14 +136,14 @@ export async function deleteEntityFormat(id) {
 
     if (existingError) {
       throw new Error(
-        `Failed to check entity format existence: ${existingError.message}`
+        `Error al verificar la existencia del formato de entidad: ${existingError.message}`
       );
     }
 
     if (!existingData) {
       return {
         success: false,
-        message: `Entity format with id ${id} not found`,
+        message: `Formato de entidad con id ${id} no encontrado`,
       };
     }
 
@@ -144,16 +154,19 @@ export async function deleteEntityFormat(id) {
 
     if (error) {
       throw new Error(
-        `Failed to delete entity format with id ${id}: ${error.message}`
+        `Error al eliminar el formato de entidad con id ${id}: ${error.message}`
       );
     }
 
     return {
       success: true,
-      message: "Entity format deleted successfully",
+      message: "Formato de entidad eliminado exitosamente",
     };
   } catch (error) {
-    console.error("Error deleting entity format:", error);
-    return { success: false, message: "Failed to delete entity format" };
+    console.error("Error al eliminar el formato de entidad:", error);
+    return {
+      success: false,
+      message: "Error al eliminar el formato de entidad",
+    };
   }
 }
