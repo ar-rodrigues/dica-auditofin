@@ -309,39 +309,81 @@ export const sidebarItems = [
   },
   {
     key: "3",
-    label: "Auditoría",
+    label: "Planeación",
     icon: <AuditOutlined />,
     url: "/audit",
     permissions: ["admin", "super admin"],
     children: [
       {
-        key: "3.1",
-        label: "Listado de Requerimientos",
-        url: "/requirements",
-        permissions: ["admin", "super admin"],
+        key: "3.0",
+        label: "Listados",
+        children: [
+          {
+            key: "3.0.1",
+            label: "Listado de Requerimientos",
+            url: "/requirements",
+          },
+          {
+            key: "3.0.2",
+            label: "Listado de Formato",
+            url: "/formats",
+          },
+        ],
       },
       {
-        key: "3.2",
-        label: "Requerimientos por Entidad",
-        url: "/entity-requirements",
-        permissions: ["admin", "super admin"],
+        key: "3.1",
+        label: "Asignaciones",
+        children: [
+          {
+            key: "3.1.1",
+            label: "Asignación de Requerimientos",
+            url: "/entity-requirements",
+          },
+          {
+            key: "3.1.2",
+            label: "Asignación de Formato",
+            url: "/entity-formats",
+          },
+        ],
       },
     ],
   },
-  // {
-  //   key: "7",
-  //   label: "Auditoría",
-  //   icon: <AuditOutlined />,
-  //   permissions: ["admin", "super admin"],
-  //   url: "/audit",
-  // },
-  // {
-  //   key: "8",
-  //   label: "Auditor",
-  //   icon: <AuditOutlined />,
-  //   permissions: ["admin", "super admin"],
-  //   url: "/auditor",
-  // },
+  {
+    key: "4",
+    label: "Auditor",
+    icon: <AuditOutlined />,
+    permissions: ["admin", "super admin"],
+    children: [
+      {
+        key: "4.1",
+        label: "Requerimientos",
+        url: "/auditor/requirements",
+      },
+      {
+        key: "4.2",
+        label: "Formatos",
+        url: "/auditor/formats",
+      },
+    ],
+  },
+  {
+    key: "5",
+    label: "Auditados",
+    icon: <AuditOutlined />,
+    permissions: ["admin", "super admin"],
+    children: [
+      {
+        key: "5.1",
+        label: "Requerimientos",
+        url: "/audit/requirements",
+      },
+      {
+        key: "5.2",
+        label: "Formatos",
+        url: "/audit/formats",
+      },
+    ],
+  },
   {
     key: "9",
     label: "Reportes",
