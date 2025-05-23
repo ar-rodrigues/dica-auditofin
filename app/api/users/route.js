@@ -46,9 +46,11 @@ export async function POST(request) {
       throw new Error(`Error al crear el usuario: ${userError.message}`);
     }
 
+    console.log("newUser", newUser);
+
     // Step 2: Create the profile
     try {
-      newProfile = await createProfile(newUser, newUserData);
+      newProfile = await createProfile(newUser.data, newUserData);
     } catch (profileError) {
       console.error("Profile creation error:", profileError);
       // If profile creation fails, clean up the user
@@ -62,7 +64,17 @@ export async function POST(request) {
       throw new Error(`Error al crear el perfil: ${profileError.message}`);
     }
 
-    // Step 3: Send welcome email
+    // Step 3: Ensure profile was created
+    if (!newProfile) {
+      try {
+        await deleteUser(newUser.id);
+      } catch (cleanupError) {
+        console.error("Error cleaning up user:", cleanupError);
+      }
+      throw new Error("No se pudo crear el perfil");
+    }
+
+    // Step 4: Send welcome email
     try {
       await sendWelcomeEmail(
         newUserData.email,
