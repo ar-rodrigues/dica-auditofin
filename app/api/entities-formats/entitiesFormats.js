@@ -5,7 +5,8 @@ export async function getEntitiesFormats(filters = {}) {
   const supabase = await createClient();
   try {
     // Extract auditor_user_id from filters, keep the rest for match()
-    const { auditor_user_id, ...matchFilters } = filters;
+    const { auditor_user_id, predecessor_id, successor_id, ...matchFilters } =
+      filters;
 
     // Execute the Supabase query with the remaining filters
     const { data, error } = await supabase
@@ -32,6 +33,14 @@ export async function getEntitiesFormats(filters = {}) {
     if (auditor_user_id) {
       filteredData = data.filter(
         (format) => format.auditor?.auditor?.id === auditor_user_id
+      );
+    } else if (predecessor_id) {
+      filteredData = data.filter(
+        (format) => format.area?.predecessor?.id === predecessor_id
+      );
+    } else if (successor_id) {
+      filteredData = data.filter(
+        (format) => format.area?.successor?.id === successor_id
       );
     }
 
