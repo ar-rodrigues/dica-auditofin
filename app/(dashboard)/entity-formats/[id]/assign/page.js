@@ -92,25 +92,10 @@ export default function AssignFormatsPage() {
           fetchUsers({ entity: entityId }),
         ]);
 
-      console.log("Data loaded:", {
-        entityData,
-        areasData,
-        formatsData,
-        assignedData,
-        usersData,
-      });
-
       setEntity(entityData || null);
       setAreas(Array.isArray(areasData) ? areasData : []);
       setFormats(Array.isArray(formatsData) ? formatsData : []);
       setAssignedFormats(Array.isArray(assignedData) ? assignedData : []);
-
-      console.log("State updated:", {
-        entity: entityData || null,
-        areas: Array.isArray(areasData) ? areasData : [],
-        formats: Array.isArray(formatsData) ? formatsData : [],
-        assignedFormats: Array.isArray(assignedData) ? assignedData : [],
-      });
     } catch (err) {
       console.error("Error loading data:", err);
       message.error("Error al cargar los datos");
@@ -132,16 +117,6 @@ export default function AssignFormatsPage() {
     loadData();
   }, [entityId]);
 
-  // Add effect to log state changes
-  useEffect(() => {
-    console.log("State changed:", {
-      entity,
-      areas,
-      formats,
-      assignedFormats,
-    });
-  }, [entity, areas, formats, assignedFormats]);
-
   // Fetch auditors for the current entity
   useEffect(() => {
     const fetchAuditors = async () => {
@@ -160,17 +135,19 @@ export default function AssignFormatsPage() {
     // Only run on entityId change
   }, [entityId]);
 
-  console.log("areas", areas);
-  //   console.log("requirements", requirements);
-  //   console.log("assignedRequirements", assignedRequirements);
-  console.log("entity id", entityId);
-
   const handleGoBack = () => {
     router.push(`/entity-formats/${entityId}`);
   };
 
   const handleAreaSelect = (area) => {
     setSelectedArea(area);
+    setAreaUsers((prev) => ({
+      ...prev,
+      [area.id]: {
+        predecessor: area.predecessor.id,
+        successor: area.successor.id,
+      },
+    }));
   };
 
   // Area predecessor/successor state handlers
@@ -463,12 +440,12 @@ export default function AssignFormatsPage() {
               />
             </div>
             {selectedArea && (
-              <div className="mb-4 flex gap-4">
-                <div>
-                  <span>Predecesor: </span>
+              <div className="mb-4 flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col gap-2">
+                  <span className="font-medium">Predecessor:</span>
                   <ConfigProvider locale={esES}>
                     <Select
-                      style={{ minWidth: 220 }}
+                      style={{ width: "100%", minWidth: 220 }}
                       placeholder="Seleccionar predecesor"
                       value={areaUsers[selectedArea.id]?.predecessor}
                       onChange={(userId) =>
@@ -525,11 +502,11 @@ export default function AssignFormatsPage() {
                     </Select>
                   </ConfigProvider>
                 </div>
-                <div>
-                  <span>Sucesor: </span>
+                <div className="flex flex-col gap-2">
+                  <span className="font-medium">Successor:</span>
                   <ConfigProvider locale={esES}>
                     <Select
-                      style={{ minWidth: 220 }}
+                      style={{ width: "100%", minWidth: 220 }}
                       placeholder="Seleccionar sucesor"
                       value={areaUsers[selectedArea.id]?.successor}
                       onChange={(userId) =>
@@ -686,100 +663,110 @@ export default function AssignFormatsPage() {
                               marginTop: 4,
                             }}
                           >
-                            <span
-                              style={{
-                                fontWeight: 500,
-                                marginRight: 6,
-                                minWidth: 70,
-                              }}
-                            >
-                              <UserOutlined
-                                style={{ color: "#1890ff", marginRight: 4 }}
-                              />{" "}
-                              Auditor:
-                            </span>
-                            {entityAuditors.length > 0 ? (
-                              <Select
-                                key="auditor-select"
-                                style={{
-                                  minWidth: 220,
-                                  maxWidth: 320,
-                                  marginRight: 12,
-                                }}
-                                placeholder="Seleccionar auditor"
-                                showSearch
-                                optionFilterProp="children"
-                                value={(() => {
-                                  const assignment = assignedFormats.find(
-                                    (f) =>
-                                      f.format.id === format.id &&
-                                      f.area.id === selectedArea.id
-                                  );
-                                  if (!assignment?.auditor) return undefined;
-                                  return assignment.auditor.id;
-                                })()}
-                                onChange={(auditorId) =>
-                                  handleAssignAuditor(format, auditorId ?? null)
-                                }
-                                loading={auditorLoading[format.id]}
-                                disabled={auditorLoading[format.id]}
-                                allowClear
-                                dropdownStyle={{
-                                  minWidth: 300,
-                                  maxHeight: 250,
-                                  overflowY: "auto",
-                                }}
-                                optionLabelProp="children"
-                              >
-                                {auditorsForEntities
-                                  .filter((item) => item.entity.id === entityId)
-                                  .map((item) => (
-                                    <Select.Option
-                                      key={item.id}
-                                      value={item.id}
-                                    >
-                                      <div
-                                        style={{
-                                          display: "flex",
-                                          flexDirection: "column",
-                                          alignItems: "flex-start",
-                                          lineHeight: 1.2,
-                                        }}
+                            <div className="flex flex-col gap-2">
+                              <span className="font-medium flex items-center">
+                                <UserOutlined
+                                  style={{ color: "#1890ff", marginRight: 4 }}
+                                />
+                                Auditor:
+                              </span>
+                              {entityAuditors.length > 0 ? (
+                                <Select
+                                  key="auditor-select"
+                                  style={{
+                                    width: "100%",
+                                    minWidth: 220,
+                                    maxWidth: "100%",
+                                  }}
+                                  placeholder="Seleccionar auditor"
+                                  showSearch
+                                  optionFilterProp="children"
+                                  value={(() => {
+                                    const assignment = assignedFormats.find(
+                                      (f) =>
+                                        f.format.id === format.id &&
+                                        f.area.id === selectedArea.id
+                                    );
+                                    if (!assignment?.auditor) return undefined;
+                                    return assignment.auditor.id;
+                                  })()}
+                                  onChange={(auditorId) =>
+                                    handleAssignAuditor(
+                                      format,
+                                      auditorId ?? null
+                                    )
+                                  }
+                                  loading={auditorLoading[format.id]}
+                                  disabled={auditorLoading[format.id]}
+                                  allowClear
+                                  dropdownStyle={{
+                                    minWidth: 300,
+                                    maxHeight: 250,
+                                    overflowY: "auto",
+                                  }}
+                                  optionLabelProp="children"
+                                >
+                                  {auditorsForEntities
+                                    .filter(
+                                      (item) => item.entity.id === entityId
+                                    )
+                                    .map((item) => (
+                                      <Select.Option
+                                        key={item.id}
+                                        value={item.id}
                                       >
-                                        <span style={{ fontWeight: 500 }}>
-                                          {item.auditor.first_name}{" "}
-                                          {item.auditor.last_name}
-                                        </span>
-                                        <span
+                                        <div
                                           style={{
-                                            color: "#888",
-                                            fontSize: 13,
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            alignItems: "flex-start",
+                                            lineHeight: 1.2,
                                           }}
                                         >
-                                          {item.auditor.email}
-                                        </span>
-                                      </div>
-                                    </Select.Option>
-                                  ))}
-                              </Select>
-                            ) : (
-                              <>
-                                <Text type="secondary" style={{ fontSize: 15 }}>
-                                  No hay auditores asignados
-                                </Text>
-                                <Button
-                                  type="primary"
-                                  icon={<PlusOutlined />}
-                                  onClick={() =>
-                                    router.push(`/entities/edit/${entityId}`)
-                                  }
-                                >
-                                  Asignar
-                                </Button>
-                              </>
-                            )}
+                                          <span style={{ fontWeight: 500 }}>
+                                            {item.auditor.first_name}{" "}
+                                            {item.auditor.last_name}
+                                          </span>
+                                          <span
+                                            style={{
+                                              color: "#888",
+                                              fontSize: 13,
+                                            }}
+                                          >
+                                            {item.auditor.email}
+                                          </span>
+                                        </div>
+                                      </Select.Option>
+                                    ))}
+                                </Select>
+                              ) : (
+                                <>
+                                  <Text
+                                    type="secondary"
+                                    style={{ fontSize: 15 }}
+                                  >
+                                    No hay auditores asignados
+                                  </Text>
+                                  <Button
+                                    type="primary"
+                                    icon={<PlusOutlined />}
+                                    onClick={() =>
+                                      router.push(`/entities/edit/${entityId}`)
+                                    }
+                                  >
+                                    Asignar
+                                  </Button>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <div style={{ marginTop: 8 }}>
+                          <div
+                            style={{ marginTop: 8 }}
+                            className="flex flex-col gap-2"
+                          >
+                            <span className="font-medium">
+                              Fecha de vencimiento:
+                            </span>
                             <ConfigProvider locale={esES}>
                               <DatePicker
                                 value={(() => {
